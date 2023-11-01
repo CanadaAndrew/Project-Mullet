@@ -1,9 +1,6 @@
-# Project-Mulligan
+# Project-Mullet
 Beauty App for Melissa Wright
+As of right now, whatever you want to test a certain page, switch the name.js and name.tx to App.js and App.tsx
 
-Programmers:
-Adrian Gonzalez //Test
-Andrew Covert //Test
-Cameron Ingersoll //Test
-Wilson Toy //Test
-Leaith Rawashdeh //Test
+Install the dependencies(if haven't):
+npx expo install expo-linear-gradient
