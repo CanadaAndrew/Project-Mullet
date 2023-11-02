@@ -4,6 +4,7 @@ import React from 'react';
 import {SafeAreaView, ScrollView} from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
+
 export default function ClientAp(){
 
     const cutName = ['Sam Smith', 'Bob Smith','Jane Doe', 'Grant Jackson' ]
@@ -37,7 +38,7 @@ export default function ClientAp(){
                     <Calendar />
                 </SafeAreaView>
             </View>
-            
+
             <View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
                 <View style = {styles.textAlignment}>
                     <Text style = {styles.appointText}>Customer:</Text>
