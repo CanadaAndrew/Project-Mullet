@@ -1,6 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import {SafeAreaView, ScrollView} from 'react-native';
+import { Calendar } from 'react-native-calendars';
 
 export default function ModifyAv() {
 
@@ -30,8 +32,11 @@ export default function ModifyAv() {
 
                         </Pressable>
                     </View>
-                    <View style={styles.calendar}>
-                        <Text style={styles.calendarText}>Calendar Implementation</Text>
+                    
+                    <View>
+                    <SafeAreaView style={styles.container}>
+                        <Calendar />
+                    </SafeAreaView>
                     </View>
 
                     <View style={styles.dateContainer}>

@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View, Pressable} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
+import {SafeAreaView, ScrollView} from 'react-native';
+import { Calendar } from 'react-native-calendars';
 
 
 export default function ClientAp(){
@@ -30,6 +32,13 @@ export default function ClientAp(){
                     </Pressable>
                 </View>
             </View>
+
+            <View>
+                <SafeAreaView style={styles.container}>
+                    <Calendar />
+                </SafeAreaView>
+            </View>
+
             <View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
                 <View style = {styles.textAlignment}>
                     <Text style = {styles.appointText}>Customer:</Text>
