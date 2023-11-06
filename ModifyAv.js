@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {SafeAreaView, ScrollView} from 'react-native';
@@ -6,9 +6,49 @@ import { Calendar } from 'react-native-calendars';
 
 export default function ModifyAv() {
 
+    // State variable that is initialized to null
+    // selectDate stores the selectedState by the user
+    // setSelectedDate is a function that updates the value of selectDate
+    // setSelectDate is called when the uder clicks on a date and that in turn updates selectDate
+    const [selectedDate, setSelectedDate] = useState(null);
+
     const listOfTimes = [
         '7:00am', '8:00am', '9:00am', '10:00am', '11:00am', '12:00pm', '1:00pm', '2:00pm'
     ]
+
+    //Getter functions
+    const getSelectedDay = () => {
+        if (selectedDate) {
+            return selectedDate.day;
+        }
+        return null;
+    }
+
+    const getSelectedMonth = () => {
+        if (selectedDate) {
+            return selectedDate.month;
+        }
+        return null;
+    }
+
+    const getSelectedYear = () => {
+        if (selectedDate) {
+            return selectedDate.year;
+        }
+        return null;
+    }
+
+    const getSelectedFullDate = () => {
+        if (selectedDate) {
+            return `${selectedDate.day}-${selectedDate.month}-${selectedDate.year}`;
+        }
+        return null;
+    }
+
+    // function that is called by the onDayPress built in function that in turn calls the setSelctedDate function
+    const handleDayPress = (day) => {
+        setSelectedDate(day);
+    }
 
     return (
         <>
@@ -35,7 +75,9 @@ export default function ModifyAv() {
                     
                     <View>
                     <SafeAreaView style={styles.container}>
-                        <Calendar />
+                        <Calendar 
+                            onDayPress={(day) => handleDayPress(day)}
+                        />
                     </SafeAreaView>
                     </View>
 
@@ -121,6 +163,7 @@ export default function ModifyAv() {
         </>
         
     );
+
 }
 
 const styles = StyleSheet.create({
