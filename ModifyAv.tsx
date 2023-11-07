@@ -8,12 +8,15 @@ import {
     View,
     SafeAreaView,
     ScrollView,
-    Pressable
+    Pressable,
+    FlatList,
 } from 'react-native';
+import AppointmentButton from './AppointmentButton';
 
-export default function ModifyAv() {
-        const listOfTimes = [
-            '7:00am', '8:00am', '9:00am', '10:00am', '11:00am', '12:00pm', '1:00pm', '2:00pm'
+export default function ModifyAv() { 
+        {/*demo data from queried db, used leading space to keep auto button width uniform*/}
+        const listOfTimes = [ 
+            ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
         ]
 
     return (
@@ -46,38 +49,23 @@ export default function ModifyAv() {
                     <View style={styles.dateContainer}>
                         <Text style={styles.dateText}>Thurs, October 4th</Text>
                     </View>
-
-                    <View style={styles.timeContainer}>
-                        <View style={styles.timeRow}>
+                    <FlatList              //adds buttons for available times from db
+                        data={listOfTimes} //need to change later to items from db and account for empty set
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item }) => (
                             <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[0]}</Text>
+                                <AppointmentButton
+                                    appointmentTime={item}
+                                    onAppointmentPress={(selectedTime) => {
+                                        //used for verification only -> delete later
+                                        console.log(`Selected time: ${selectedTime}`);
+                                    }}
+                                />
                             </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[1]}</Text>
-                            </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[2]}</Text>
-                            </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[3]}</Text>
-                            </View>
-                        </View>
-                        <View style={styles.timeRow}>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[4]}</Text>
-                            </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[5]}</Text>
-                            </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[6]}</Text>
-                            </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[7]}</Text>
-                            </View>
-                        </View>
-                    </View>
-
+                        )}
+                        numColumns={4}                               //number buttons per row
+                        contentContainerStyle={styles.timeContainer} //adjust to style buttons
+                    />
                     <View style={styles.bottomButtonContainer}>
                         <View style={styles.bottomButton}>
                             <Pressable
@@ -199,11 +187,16 @@ const styles = StyleSheet.create({
         paddingBottom: 15
     },
     timeCell: {
-        width: 80,
-        paddingRight: 10
+        //width: 80,
+        paddingRight: 10,
+        width: '25%',             //Adjust width to 25% for four buttons per row
+        justifyContent: 'center', //center content vertically
+        alignItems: 'center',     //center content horizontally
+        marginBottom: 10,         //add marginBottom for spacing
+        height: 50,               //add uniform height to buttons
     },
     timeText: {
-        backgroundColor: 'white',
+        //backgroundColor: 'white',
         color: 'black',
         borderRadius: 20,
         fontSize: 15,
