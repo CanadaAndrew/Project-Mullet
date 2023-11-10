@@ -8,7 +8,7 @@ import { Link } from 'expo-router';
 
 export default function ClientAp(){
 
-    const cutName = ['Sam Smith', 'Bob Smith','Jane Doe', 'Grant Jackson' ]
+    const cutName = ['am Smith', 'Bob Smith','Jane Doe', 'Grant Jackson' ]
     const service = ["Woman's Haircut", "Men's Haircut", "Hair Extensions"]
     const date = ['10/27/23, Fri, 1:00pm', '9/10/23, Mon, 2:00pm', '11/14/23, Fri, 3:00pm', '11/15/23, Sat, 2:00pm']
     const stylist = ['Melissa Wright']
