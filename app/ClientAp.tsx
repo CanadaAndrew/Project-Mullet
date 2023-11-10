@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {SafeAreaView, ScrollView} from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import { Link } from 'expo-router';
 
 
 export default function ClientAp(){
@@ -23,13 +24,21 @@ export default function ClientAp(){
                 <View style = {styles.header}>
                      <Text style = {styles.headerTitle}>Client Appointments</Text>
                 </View>
-                <View style = {styles.backButton}>
-                    <Pressable 
-                       style = {({ pressed }) => [{ backgroundColor: pressed ? '#C154C1' : '#BE42B2'},
-                       styles.backButtonText
-                       ]}>
-                        {({ pressed }) => (<Text style = {styles.backButtonText}>Back</Text>)}
-                    </Pressable>
+                <View style = {styles.backButton}>     
+                    
+                    <Pressable
+                            style={({ pressed }) => [{
+                                backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
+                            },
+                            styles.backButtonText
+                            ]}>
+                            {({ pressed }) => (
+                                <Link href = "/" asChild>
+                                <Text style={styles.backButtonText}>Back</Text>
+                                </Link>
+                            )}
+                        </Pressable>
+                    
                 </View>
             </View>
 

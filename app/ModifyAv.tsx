@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import {SafeAreaView, ScrollView} from 'react-native';
+import {LinearGradient} from 'expo-linear-gradient';
+import {
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    SafeAreaView,
+    ScrollView,
+    Pressable,
+    FlatList,
+} from 'react-native';
+import AppointmentButton from './AppointmentButton';
 import { Calendar } from 'react-native-calendars';
+import { Link } from 'expo-router';
 
-export default function ModifyAv() {
-
-    // State variable that is initialized to null
-    // selectDate stores the selectedState by the user
-    // setSelectedDate is a function that updates the value of selectDate
-    // setSelectDate is called when the uder clicks on a date and that in turn updates selectDate
+export default function ModifyAv() { 
     const [selectedDate, setSelectedDate] = useState(null);
 
-    const listOfTimes = [
-        '7:00am', '8:00am', '9:00am', '10:00am', '11:00am', '12:00pm', '1:00pm', '2:00pm'
-    ]
-
-    //Getter functions
     const getSelectedDay = () => {
         if (selectedDate) {
             return selectedDate.day;
@@ -48,10 +49,16 @@ export default function ModifyAv() {
     // function that is called by the onDayPress built in function that in turn calls the setSelctedDate function
     const handleDayPress = (day) => {
         setSelectedDate(day);
+        console.log(`Selected day: ${getSelectedDay}`);  //For testing purposes
     }
+        {/*demo data from queried db, used leading space to keep auto button width uniform*/}
+        const listOfTimes = [ 
+            ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
+        ]
 
     return (
         <>
+            <StatusBar backgroundColor={'black'} />
             <LinearGradient
                 locations={[0.7, 1]}
                 colors={['#DDA0DD', 'white']} style={styles.container}>
@@ -67,55 +74,40 @@ export default function ModifyAv() {
                             styles.backButtonText
                             ]}>
                             {({ pressed }) => (
+                                <Link href = "/">
                                 <Text style={styles.backButtonText}>Back</Text>
+                                </Link>
                             )}
 
                         </Pressable>
                     </View>
                     
-                    <View>
-                    <SafeAreaView style={styles.container}>
-                        <Calendar 
-                            onDayPress={(day) => handleDayPress(day)}
-                        />
-                    </SafeAreaView>
-                    </View>
+                    <Calendar onDayPress={(day) => handleDayPress(day)}/>
 
+                    
                     <View style={styles.dateContainer}>
                         <Text style={styles.dateText}>Thurs, October 4th</Text>
                     </View>
-
-                    <View style={styles.timeContainer}>
-                        <View style={styles.timeRow}>
+                    <FlatList              //adds buttons for available times from db
+                        data={listOfTimes} //need to change later to items from db and account for empty set
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item }) => (
+                            
                             <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[0]}</Text>
+                                <AppointmentButton
+                                    appointmentTime={item}
+                                    onAppointmentPress={(selectedTime) => {
+                                        //used for verification only -> delete later
+                                        console.log(`Selected time: ${selectedTime}`);
+                                    }}
+                                />
                             </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[1]}</Text>
-                            </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[2]}</Text>
-                            </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[3]}</Text>
-                            </View>
-                        </View>
-                        <View style={styles.timeRow}>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[4]}</Text>
-                            </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[5]}</Text>
-                            </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[6]}</Text>
-                            </View>
-                            <View style={styles.timeCell}>
-                                <Text style={styles.timeText}>{listOfTimes[7]}</Text>
-                            </View>
-                        </View>
-                    </View>
-
+                            
+                        )}
+                        numColumns={4}                               //number buttons per row
+                        contentContainerStyle={styles.timeContainer} //adjust to style buttons
+                    />
+                   
                     <View style={styles.bottomButtonContainer}>
                         <View style={styles.bottomButton}>
                             <Pressable
@@ -161,19 +153,18 @@ export default function ModifyAv() {
                 </View>
             </LinearGradient>
         </>
-        
-    );
-
+    )
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         //backgroundColor: '#DDA0DD'
     },
     // header
     header: {
         alignItems: 'center',
-        paddingTop: 60,
+        paddingTop: 30,
         paddingBottom: 20,
         backgroundColor: '#880085'
     },
@@ -238,11 +229,16 @@ const styles = StyleSheet.create({
         paddingBottom: 15
     },
     timeCell: {
-        width: 80,
-        paddingRight: 10
+        //width: 80,
+        paddingRight: 10,
+        width: '25%',             //Adjust width to 25% for four buttons per row
+        justifyContent: 'center', //center content vertically
+        alignItems: 'center',     //center content horizontally
+        marginBottom: 10,         //add marginBottom for spacing
+        height: 50,               //add uniform height to buttons
     },
     timeText: {
-        backgroundColor: 'white',
+        //backgroundColor: 'white',
         color: 'black',
         borderRadius: 20,
         fontSize: 15,

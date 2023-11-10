@@ -18,7 +18,6 @@ web-build/
 
 #Leaith Rawashdeh ignores
 *.png
-*.json
 **/babel
 
 
