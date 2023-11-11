@@ -63,7 +63,6 @@ export default function ModifyAv() {
         setAppointmentTimes(listOfTimes);
     }, []);
 
-
     const handleAppointmentPress = (time) => {
         const updatedAppointments = [...appointmentTimes];  
         if (updatedAppointments.includes(time)) {
