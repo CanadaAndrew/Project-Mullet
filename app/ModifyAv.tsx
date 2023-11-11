@@ -22,10 +22,6 @@ export default function ModifyAv() {
         ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
     ]
 
-    useEffect(() => { //initialize appointmentTimes with demo data
-        setAppointmentTimes(listOfTimes);
-    }, []);
-
     const getSelectedDay = () => {
         if (selectedDate) {
             return selectedDate.day;
@@ -57,8 +53,15 @@ export default function ModifyAv() {
     // function that is called by the onDayPress built in function that in turn calls the setSelctedDate function
     const handleDayPress = (day) => {
         setSelectedDate(day);
-        console.log(`Selected day: ${getSelectedDay}`);  //For testing purposes
+        console.log(`Selected day: ${day.day}`);     //For testing purposes
+        console.log(`Selected month: ${day.month}`); //For testing purposes
+        console.log(`Selected year: ${day.year}`);   //For testing purposes
+        //add API call to database here using day and copy results over listOfTimes
     };
+
+    useEffect(() => { //initialize appointmentTimes with demo data
+        setAppointmentTimes(listOfTimes);
+    }, []);
 
     const handleAppointmentPress = (time) => {
         const updatedAppointments = [...appointmentTimes];  
