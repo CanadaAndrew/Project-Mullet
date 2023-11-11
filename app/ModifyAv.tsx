@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {LinearGradient} from 'expo-linear-gradient';
 import {
     StatusBar,
@@ -11,12 +11,20 @@ import {
     Pressable,
     FlatList,
 } from 'react-native';
-import AppointmentButton from './AppointmentButton';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
 
 export default function ModifyAv() { 
     const [selectedDate, setSelectedDate] = useState(null);
+    const [appointmentTimes, setAppointmentTimes] = useState([]);
+     {/*demo data from queried db, used leading space to keep auto button width uniform*/}
+     const listOfTimes = [ 
+        ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
+    ]
+
+    useEffect(() => { //initialize appointmentTimes with demo data
+        setAppointmentTimes(listOfTimes);
+    }, []);
 
     const getSelectedDay = () => {
         if (selectedDate) {
@@ -50,64 +58,65 @@ export default function ModifyAv() {
     const handleDayPress = (day) => {
         setSelectedDate(day);
         console.log(`Selected day: ${getSelectedDay}`);  //For testing purposes
-    }
-        {/*demo data from queried db, used leading space to keep auto button width uniform*/}
-        const listOfTimes = [ 
-            ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
-        ]
+    };
+
+    const handleAppointmentPress = (time) => {
+        const updatedAppointments = [...appointmentTimes];  
+        if (updatedAppointments.includes(time)) {
+            const index = updatedAppointments.indexOf(time);
+            updatedAppointments.splice(index, 1);
+        } else {
+            updatedAppointments.push(time);
+        }
+        setAppointmentTimes(updatedAppointments);
+    };
+
+    const handleSetSchedule = () => {
+        // Push the appointmentTimes array to the database here
+        console.log('Appointment Times:', appointmentTimes);       
+    };
 
     return (
         <>
             <StatusBar backgroundColor={'black'} />
-            <LinearGradient
-                locations={[0.7, 1]}
-                colors={['#DDA0DD', 'white']} style={styles.container}>
+            <LinearGradient locations={[0.7, 1]} colors={['#DDA0DD', 'white']} style={styles.container}>
                 <View style={styles.container}>
                     <View style={styles.header}>
                         <Text style={styles.headerText}>Modify Availability</Text>
                     </View>
                     <View style={styles.backButton}>
                         <Pressable
-                            style={({ pressed }) => [{
-                                backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
-                            },
-                            styles.backButtonText
-                            ]}>
+                            style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]}
+                        >
                             {({ pressed }) => (
                                 <Link href = "/">
-                                <Text style={styles.backButtonText}>Back</Text>
+                                    <Text style={styles.backButtonText}>Back</Text>
                                 </Link>
                             )}
-
                         </Pressable>
                     </View>
-                    
                     <Calendar onDayPress={(day) => handleDayPress(day)}/>
-
-                    
                     <View style={styles.dateContainer}>
                         <Text style={styles.dateText}>Thurs, October 4th</Text>
                     </View>
                     <FlatList              //adds buttons for available times from db
                         data={listOfTimes} //need to change later to items from db and account for empty set
                         keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item }) => (
-                            
+                        renderItem={({ item }) => (               
                             <View style={styles.timeCell}>
-                                <AppointmentButton
-                                    appointmentTime={item}
-                                    onAppointmentPress={(selectedTime) => {
-                                        //used for verification only -> delete later
-                                        console.log(`Selected time: ${selectedTime}`);
-                                    }}
-                                />
+                                <TouchableOpacity
+                                    style={[styles.button, { backgroundColor: 'white' }]}
+                                    onPress={() => handleAppointmentPress(item)}
+                                >
+                                    <Text style={[styles.buttonText, { color: appointmentTimes.includes(item) ? 'green' : 'red' }]}>
+                                        {item}
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
-                            
                         )}
                         numColumns={4}                               //number buttons per row
                         contentContainerStyle={styles.timeContainer} //adjust to style buttons
                     />
-                   
                     <View style={styles.bottomButtonContainer}>
                         <View style={styles.bottomButton}>
                             <Pressable
@@ -120,7 +129,6 @@ export default function ModifyAv() {
                                 {({ pressed }) => (
                                     <Text style={styles.bottomButtonText}>Add Times</Text>
                                 )}
-
                             </Pressable>
                         </View>
                         <View style={styles.bottomButton}>
@@ -133,28 +141,24 @@ export default function ModifyAv() {
                                 {({ pressed }) => (
                                     <Text style={styles.bottomButtonText}>Delete Times</Text>
                                 )}
-
                             </Pressable>
                         </View>
                         <View style={styles.bottomButton}>
                             <Pressable
                                 style={({ pressed }) => [{
                                     backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
-                                },
-                                styles.bottomButtonText
-                                ]}>
-                                {({ pressed }) => (
-                                    <Text style={styles.bottomButtonText}>Set Schedule</Text>
-                                )}
-
+                                }, styles.bottomButtonText]}
+                                onPress={handleSetSchedule} // Attach the function to the onPress event
+                                >
+                                <Text style={styles.bottomButtonText}>Set Schedule</Text>
                             </Pressable>
                         </View>
                     </View>
                 </View>
             </LinearGradient>
         </>
-    )
-}
+    );    
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -237,15 +241,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,         //add marginBottom for spacing
         height: 50,               //add uniform height to buttons
     },
-    timeText: {
-        //backgroundColor: 'white',
-        color: 'black',
-        borderRadius: 20,
-        fontSize: 15,
-        paddingTop: 5,
-        paddingBottom: 5,
-        textAlign: 'center'
-    },
     // bottom three buttons
     bottomButtonContainer: {
         //backgroundColor: 'lightgreen',
@@ -269,6 +264,14 @@ const styles = StyleSheet.create({
         //elevation: 10,
         shadowColor: 'black',
         shadowOpacity: 0.1
-    }
-
+    },
+    button: {
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });
