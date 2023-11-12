@@ -10,6 +10,7 @@ import {
     ScrollView,
     Pressable,
     FlatList,
+    Modal,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
@@ -74,8 +75,13 @@ export default function ModifyAv() {
         setAppointmentTimes(updatedAppointments);
     };
 
+   
+    const [modalVisible, setModalVisible] = useState(false); //popup for set schedule
     const handleSetSchedule = () => {
         // Push the appointmentTimes array to the database here
+
+        setModalVisible(!modalVisible); //toggle popup
+  
         console.log('Appointment Times:', appointmentTimes);       
     };
 
@@ -159,6 +165,25 @@ export default function ModifyAv() {
                     </View>
                 </View>
             </LinearGradient>
+
+            <Modal visible={modalVisible}> 
+        <View style={{ flex: 1 }}>
+          <Text>Hello!</Text>
+
+        
+                                
+        
+          <Pressable 
+            style={({ pressed }) => [{
+                backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
+            }, styles.bottomButtonText]}
+           onPress={() => setModalVisible(!modalVisible)}>
+           <Text >Hide Modal</Text>
+        
+          </Pressable>
+        </View>
+      </Modal>
+
         </>
     );    
 };
