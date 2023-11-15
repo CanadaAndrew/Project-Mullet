@@ -117,7 +117,7 @@ export default function setupAppointment2() {
                             </Pressable>
                         </View>
                         <View style={styles.logoContainer}>
-                            <Image source={require('../assets/logo.png')} style={styles.logo} />
+                            <Image source={require('./images/logo.png')} style={styles.logo} />
                         </View>
                     </View>
 
@@ -194,15 +194,15 @@ export default function setupAppointment2() {
                             <View style = {styles.availableLegendContainer}>
                                 <Text style={styles.availableLegendText}>{legendWords[0]}</Text>
                                 <View style = {styles.availableLegendDotCell}>
-                                    <Image source={require('../assets/black_dot.png')} style={styles.availableLegendDot} />
+                                    <Image source={require('./images/black_dot.png')} style={styles.availableLegendDot} />
                                 </View>
                                 <Text style={styles.availableLegendText}>{legendWords[1]}</Text>
                                 <View style={styles.availableLegendDotCell}>
-                                    <Image source={require('../assets/red_dot.png')} style={styles.availableLegendDot} />
+                                    <Image source={require('./images/red_dot.png')} style={styles.availableLegendDot} />
                                 </View>
                                 <Text style={styles.availableLegendText}>{legendWords[2]}</Text>
                                 <View style={styles.availableLegendDotCell}>
-                                    <Image source={require('../assets/green_dot.png')} style={styles.availableLegendDot} />
+                                    <Image source={require('./images/green_dot.png')} style={styles.availableLegendDot} />
                                 </View>
                             </View>
                         </View>
