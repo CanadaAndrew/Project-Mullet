@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     // header color
     header: {
         backgroundColor: '#942989',
-        paddingTop: 60,
+        paddingTop: 30,
         paddingBottom: 20,
         alignItems: 'center'
     },
