@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Pressable, Image, ImageBackground} from 'react-
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import React from 'react';
-
+import { Calendar } from 'react-native-calendars';
 export default function setUpAppoint1(){
 
     return(
@@ -49,10 +49,14 @@ export default function setUpAppoint1(){
                     <Text>drop down menu placeholder</Text>
                 </View>
 
-                <Text style = {styles.objectTitle}> Select Perfered Days:</Text>
-                {/*dummy calendar placeholder*/}
+                <Text style = {styles.objectTitle}>Select Preferred Days:</Text>
                 <View style = {[styles.dummyCalendar, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                    <Text>calendar placeholder</Text>
+               {/*Basic calendar implementation. No interactivity.*/}
+                <Calendar
+                        onDayPress={day => {
+                           console.log('selected day', day);
+                        }}
+                />
                 </View>
 
                 {/*appointment button no functionality yet*/}
