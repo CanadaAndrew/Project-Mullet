@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function ModifyAv() { 
     const [selectedDate, setSelectedDate] = useState(null);
@@ -75,6 +76,7 @@ export default function ModifyAv() {
         setAppointmentTimes(updatedAppointments);
     };
 
+<<<<<<< Updated upstream
    
     const [modalVisible, setModalVisible] = useState(false); //popup for set schedule
     const handleSetSchedule = () => {
@@ -83,6 +85,33 @@ export default function ModifyAv() {
         setModalVisible(!modalVisible); //toggle popup
   
         console.log('Appointment Times:', appointmentTimes);       
+=======
+    
+ const [modalVisible, setModalVisible] = useState(false); //popup for set schedule
+ const handleSetSchedule = () => {
+     //TODO: Push the appointmentTimes array to the database here
+     setModalVisible(!modalVisible);
+
+     console.log('Appointment Times:', appointmentTimes);       
+ };
+ const [date, setDate] = useState(new Date(1598051700000));
+    const [mode, setMode] = useState('date');
+    const [show, setShow] = useState(false);
+  
+    const onChange = (event, selectedDate) => {
+      const currentDate = selectedDate;
+      setShow(false);
+      setDate(currentDate);
+    };
+  
+    const showMode = (currentMode) => {
+      setShow(true);
+      setMode(currentMode);
+    };
+
+    const showTimepicker = () => {
+      showMode('time');
+>>>>>>> Stashed changes
     };
 
     return (
@@ -166,7 +195,12 @@ export default function ModifyAv() {
                 </View>
             </LinearGradient>
 
+<<<<<<< Updated upstream
             <Modal visible={modalVisible}> 
+=======
+
+    <Modal visible={modalVisible}> 
+>>>>>>> Stashed changes
         <View style={{ flex: 1 }}>
           <Text>Hello!</Text>
 
@@ -181,6 +215,30 @@ export default function ModifyAv() {
            <Text >Hide Modal</Text>
         
           </Pressable>
+<<<<<<< Updated upstream
+=======
+
+
+
+          <Pressable onPress={showTimepicker}  >
+          <Text>Show time picker!</Text>
+          </Pressable>
+
+        <Text>selected: {date.toLocaleTimeString()}</Text>
+        <Text>selected: {date.toTimeString()}</Text>
+        <Text>selected: {date.getTime()}</Text>
+        <Text>selected: {date.getHours()}</Text>
+        <Text>selected: {date.getMinutes()}</Text>
+        {show && (
+          <DateTimePicker
+            value={date}
+            mode={'time'}
+            is24Hour={false}
+            onChange={onChange}
+            
+          />
+        )}
+>>>>>>> Stashed changes
         </View>
       </Modal>
 
