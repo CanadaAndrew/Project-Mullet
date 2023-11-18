@@ -1,12 +1,44 @@
-import { StyleSheet, Text, View, Pressable, Image, ImageBackground} from 'react-native';
+import { StyleSheet, Text, View, Pressable, Image, ImageBackground, ScrollView} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import React from 'react';
 import { Calendar } from 'react-native-calendars';
+import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
+
+//made this available for all pages in the app
+export let hairStyleSelected: string[] = [];
+
 export default function setUpAppoint1(){
+
+    //useState for drop down menu
+    const [selected, setSelected] = React.useState("");
+
+    //options for drop down menu
+    const hairOptions = [
+        {key: 'Mens Haircut', value: 'Mens Haircut'},
+        {key: 'Womens Haircut', value: 'Womens Haircut'},
+        {key: 'Hair Color', value: 'Hair Color'},
+        {key: 'Extensions', value: 'Extensions'}
+    ]
+
+    //the hairStyleSelected string array that is able to be given to different pages
+    //let hairStyleSelected: string[] = [];
+
+    //function that handles the selection of the drop down menu
+    //converts selected items to a string so it is 100% a string, splits selected based on "," and stores
+    //them in the global hairStyleSelected array
+    function handleHairSelection(selected)
+    {
+        let temparr: string[] = [];
+
+        var temp = selected.toString();
+        temparr = temp.split(",");
+        hairStyleSelected = temparr;
+    }
 
     return(
         <>
+        <ScrollView>
           <View style = {styles.container}>
 
             {/*added logo image use imagebackground in order for back button to overlap image*/}
@@ -44,9 +76,26 @@ export default function setUpAppoint1(){
             <View style = {styles.background}>
 
                 <Text style = {styles.objectTitle}> Schedule an Appointment</Text>
-                {/*dummy dropdown placeholder*/}
-                <View style = {[styles.dummyDropDown, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                    <Text>drop down menu placeholder</Text>
+
+                {/*
+                -----multiple select drop down list-----
+                this is kinda cool because it concatinates every selection onto the next as a CSV-like object and it takes them off
+                in order automatically if you deselect the item. handles the selection up above
+                */}
+                <View>
+                    <MultipleSelectList
+                        setSelected = {(val) => setSelected(val)}
+                        data={hairOptions}
+                        boxStyles = {styles.dropDown}
+                        dropdownStyles = {{backgroundColor:'white'}}
+                        badgeStyles = {styles.badgeStyle}
+                        maxHeight = {270}
+                        save = 'value'
+                        search = {false}
+                        label = "Hair Options"
+                        placeholder = "Hair Options"
+                        onSelect = {() => handleHairSelection(selected) }
+                    />
                 </View>
 
                 <Text style = {styles.objectTitle}>Select Preferred Days:</Text>
@@ -71,9 +120,11 @@ export default function setUpAppoint1(){
             </LinearGradient>
 
           </View>
+        </ScrollView>
         </>
     );
 }
+
 
 const styles = StyleSheet.create({
     container:{
@@ -86,13 +137,14 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     // temporary dummy drop down
-    dummyDropDown: {
+    dropDown: {
         backgroundColor: 'white',
         margin: 15,
         paddingTop: 10,
-        paddingBottom: 10,
-        paddingRight: 100,
-        paddingLeft: 100
+        //paddingBottom: 10,
+        //paddingRight: 150,
+        //paddingLeft: 100,
+        padding: 100
     },
     // temporary dummy calendar
     dummyCalendar: {
@@ -179,5 +231,9 @@ const styles = StyleSheet.create({
         paddingTop: 5,
         paddingBottom: 5,
 
+    },
+    badgeStyle: {
+        textAlign: 'center',
+        backgroundColor: '#C154C1',
     }
 })
