@@ -14,7 +14,11 @@ import {
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
+<<<<<<< Updated upstream
 import DateTimePicker from "@react-native-community/datetimepicker";
+=======
+import DateTimePicker from '@react-native-community/datetimepicker';
+>>>>>>> Stashed changes
 
 export default function ModifyAv() { 
     const [selectedDate, setSelectedDate] = useState(null);
@@ -52,6 +56,7 @@ export default function ModifyAv() {
         return null;
     }
 
+   
     // function that is called by the onDayPress built in function that in turn calls the setSelctedDate function
     const handleDayPress = (day) => {
         setSelectedDate(day);
@@ -77,6 +82,7 @@ export default function ModifyAv() {
     };
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
    
     const [modalVisible, setModalVisible] = useState(false); //popup for set schedule
     const handleSetSchedule = () => {
@@ -88,12 +94,16 @@ export default function ModifyAv() {
 =======
     
  const [modalVisible, setModalVisible] = useState(false); //popup for set schedule
+=======
+    const [modalVisible, setModalVisible] = useState(false); //popup for set schedule
+>>>>>>> Stashed changes
  const handleSetSchedule = () => {
      //TODO: Push the appointmentTimes array to the database here
      setModalVisible(!modalVisible);
 
      console.log('Appointment Times:', appointmentTimes);       
  };
+<<<<<<< Updated upstream
  const [date, setDate] = useState(new Date(1598051700000));
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
@@ -112,7 +122,47 @@ export default function ModifyAv() {
     const showTimepicker = () => {
       showMode('time');
 >>>>>>> Stashed changes
+=======
+    
+ //NOTE: Date is set in Unix timestamp format, using a converter highly recommended. https://www.epochconverter.com/
+    const [date1, setDate1] = useState(new Date(1700326800000));
+    const [show1, setShow1] = useState(false);
+  
+    const onChange1 = (event, selectedDate) => {
+      const currentDate = selectedDate;
+      setShow1(false);
+      setDate1(currentDate);
+>>>>>>> Stashed changes
     };
+  
+    const showTimePicker1 = () => {setShow1(true); };
+
+    const [date2, setDate2] = useState(new Date(1700355600000));
+    const [show2, setShow2] = useState(false);
+  
+    const onChange2 = (event, selectedDate2) => {
+      const currentDate2 = selectedDate2;
+      setShow2(false);
+      setDate2(currentDate2);
+    };
+  
+    const showTimePicker2 = () => {setShow2(true); };
+
+    const getTime1 = () => {
+
+        return (date1.getHours()*100) + date1.getMinutes();
+    }
+
+    const getTime2 = () => {
+
+        return (date2.getHours()*100) + date2.getMinutes();
+        
+    }
+
+    
+
+
+
 
     return (
         <>
@@ -196,17 +246,24 @@ export default function ModifyAv() {
             </LinearGradient>
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             <Modal visible={modalVisible}> 
 =======
 
     <Modal visible={modalVisible}> 
 >>>>>>> Stashed changes
+=======
+            <Modal visible={modalVisible}> 
+>>>>>>> Stashed changes
         <View style={{ flex: 1 }}>
           <Text>Hello!</Text>
 
         
+<<<<<<< Updated upstream
                                 
         
+=======
+>>>>>>> Stashed changes
           <Pressable 
             style={({ pressed }) => [{
                 backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
@@ -215,6 +272,7 @@ export default function ModifyAv() {
            <Text >Hide Modal</Text>
         
           </Pressable>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 =======
 
@@ -242,6 +300,45 @@ export default function ModifyAv() {
         </View>
       </Modal>
 
+=======
+
+
+
+          <Pressable onPress={showTimePicker1}  >
+          <Text>Show time picker #1!</Text>
+          </Pressable>
+
+          <Pressable onPress={showTimePicker2}  >
+          <Text>Show time picker #2!</Text>
+          </Pressable>
+
+        
+        <Text>time 1: {date1.getHours()} : {date1.getMinutes()}</Text>
+        <Text>time 1 const: {getTime1()}</Text>
+        <Text>time 2: {date2.getHours()} : {date2.getMinutes()}</Text>
+        <Text>time 2 const: {getTime2()}</Text>
+        {show1 && (
+          <DateTimePicker
+            value={date1}
+            mode={'time'}
+            is24Hour={false}
+            onChange={onChange1}
+            
+          />
+        )}
+
+        {show2 && (
+          <DateTimePicker
+            value={date2}
+            mode={'time'}
+            is24Hour={false}
+            onChange={onChange2}
+            
+          />
+        )}
+        </View>
+      </Modal>
+>>>>>>> Stashed changes
         </>
     );    
 };
@@ -293,7 +390,7 @@ const styles = StyleSheet.create({
     calendarText: {
         color: 'black'
     },
-    // date
+    // date1
     dateContainer: {
         //backgroundColor: 'lightblue',
         height: 35
