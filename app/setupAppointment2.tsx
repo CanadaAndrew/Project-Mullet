@@ -6,169 +6,112 @@ import {
     Text,
     TouchableOpacity,
     View,
-    SafeAreaView,
-    ScrollView,
     Pressable,
     FlatList,
     Image
 } from 'react-native';
-import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
 
-export default function setupAppointment2() {
+export default function SetupAppointment2() {
     const [selectedDate, setSelectedDate] = useState(null);
-    const [appointmentTimes, setAppointmentTimes] = useState([]);
-    {/*demo data from queried db, used leading space to keep auto button width uniform*/ }
-    const listOfTimes = [
-        ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
-    ]
+    const [appointmentTimes, setAppointmentTimes] = useState([]); //list of selected times to push to db upon confirmation
+    const [selectedTime, setSelectedTime] = useState(null);       //updates the selected time state
 
-    // dummy input.  change later.
+    const listOfTimes = [ //dummy data for testing purposes -> get data from db either from query in setupAppointment1 or this screen on initialization with date from setupAppointment1
+        ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
+    ];
+
     const month = [
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
-    ]
-    const services = [
-        //'Service 1', 'Service 2', 'Service 3', 'Service 4'
-        'Women\'s Haircut'
-    ]
-    const dates = [
-        //'1', '8', '17', '24'
-        '24th', '27th'
-    ]
-    const dummyDates = [
-        'Tues, Oct 24th', 'Fri, Oct 27th'
-    ]
-    const legendWords = [
-        'Available:', 'Unavailable:', 'Selected:'
-    ]
+    ];
 
-    // functions
-    const getSelectedDay = () => {
-        if (selectedDate) {
-            return selectedDate.day;
-        }
-        return null;
-    }
+    const services = ['Women\'s Haircut'];
 
-    const getSelectedMonth = () => {
-        if (selectedDate) {
-            return selectedDate.month;
-        }
-        return null;
-    }
+    const dates = ['24th'];
+    const dummyDates = ['Tues, Oct 24th'];
 
-    const getSelectedYear = () => {
-        if (selectedDate) {
-            return selectedDate.year;
-        }
-        return null;
-    }
+    const legendWords = ['Available:', 'Selected:'];
 
-    const getSelectedFullDate = () => {
-        if (selectedDate) {
-            return `${selectedDate.day}-${selectedDate.month}-${selectedDate.year}`;
-        }
-        return null;
-    }
-
-    // function that is called by the onDayPress built in function that in turn calls the setSelctedDate function
-    const handleDayPress = (day) => {
-        setSelectedDate(day);
-        console.log(`Selected day: ${day.day}`);     //For testing purposes
-        console.log(`Selected month: ${day.month}`); //For testing purposes
-        console.log(`Selected year: ${day.year}`);   //For testing purposes
-        //add API call to database here using day and copy results over listOfTimes
-    };
-
-    useEffect(() => { //initialize appointmentTimes with demo data
+    useEffect(() => {
         setAppointmentTimes(listOfTimes);
     }, []);
 
     const handleAppointmentPress = (time) => {
-        const updatedAppointments = [...appointmentTimes];
-        if (updatedAppointments.includes(time)) {
-            const index = updatedAppointments.indexOf(time);
-            updatedAppointments.splice(index, 1);
-        } else {
-            updatedAppointments.push(time);
-        }
-        setAppointmentTimes(updatedAppointments);
-    };
-
-    const handleSetSchedule = () => {
-        // Push the appointmentTimes array to the database here
-        console.log('Appointment Times:', appointmentTimes);
+        setSelectedTime((prevTime) => {
+            const newTime = prevTime === time ? null : time;
+            console.log('selected time: ' + newTime); //for testing purposes
+            return newTime;
+        });
     };
 
     return (
         <>
             <StatusBar backgroundColor={'black'} />
-                <View style={styles.container}>
-                    <View style={styles.header}>
-                        <View style={styles.backButton}>
-                            <Pressable
-                                style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText]}
-                            >
-                                {({ pressed }) => (
-                                    <Link href="/">
-                                        <Text style={styles.backButtonText}>Back</Text>
-                                    </Link>
-                                )}
-                            </Pressable>
-                        </View>
-                        <View style={styles.logoContainer}>
-                            <Image source={require('./images/logo.png')} style={styles.logo} />
-                        </View>
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <View style={styles.backButton}>
+                        <Pressable
+                            style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText]}
+                        >
+                            {({ pressed }) => (
+                                <Link href="/">
+                                    <Text style={styles.backButtonText}>Back</Text>
+                                </Link>
+                            )}
+                        </Pressable>
                     </View>
+                    <View style={styles.logoContainer}>
+                        <Image source={require('./images/logo.png')} style={styles.logo} />
+                    </View>
+                </View>
 
-                    <LinearGradient locations={[0.8, 1]} colors={['#DDA0DD', 'white']} style={styles.linearGradientStyle}>
-                    <View style = {styles.body}>
+                <LinearGradient locations={[0.8, 1]} colors={['#DDA0DD', 'white']} style={styles.linearGradientStyle}>
+                    <View style={styles.body}>
                         <View style={styles.appointmentInfoContainer}>
                             <View style={styles.appointmentHeader}>
                                 <Text style={styles.appointmentText}>Schedule an Appointment</Text>
                             </View>
                             <View style={styles.appointmentServicesSelected}>
                                 <Text style={styles.appointmentText}>Services Selected:</Text>
-                                <FlatList              //adds buttons for available times from db
-                                    data={services} //need to change later to items from db and account for empty set
+                                <FlatList
+                                    data={services}
                                     renderItem={({ item }) => (
                                         <Text style={styles.appointmentText}>
                                             {item}{', '}
                                         </Text>
                                     )}
-                                    horizontal = {true}
-                                //contentContainerStyle={styles.timeContainer} //adjust to style buttons
+                                    horizontal={true}
                                 />
                             </View>
                             <View style={styles.appointmentDateChosen}>
-                                <Text style={styles.appointmentText}>Date/Dates Chosen:</Text>
-                                <FlatList              //adds buttons for available times from db
-                                    data={dates} //need to change later to items from db and account for empty set
+                                <Text style={styles.appointmentText}>Date Chosen:</Text>
+                                <FlatList
+                                    data={dates}
                                     renderItem={({ item }) => (
                                         <Text style={styles.appointmentText}>
-                                            {item}{', '}
+                                            {item}
                                         </Text>
                                     )}
-                                    horizontal = {true}
+                                    horizontal={true}
                                 />
                             </View>
                         </View>
-                        <View style = {styles.availableContainer}>
+                        <View style={styles.availableContainer}>
                             <View style={styles.availableTimesHeader}>
                                 <Text style={styles.appointmentText}>Available Times:</Text>
                             </View>
-                            <View style = {styles.availableIterable}>
-                                <FlatList              //adds buttons for available times from db
-                                    data={dummyDates} //need to change later to items from db and account for empty set
+                            <View style={styles.availableIterable}>
+                                <FlatList
+                                    data={dummyDates}
                                     keyExtractor={(item, index) => index.toString()}
                                     renderItem={({ item }) => (
-                                        <View style = {styles.availableViewInFlatList}>
-                                            <View style = {styles.availableDateContainer}>
+                                        <View style={styles.availableViewInFlatList}>
+                                            <View style={styles.availableDateContainer}>
                                                 <Text style={styles.availableDateText}>{item}</Text>
                                             </View>
                                             <View style={styles.availableTimeContainer}>
-                                                <FlatList              //adds buttons for available times from db
-                                                    data={listOfTimes} //need to change later to items from db and account for empty set
+                                                <FlatList
+                                                    data={listOfTimes}
                                                     keyExtractor={(item, index) => index.toString()}
                                                     renderItem={({ item }) => (
                                                         <View style={styles.availableTimeCell}>
@@ -176,14 +119,14 @@ export default function setupAppointment2() {
                                                                 style={[styles.availableTimeCellButton, { backgroundColor: 'white' }]}
                                                                 onPress={() => handleAppointmentPress(item)}
                                                             >
-                                                                <Text style={[styles.availableTimeCellText, { color: appointmentTimes.includes(item) ? 'green' : 'red' }]}>
+                                                                <Text style={[styles.availableTimeCellText, { color: selectedTime === item ? 'green' : 'black' }]}>
                                                                     {item}
                                                                 </Text>
                                                             </TouchableOpacity>
                                                         </View>
                                                     )}
-                                                    numColumns={4}                               //number buttons per row
-                                                    contentContainerStyle={styles.availableTimeContainer} //adjust to style buttons
+                                                    numColumns={4}
+                                                    contentContainerStyle={styles.availableTimeContainer}
                                                 />
                                             </View>
                                         </View>
@@ -191,22 +134,18 @@ export default function setupAppointment2() {
                                     contentContainerStyle={styles.availableIterable}
                                 />
                             </View>
-                            <View style = {styles.availableLegendContainer}>
+                            <View style={styles.availableLegendContainer}>
                                 <Text style={styles.availableLegendText}>{legendWords[0]}</Text>
-                                <View style = {styles.availableLegendDotCell}>
+                                <View style={styles.availableLegendDotCell}>
                                     <Image source={require('./images/black_dot.png')} style={styles.availableLegendDot} />
                                 </View>
                                 <Text style={styles.availableLegendText}>{legendWords[1]}</Text>
-                                <View style={styles.availableLegendDotCell}>
-                                    <Image source={require('./images/red_dot.png')} style={styles.availableLegendDot} />
-                                </View>
-                                <Text style={styles.availableLegendText}>{legendWords[2]}</Text>
                                 <View style={styles.availableLegendDotCell}>
                                     <Image source={require('./images/green_dot.png')} style={styles.availableLegendDot} />
                                 </View>
                             </View>
                         </View>
-                        <View style = {styles.confirmButtonContainer}>
+                        <View style={styles.confirmButtonContainer}>
                             <Pressable
                                 style={({ pressed }) => [{
                                     backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
@@ -219,11 +158,11 @@ export default function setupAppointment2() {
                             </Pressable>
                         </View>
                     </View>
-                    </LinearGradient>
-                </View>
+                </LinearGradient>
+            </View>
         </>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
