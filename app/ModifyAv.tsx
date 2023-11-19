@@ -92,7 +92,7 @@ export default function ModifyAv() {
                             style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]}
                         >
                             {({ pressed }) => (
-                                <Link href = "/">
+                                <Link href = "/" asChild>
                                     <Text style={styles.backButtonText}>Back</Text>
                                 </Link>
                             )}
