@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
+import axios from 'axios';  //Used to get data from the backend nodejs
+
 
 export default function ModifyAv() { 
     const [selectedDate, setSelectedDate] = useState(null);
@@ -21,6 +23,12 @@ export default function ModifyAv() {
      const listOfTimes = [ 
         ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
     ]
+
+    //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend, 
+    //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
+    const database = axios.create({
+        baseURL: 'http://10.0.0.192:3000',
+    })
 
     const getSelectedDay = () => {
         if (selectedDate) {
@@ -128,7 +136,17 @@ export default function ModifyAv() {
                                 },
                                 //styles.backButtonText
                                 styles.bottomButtonText
-                                ]}>
+                                ]}
+                                onPress={() => database.get('/customQuery',{
+                                    params:{
+                                        query: 
+                                        "SELECT * FROM ServicesWanted WHERE PhoneNumberEmail = '321-422-4215';"
+                                    }
+                                }
+                                )
+                                .then((ret) => {alert(JSON.stringify(ret.data[0]))})
+                                .catch(() =>alert('error'))}
+                                >
                                 {({ pressed }) => (
                                     <Text style={styles.bottomButtonText}>Add Times</Text>
                                 )}
