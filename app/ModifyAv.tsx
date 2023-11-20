@@ -10,9 +10,11 @@ import {
     ScrollView,
     Pressable,
     FlatList,
+    Modal,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function ModifyAv() { 
     const [selectedDate, setSelectedDate] = useState(null);
@@ -81,19 +83,28 @@ export default function ModifyAv() {
         console.log('Appointment Times:', appointmentTimes);       
     };
 
-    const [date1, setDate1] = useState(new Date(1598051700000));
-    const [date2, setDate2] = useState(new Date(1598051700000));
+    const [date1, setDate1] = useState(new Date(1700326800000));
+    const [date2, setDate2] = useState(new Date(1700355600000));
     const [show1, setShow1] = useState(false);
     const [show2, setShow2] = useState(false);
 
-    const onChange = (event, selectedDate) => {
+    const onChange1 = (event, selectedDate) => {
         const currentDate = selectedDate;
-        setShow(false);
-        setDate(currentDate);
+        setShow1(false);
+        setDate1(currentDate);
+      };
+
+      const onChange2 = (event, selectedDate) => {
+        const currentDate = selectedDate;
+        setShow2(false);
+        setDate2(currentDate);
       };
   
       const showTimePicker1 = () => {setShow1(true); };
       const showTimePicker2 = () => {setShow2(true); };
+
+      const getTime1 = () => {return (date1.getHours()*100) + date1.getMinutes();}
+      const getTime2 = () => {return (date2.getHours()*100) + date2.getMinutes();}
       
     return (
         <>
@@ -173,8 +184,54 @@ export default function ModifyAv() {
                             </Pressable>
                         </View>
                     </View>
-                </View>
-            </LinearGradient>
+<Modal visible={modalVisible}>
+<Pressable onPress={showTimePicker1}  >
+<Text>Show time picker #1!</Text>
+</Pressable>
+
+<Pressable onPress={showTimePicker2}  >
+<Text>Show time picker #2!</Text>
+</Pressable>
+
+
+<Text>time 1: {date1.getHours()} : {date1.getMinutes()}</Text>
+<Text>time 1 const: {getTime1()}</Text>
+<Text>time 2: {date2.getHours()} : {date2.getMinutes()}</Text>
+<Text>time 2 const: {getTime2()}</Text>
+{show1 && (
+<DateTimePicker
+  value={date1}
+  mode={'time'}
+  is24Hour={false}
+  onChange={onChange1}
+  
+/>
+)}
+
+{show2 && (
+<DateTimePicker
+  value={date2}
+  mode={'time'}
+  is24Hour={false}
+  onChange={onChange2}
+  
+/>
+)}
+
+<Pressable 
+            style={({ pressed }) => [{
+                backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
+            }, styles.bottomButtonText]}
+           onPress={() => setModalVisible(!modalVisible)}>
+           <Text >Hide Modal</Text>
+        
+          </Pressable>
+</Modal>
+</View>
+
+</LinearGradient>
+
+
         </>
     );    
 };
