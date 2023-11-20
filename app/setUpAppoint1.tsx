@@ -2,13 +2,13 @@ import { StyleSheet, Text, View, Pressable, Image, ImageBackground, ScrollView} 
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import React from 'react';
-import { Calendar } from 'react-native-calendars';
+import MyCalendar from './MyCalendar';
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
-export default function setUpAppoint1(){
+export default function setUpAppoint1() {
 
     //useState for drop down menu
     const [selected, setSelected] = React.useState("");
@@ -19,7 +19,12 @@ export default function setUpAppoint1(){
         {key: 'Womens Haircut', value: 'Womens Haircut'},
         {key: 'Hair Color', value: 'Hair Color'},
         {key: 'Extensions', value: 'Extensions'}
-    ]
+    ];
+        
+    /*I have genuinely no idea why this function is needed*/
+    const handleDatesSelected = (selectedDates: string[]) => {};
+
+    
 
     //the hairStyleSelected string array that is able to be given to different pages
     //let hairStyleSelected: string[] = [];
@@ -99,13 +104,11 @@ export default function setUpAppoint1(){
                 </View>
 
                 <Text style = {styles.objectTitle}>Select Preferred Days:</Text>
+
+                {/*Basic calendar implementation. Currently logs selected dates to the console and highlights them.*/
+                /*Setting disabled to true will disable the higlighting feature.*/}
                 <View style = {[styles.dummyCalendar, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-               {/*Basic calendar implementation. No interactivity.*/}
-                <Calendar
-                        onDayPress={day => {
-                           console.log('selected day', day);
-                        }}
-                />
+                    <MyCalendar pageName='setUpAppoint1' onDatesSelected={handleDatesSelected} disabled={false}/>
                 </View>
 
                 {/*appointment button no functionality yet*/}
@@ -150,10 +153,10 @@ const styles = StyleSheet.create({
     dummyCalendar: {
         backgroundColor: 'white',
         margin: 15,
-        paddingTop: 10,
-        paddingBottom: 270,
-        paddingLeft: 100,
-        paddingRight: 100,
+        paddingTop: 5,
+        paddingBottom: 50,
+        paddingLeft: 50,
+        paddingRight: 50,
     },
     // background under logo image
     background: {
