@@ -14,17 +14,26 @@ import {
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
 import MyCalendar from './MyCalendar';
+import axios from 'axios';  //Used to get data from the backend nodejs
 
-export default function ModifyAv() { 
+
+export default function ModifyAv() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]);
      {/*demo data from queried db, used leading space to keep auto button width uniform*/}
-     const listOfTimes = [ 
+     const listOfTimes = [
         ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
     ]
 
+    //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
+    //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
+    const database = axios.create({
+        baseURL: 'http://10.0.0.192:3000',
+    })
+
     /*I have genuinely no idea why this function is needed*/
     const handleDatesSelected = (selectedDates: string[]) => {};
+
 
     useEffect(() => { //initialize appointmentTimes with demo data
         setAppointmentTimes(listOfTimes);
@@ -102,7 +111,26 @@ export default function ModifyAv() {
                                 },
                                 //styles.backButtonText
                                 styles.bottomButtonText
-                                ]}>
+                                ]}
+                                /**
+                                 * Example on how to custom query, for the basic queries the second arguement is not needed
+                                 * Please form exactly how it is for a custom query with params:{query: queryString}
+                                 */
+                                onPress={() => database.get('/customQuery',{
+                                    params:{
+                                        query: 
+                                        "SELECT * FROM ServicesWanted WHERE PhoneNumberEmail = '321-422-4215';"
+                                    }
+                                }
+                                )
+                                /**
+                                 * Note the JSON.stringify, it turns whatever object it is into a string with keys and values,
+                                 * might be a better way to handle it for a string as this prints the {} as well.
+                                 * Should include ret.data, otherwise you get additional internet header stuff.
+                                 */
+                                .then((ret) => {alert(JSON.stringify(ret.data[0]))})
+                                .catch(() =>alert('error'))}
+                                >
                                 {({ pressed }) => (
                                     <Text style={styles.bottomButtonText}>Add Times</Text>
                                 )}
