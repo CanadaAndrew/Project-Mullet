@@ -1,0 +1,232 @@
+const sql = require('mssql')
+const express = require('express')
+const cors = require('cors');
+const app = express()
+
+/**
+ * This is config, it creates an object that stores log information in order to connect to the server.
+ * This will be passed on to connect, and if it is valid it will return an object.
+ */
+const config = {
+    user: 'hdw530', // better stored in an app setting such as process.env.DB_USER
+    password: '#RecyclingTeam', // better stored in an app setting such as process.env.DB_PASSWORD
+    server: 'hair-done-wright530.database.windows.net', // better stored in an app setting such as process.env.DB_SERVER
+    port: 1433, // optional, defaults to 1433, better stored in an app setting such as process.env.DB_PORT
+    database: 'mobile_app', // better stored in an app setting such as process.env.DB_NAME
+    authentication: {
+        type: 'default'
+    },
+    options: {
+        encrypt: true
+    }
+}
+
+/**
+ * 
+ * This function is a template function that shows the basics of connecting and running through the columns/rows.
+ */
+async function connectAndQuery() {
+    try {
+        console.log(config.user);
+        var poolConnection = await sql.connect(config);
+        console.log("Reading rows from the Table...");
+        var resultSet = await poolConnection.request().query(`
+        SELECT *
+        FROM Clients;`);
+
+        console.log(`${resultSet.recordset.length} rows returned.`);
+
+        // output column headers
+        var columns = "";
+        for (var column in resultSet.recordset.columns) {
+            columns += column + ", ";
+        }
+        console.log("%s\t", columns.substring(0, columns.length - 2));
+        let ret = [];
+        let i = 0;
+        // ouput row contents from default record set
+        resultSet.recordset.forEach(client => {
+            console.log("%s\t%s", client.PhoneNumberEmail, client.FirstName, client.MiddleName, client.LastName, client.PreferredWayOfContact);
+            ret[i] = client.PhoneNumberEmail + ' ' + client.FirstName + ' ' + client.MiddleName + ' ' + client.LastName + ' ' +client.PreferredWayOfContact +'\n' ;
+            console.log(ret[i]);
+            i += 1;
+        });
+
+        // close connection only when we're certain application is finished
+        poolConnection.close();
+        return ret;
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+/**
+ * This function attempts to connect the database using config.
+ * If successful,
+ * @returns poolConnection, an object used to request actions to the dbs.
+ */
+async function connect(){
+    try {
+        var poolConnection = await sql.connect(config);
+        return poolConnection;
+    }catch(err){
+        console.error(err.message);
+    }
+}
+
+/**
+ * This takes in a result from the queried database, makes them into objects, and puts them in an array to create an array of those objects.
+ * @param resultSet, the queried information not yet sorted into proper arrays. 
+ * @returns ret, an array of objects created from the resultSet given.
+ */
+function sortingResults(resultSet){
+    let ret = [];
+    let i = 0;
+    //For each goes through each row taking one row at a time.
+    resultSet.recordset.forEach(object => {
+        const arrayObject = {};
+        for (var column in resultSet.recordset.columns) {
+            arrayObject[column] = object[column];
+        }
+        ret[i] = arrayObject;
+        i += 1;
+    })
+    return ret;
+}
+
+/**
+ * The general querying for tables are all the same, so I'll comment this one 
+ * @returns Array of Objects created from the querry
+ */
+async function queryUsers(){
+    try {
+        //First tries to connect to the dbs using the connect method, await is important
+        var poolConnection = await connect();
+        //Sends a request ussing the object given from connect, await is important, type in a query command that you would use in SQL
+        var resultSet = await poolConnection.request().query(`
+        SELECT *
+        FROM Users;`);
+        //Closes the connection
+        poolConnection.close();
+        //Sorts the result into an object array using the method and returns it.
+        return sortingResults(resultSet);
+    } catch (err) {
+        //If any error occurs, it'll throw it over here and print it in console
+        console.error(err.message);
+    }
+}
+
+async function queryClients(){
+    try {
+        var poolConnection = await connect();
+        var resultSet = await poolConnection.request().query(`
+        SELECT *
+        FROM ClientView;`);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+async function queryAdmins(){
+    try {
+        var poolConnection = await connect();
+        var resultSet = await poolConnection.request().query(`
+        SELECT *
+        FROM AdminView;`);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+async function queryCurrentClients(){
+    try {
+        var poolConnection = await connect();
+        var resultSet = await poolConnection.request().query(`
+        SELECT *
+        FROM CurrentClientView;`);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+async function queryNewClients(){
+    try {
+        var poolConnection = await connect();
+        var resultSet = await poolConnection.request().query(`
+        SELECT *
+        FROM NewClientView;`);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+async function queryServicesWanted(){
+    try {
+        var poolConnection = await connect();
+        var resultSet = await poolConnection.request().query(`
+        SELECT *
+        FROM ServicesWanted;`);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+async function queryAppointments(){
+    try {
+        var poolConnection = await connect();
+        var resultSet = await poolConnection.request().query(`
+        SELECT *
+        FROM Appointments;`);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+//Custom Query is the same as the general queries except that a custom queryString is given.
+async function customQuery(queryString){
+    try {
+        var poolConnection = await connect();
+        var resultSet = await poolConnection.request().query(queryString);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+app.use(cors());
+//For each query/function, a REST API needs to be created, a way for the frontend of our program to call methods to our backend.
+//app.get means the front end will GET stuff from the backend
+//app.post means the front end will POST stuff to the backend(read up on the Axion api for more information.)
+app.get('/queryUsers', (req, res) => queryUsers().then((ret) => res.send(ret)).catch(() => console.log('error')))
+app.get('/queryAdmins', (req, res) => queryAdmins().then((ret) => res.send(ret)).catch(() => console.log('error')))
+app.get('/queryClients', (req, res) => queryClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
+app.get('/queryCurrentClient', (req, res) => queryCurrentClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
+app.get('/queryNewClient', (req, res) => queryNewClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
+app.get('/queryServicesWanted', (req, res) => queryServicesWanted().then((ret) => res.send(ret)).catch(() => console.log('error')))
+app.get('/queryNewClient', (req, res) => queryNewClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
+/**
+ * This breaks down the params, getting the string and storing it before calling the query methd.
+ */
+app.get('/customQuery', (req, res) => {
+    const query = req.query.query;
+    console.log(query);
+    customQuery(query)
+.then((ret) => res.send(ret))
+.catch(() => console.log('error'));
+}
+)
+//This opens the server, printing to console 'up' when it is up.
+app.listen(3000, () => console.log('up'));
