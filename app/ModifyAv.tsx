@@ -83,28 +83,53 @@ export default function ModifyAv() {
         console.log('Appointment Times:', appointmentTimes);       
     };
 
+    //note: Date is in UNIX format, including milliseconds, using a converter is recommended
     const [date1, setDate1] = useState(new Date(1700326800000));
     const [date2, setDate2] = useState(new Date(1700355600000));
     const [show1, setShow1] = useState(false);
     const [show2, setShow2] = useState(false);
 
+    //changes time with time picker
     const onChange1 = (event, selectedDate) => {
         const currentDate = selectedDate;
         setShow1(false);
         setDate1(currentDate);
+
+        if(getTime1 < getTime2)
+        {
+          console.log('Time range is correct!'); 
+          //TODO: Call button constructors to create custom buttons with those time ranges with a gap
+        }
+        else
+        {
+            console.log('Time range is incorrect!');
+        }
       };
 
       const onChange2 = (event, selectedDate) => {
         const currentDate = selectedDate;
         setShow2(false);
         setDate2(currentDate);
+
+        if(getTime1 < getTime2)
+        {
+          console.log('Time range is correct!'); 
+          //TODO: Call button constructors to create custom buttons with those time ranges with a gap
+        }
+        else
+        {
+            console.log('Time range is incorrect!');
+        }
       };
   
       const showTimePicker1 = () => {setShow1(true); };
       const showTimePicker2 = () => {setShow2(true); };
 
+      //return time in hhmm format
       const getTime1 = () => {return (date1.getHours()*100) + date1.getMinutes();}
       const getTime2 = () => {return (date2.getHours()*100) + date2.getMinutes();}
+
+     
       
     return (
         <>
@@ -184,50 +209,52 @@ export default function ModifyAv() {
                             </Pressable>
                         </View>
                     </View>
-<Modal visible={modalVisible}>
-<Pressable onPress={showTimePicker1}  >
-<Text>Show time picker #1!</Text>
-</Pressable>
+                    
+                    <Modal visible={modalVisible} //popup that displays the two times to input
+                    > 
+                        <Pressable onPress={showTimePicker1}  >
+                        <Text>Show time picker #1!</Text>
+                        </Pressable>
 
-<Pressable onPress={showTimePicker2}  >
-<Text>Show time picker #2!</Text>
-</Pressable>
+                        <Pressable onPress={showTimePicker2}  >
+                        <Text>Show time picker #2!</Text>
+                        </Pressable>
 
 
-<Text>time 1: {date1.getHours()} : {date1.getMinutes()}</Text>
-<Text>time 1 const: {getTime1()}</Text>
-<Text>time 2: {date2.getHours()} : {date2.getMinutes()}</Text>
-<Text>time 2 const: {getTime2()}</Text>
-{show1 && (
-<DateTimePicker
-  value={date1}
-  mode={'time'}
-  is24Hour={false}
-  onChange={onChange1}
-  
-/>
-)}
+                        <Text>time 1: {date1.getHours()} : {date1.getMinutes()}</Text>
+                        <Text>time 1 const: {getTime1()}</Text>
+                        <Text>time 2: {date2.getHours()} : {date2.getMinutes()}</Text>
+                        <Text>time 2 const: {getTime2()}</Text>
+                        {show1 && (
+                        <DateTimePicker
+                        value={date1}
+                        mode={'time'}
+                        is24Hour={false}
+                        onChange={onChange1}
+                        
+                        />
+                        )}
 
-{show2 && (
-<DateTimePicker
-  value={date2}
-  mode={'time'}
-  is24Hour={false}
-  onChange={onChange2}
-  
-/>
-)}
+                        {show2 && (
+                        <DateTimePicker
+                        value={date2}
+                        mode={'time'}
+                        is24Hour={false}
+                        onChange={onChange2}
+                        
+                        />
+                        )}
 
-<Pressable 
-            style={({ pressed }) => [{
-                backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
-            }, styles.bottomButtonText]}
-           onPress={() => setModalVisible(!modalVisible)}>
-           <Text >Hide Modal</Text>
-        
-          </Pressable>
-</Modal>
-</View>
+                        <Pressable //hide the popup window
+                                    style={({ pressed }) => [{
+                                        backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
+                                    }, styles.bottomButtonText]}
+                                onPress={() => setModalVisible(!modalVisible)}>
+                                <Text >Hide Modal</Text>
+                                
+                                </Pressable>
+                    </Modal>
+                    </View>
 
 </LinearGradient>
 
