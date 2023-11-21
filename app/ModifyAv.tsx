@@ -137,6 +137,10 @@ export default function ModifyAv() {
                                 //styles.backButtonText
                                 styles.bottomButtonText
                                 ]}
+                                /**
+                                 * Example on how to custom query, for the basic queries the second arguement is not needed
+                                 * Please form exactly how it is for a custom query with params:{query: queryString}
+                                 */
                                 onPress={() => database.get('/customQuery',{
                                     params:{
                                         query: 
@@ -144,6 +148,11 @@ export default function ModifyAv() {
                                     }
                                 }
                                 )
+                                /**
+                                 * Note the JSON.stringify, it turns whatever object it is into a string with keys and values,
+                                 * might be a better way to handle it for a string as this prints the {} as well.
+                                 * Should include ret.data, otherwise you get additional internet header stuff.
+                                 */
                                 .then((ret) => {alert(JSON.stringify(ret.data[0]))})
                                 .catch(() =>alert('error'))}
                                 >

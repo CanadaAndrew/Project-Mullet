@@ -3,6 +3,10 @@ const express = require('express')
 const cors = require('cors');
 const app = express()
 
+/**
+ * This is config, it creates an object that stores log information in order to connect to the server.
+ * This will be passed on to connect, and if it is valid it will return an object.
+ */
 const config = {
     user: 'hdw530', // better stored in an app setting such as process.env.DB_USER
     password: '#RecyclingTeam', // better stored in an app setting such as process.env.DB_PASSWORD
@@ -17,9 +21,10 @@ const config = {
     }
 }
 
-//console.log("Starting...");
-//connectAndQuery()
-
+/**
+ * 
+ * This function is a template function that shows the basics of connecting and running through the columns/rows.
+ */
 async function connectAndQuery() {
     try {
         console.log(config.user);
@@ -55,6 +60,11 @@ async function connectAndQuery() {
     }
 }
 
+/**
+ * This function attempts to connect the database using config.
+ * If successful,
+ * @returns poolConnection, an object used to request actions to the dbs.
+ */
 async function connect(){
     try {
         var poolConnection = await sql.connect(config);
@@ -64,9 +74,15 @@ async function connect(){
     }
 }
 
+/**
+ * This takes in a result from the queried database, makes them into objects, and puts them in an array to create an array of those objects.
+ * @param resultSet, the queried information not yet sorted into proper arrays. 
+ * @returns ret, an array of objects created from the resultSet given.
+ */
 function sortingResults(resultSet){
     let ret = [];
     let i = 0;
+    //For each goes through each row taking one row at a time.
     resultSet.recordset.forEach(object => {
         const arrayObject = {};
         for (var column in resultSet.recordset.columns) {
@@ -78,15 +94,24 @@ function sortingResults(resultSet){
     return ret;
 }
 
+/**
+ * The general querying for tables are all the same, so I'll comment this one 
+ * @returns Array of Objects created from the querry
+ */
 async function queryUsers(){
     try {
+        //First tries to connect to the dbs using the connect method, await is important
         var poolConnection = await connect();
+        //Sends a request ussing the object given from connect, await is important, type in a query command that you would use in SQL
         var resultSet = await poolConnection.request().query(`
         SELECT *
         FROM Users;`);
+        //Closes the connection
         poolConnection.close();
+        //Sorts the result into an object array using the method and returns it.
         return sortingResults(resultSet);
     } catch (err) {
+        //If any error occurs, it'll throw it over here and print it in console
         console.error(err.message);
     }
 }
@@ -169,6 +194,7 @@ async function queryAppointments(){
     }
 }
 
+//Custom Query is the same as the general queries except that a custom queryString is given.
 async function customQuery(queryString){
     try {
         var poolConnection = await connect();
@@ -181,6 +207,9 @@ async function customQuery(queryString){
 }
 
 app.use(cors());
+//For each query/function, a REST API needs to be created, a way for the frontend of our program to call methods to our backend.
+//app.get means the front end will GET stuff from the backend
+//app.post means the front end will POST stuff to the backend(read up on the Axion api for more information.)
 app.get('/queryUsers', (req, res) => queryUsers().then((ret) => res.send(ret)).catch(() => console.log('error')))
 app.get('/queryAdmins', (req, res) => queryAdmins().then((ret) => res.send(ret)).catch(() => console.log('error')))
 app.get('/queryClients', (req, res) => queryClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
@@ -188,6 +217,9 @@ app.get('/queryCurrentClient', (req, res) => queryCurrentClients().then((ret) =>
 app.get('/queryNewClient', (req, res) => queryNewClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
 app.get('/queryServicesWanted', (req, res) => queryServicesWanted().then((ret) => res.send(ret)).catch(() => console.log('error')))
 app.get('/queryNewClient', (req, res) => queryNewClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
+/**
+ * This breaks down the params, getting the string and storing it before calling the query methd.
+ */
 app.get('/customQuery', (req, res) => {
     const query = req.query.query;
     console.log(query);
@@ -196,4 +228,5 @@ app.get('/customQuery', (req, res) => {
 .catch(() => console.log('error'));
 }
 )
+//This opens the server, printing to console 'up' when it is up.
 app.listen(3000, () => console.log('up'));
