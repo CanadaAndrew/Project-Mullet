@@ -1,9 +1,5 @@
 # Project-Mullet
 Beauty App for Melissa Wright
-As of right now, whatever you want to test a certain page, switch the name.js and name.tx to App.js and App.tsx(if tsx is applicable)
-
-NOTE: If datetimepicker throws an error, try this: npx expo install --fix 
-
 Install the dependencies(if haven't):
 
 
@@ -12,4 +8,7 @@ Install the dependencies(if haven't):
 -npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar react-native-gesture-handler
 -npm install react-native-dropdown-select-list
 -npm install @react-native-community/datetimepicker --save
-
+-npm install axios
+-npm install mssql
+-npm install express
+-npm install cors
