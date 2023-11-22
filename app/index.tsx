@@ -9,7 +9,7 @@ export default function index(){
         <Text>Navigation to currently developed/developing screens, placeholder for homepage.</Text>
         <Link href = "/ModifyAv">Click/Tap here for ModifyAv</Link>
         <Link href = "/ClientAp">Click/Tap here for ClientAp</Link>
-        <Link href = "/setupAppointment2">Click/Tap here for setupAppoiintment2</Link>
+        <Link href = "/setupAppointment2">Click/Tap here for setupAppointment2</Link>
     </View>
     /*
         <StatusBar style = 'light'/>
