@@ -11,14 +11,18 @@ import {
     Image
 } from 'react-native';
 import { Link } from 'expo-router';
-
+import axios from 'axios';
 export default function SetupAppointment2() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]); //list of selected times to push to db upon confirmation
     const [selectedTime, setSelectedTime] = useState(null);       //updates the selected time state
 
+    const database = axios.create({
+        baseURL: 'http://10.0.0.192:3000',
+    })
+
     const listOfTimes = [ //dummy data for testing purposes -> get data from db either from query in setupAppointment1 or this screen on initialization with date from setupAppointment1
-        ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
+        '7:00am', '8:00am', '9:00am', '10:00am', '11:00am', '12:00pm', '1:00pm', '2:00pm'
     ];
 
     const month = [
@@ -28,7 +32,7 @@ export default function SetupAppointment2() {
     const services = ['Women\'s Haircut'];
 
     const dates = ['24th'];
-    const dummyDates = ['Tues, Oct 24th'];
+    const dummyDates = ['Tuesday, October 24th 2023', 'Wednesday, November 22th 2023'];
 
     const legendWords = ['Available:', 'Selected:'];
 
@@ -36,10 +40,15 @@ export default function SetupAppointment2() {
         setAppointmentTimes(listOfTimes);
     }, []);
 
-    const handleAppointmentPress = (time) => {
+    const handleAppointmentPress = (time, date) => {
+        setSelectedDate((prevDate) => {
+            const newDate = prevDate === date ? null : date;
+            alert('selected date: ' + newDate); //for testing purposes
+            return newDate;
+        });
         setSelectedTime((prevTime) => {
             const newTime = prevTime === time ? null : time;
-            console.log('selected time: ' + newTime); //for testing purposes
+            alert('selected time: ' + newTime); //for testing purposes
             return newTime;
         });
     };
@@ -104,7 +113,7 @@ export default function SetupAppointment2() {
                                 <FlatList
                                     data={dummyDates}
                                     keyExtractor={(item, index) => index.toString()}
-                                    renderItem={({ item }) => (
+                                    renderItem={({ item, index }) => (
                                         <View style={styles.availableViewInFlatList}>
                                             <View style={styles.availableDateContainer}>
                                                 <Text style={styles.availableDateText}>{item}</Text>
@@ -117,9 +126,9 @@ export default function SetupAppointment2() {
                                                         <View style={styles.availableTimeCell}>
                                                             <TouchableOpacity
                                                                 style={[styles.availableTimeCellButton, { backgroundColor: 'white' }]}
-                                                                onPress={() => handleAppointmentPress(item)}
+                                                                onPress={() => handleAppointmentPress(item, dummyDates[index])}
                                                             >
-                                                                <Text style={[styles.availableTimeCellText, { color: selectedTime === item ? 'green' : 'black' }]}>
+                                                                <Text style={[styles.availableTimeCellText, { color: selectedTime === item && selectedDate === dummyDates[index] ? 'green' : 'black' }]}>
                                                                     {item}
                                                                 </Text>
                                                             </TouchableOpacity>
@@ -151,9 +160,18 @@ export default function SetupAppointment2() {
                                     backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
                                 },
                                 styles.confirmButton
-                                ]}>
+                                ]}
+                                onPress = {() => database.put('/confirmAppointment', null, {
+                                    params:{
+                                        date:selectedDate,
+                                        time:selectedTime,
+                                        userID: '321-422-4215'
+                                    }
+                                }).then(()=>{alert('success')}).catch(() => alert('error'))}
+                                >
                                 {({ pressed }) => (
                                     <Text style={styles.confirmButtonText}>Confirm Appointment</Text>
+                                    
                                 )}
                             </Pressable>
                         </View>
