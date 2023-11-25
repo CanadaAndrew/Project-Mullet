@@ -1,24 +1,26 @@
-import { StyleSheet, Text, View, Pressable, Image, ImageBackground, ScrollView} from 'react-native';
+import { StyleSheet, Text, View, Pressable, Image, ImageBackground, ScrollView, Button} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import React from 'react';
 import MyCalendar from './MyCalendar';
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
+import { useNavigation } from '@react-navigation/native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
-export default function setUpAppoint1() {
+export default function setUpAppoint1({navigation}) { // add navigation to default function for data transfer between pages
 
     //useState for drop down menu
     const [selected, setSelected] = React.useState("");
 
     //options for drop down menu
     const hairOptions = [
-        {key: 'Mens Haircut', value: 'Mens Haircut'},
-        {key: 'Womens Haircut', value: 'Womens Haircut'},
-        {key: 'Hair Color', value: 'Hair Color'},
-        {key: 'Extensions', value: 'Extensions'}
+        {key: ' Mens Haircut', value: ' Mens Haircut'},
+        {key: ' Womens Haircut', value: ' Womens Haircut'},
+        {key: ' Hair Color', value: ' Hair Color'},
+        {key: ' Extensions', value: ' Extensions'}
     ];
         
     /*I have genuinely no idea why this function is needed*/
@@ -112,11 +114,39 @@ export default function setUpAppoint1() {
                 </View>
 
                 {/*appointment button no functionality yet*/}
-                <View style = {styles.appointmentButton}>
+                {/*<View style = {styles.appointmentButton}>
                   <Pressable
                     style = {({ pressed }) => [{ backgroundColor: pressed ? '#C154C1' : '#BE42B2'}, styles.appointButtonText ]}>
-                        {({ pressed }) => (<Text style = {styles.appointButtonText}>Schedule Appointment</Text>)}
+                        {({ pressed }) => (
+                        <Link href = "/ClientAp">
+                            <Text style = {styles.appointButtonText}>Schedule Appointment</Text>  
+                        </Link>)}
                   </Pressable>
+                        </View> */}
+
+                {/*<View style = {[styles.appointmentButton, styles.appointButtonText]}>
+                    <Button  
+                      title = "test"
+                      color = "white"
+                      
+                      onPress={() => navigation.navigate("ClientAp", {
+                        name1: hairStyleSelected, 
+                        name2: <Text>{handleDatesSelected(selectedDates)}</Text>
+                      })} 
+                    />
+                </View>*/}
+
+                {/*appointment button can send data over to setupAppointemnt2 currently
+                only sending data for hairstyles, data for dates is placeholder data for now*/}
+                <View>
+                    <TouchableOpacity
+                      style = {styles.appointmentButton}
+                      onPress = {() => navigation.navigate("ClientAp", { // replace "ClientAp" with "setupAppointemnt2"
+                        hairStyleData: hairStyleSelected, 
+                        dateData: "11-30-2023"
+                      })}>
+                        <Text style = {styles.appointButtonText}>Schedule Appointment</Text>
+                    </TouchableOpacity>
                 </View>
 
             </View>
@@ -211,9 +241,9 @@ const styles = StyleSheet.create({
     },
     // schedule appointment button style
     appointmentButton: {
-        width: 350,
-        height: 65,
-        paddingTop: 20,
+        width: 350, //
+        height: 50, //
+        paddingTop: 15,
         margin: 5,
         shadowColor: 'black',
         shadowOffset: {
@@ -222,7 +252,10 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.5,
         shadowRadius: 3,
-        //alignItems: 'center'
+        //alignItems: 'center',
+        //backgroundColor: '#C154C1',
+        backgroundColor: '#BE42B2',
+        borderRadius: 20,
     },
     // schedule appointment button text style
     appointButtonText: {
@@ -231,8 +264,10 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         borderRadius: 20,
-        paddingTop: 5,
-        paddingBottom: 5,
+        //paddingTop: 5,
+        //paddingBottom: 5,
+        //alignItems: 'center'
+        
 
     },
     badgeStyle: {
