@@ -34,6 +34,13 @@ export default function ModifyAv() {
     /*I have genuinely no idea why this function is needed*/
     const handleDatesSelected = (selectedDates: string[]) => {};
 
+    // function that is called by the onDayPress built in function that in turn calls the setSelctedDate function
+    const handleDayPress = (day) => {
+        setSelectedDate(day);
+        alert(`Selected day: ${day.day}`);     //For testing purposes
+        console.log(`Selected month: ${day.month}`); //For testing purposes
+        console.log(`Selected year: ${day.year}`);   //For testing purposes
+        //add API call to database here using day and copy results over listOfTimes
 
     useEffect(() => { //initialize appointmentTimes with demo data
         setAppointmentTimes(listOfTimes);
