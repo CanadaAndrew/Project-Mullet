@@ -19,10 +19,14 @@ export default function NaviagateHome(){
             />
             <Button  
                 title = "Client Appointment page"
-                onPress={() => navigation.navigate("ClientAp", {
+                onPress={() => navigation.navigate("ClientAp")} 
+            />
+            <Button  
+                title = "setupAppointment2 page"
+                onPress={() => navigation.navigate("setupAppointment2", {
                     hairStyleData: "",
                     dataDate: ""
-                })} 
+                })}  
             />
             
         </View>

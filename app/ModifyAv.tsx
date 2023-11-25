@@ -40,6 +40,7 @@ export default function ModifyAv() {
         alert(`Selected day: ${day.day}`);     //For testing purposes
         console.log(`Selected month: ${day.month}`); //For testing purposes
         console.log(`Selected year: ${day.year}`);   //For testing purposes
+    }
         //add API call to database here using day and copy results over listOfTimes
 
     useEffect(() => { //initialize appointmentTimes with demo data
@@ -290,6 +291,6 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontSize: 16,
-        fontWeight: 'bold',
-    },
+        fontWeight: 'bold', 
+    }, 
 });

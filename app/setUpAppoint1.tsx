@@ -124,24 +124,12 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
                   </Pressable>
                         </View> */}
 
-                {/*<View style = {[styles.appointmentButton, styles.appointButtonText]}>
-                    <Button  
-                      title = "test"
-                      color = "white"
-                      
-                      onPress={() => navigation.navigate("ClientAp", {
-                        name1: hairStyleSelected, 
-                        name2: <Text>{handleDatesSelected(selectedDates)}</Text>
-                      })} 
-                    />
-                </View>*/}
-
                 {/*appointment button can send data over to setupAppointemnt2 currently
                 only sending data for hairstyles, data for dates is placeholder data for now*/}
                 <View>
                     <TouchableOpacity
                       style = {styles.appointmentButton}
-                      onPress = {() => navigation.navigate("ClientAp", { // replace "ClientAp" with "setupAppointemnt2"
+                      onPress = {() => navigation.navigate("setupAppointment2", { 
                         hairStyleData: hairStyleSelected, 
                         dateData: "11-30-2023"
                       })}>

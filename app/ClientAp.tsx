@@ -8,10 +8,7 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import MyCalendar from './MyCalendar';
 
 
-export default function ClientAp({route}){ // move route to appointmentpage2
-    const {hairStyleData} = route.params; // move to appointmentpage2 
-    const {dateData} = route.params; // move to appointmentpage2
-    
+export default function ClientAp(){ 
 
     interface Appointment {
         name: string;
@@ -164,9 +161,7 @@ export default function ClientAp({route}){ // move route to appointmentpage2
         style = {styles.container}>
             <View style = {styles.container}>
                 <View style = {styles.header}>
-                     <Text style = {styles.headerTitle}>Client Appointments</Text>
-                     <Text style = {styles.headerTitle}>{hairStyleData}</Text> 
-                     <Text style = {styles.headerTitle}>{dateData}</Text>
+                     <Text style = {styles.headerTitle}>Client Appointments</Text> 
                 </View>
                 <View style = {styles.backButton}>     
                     
