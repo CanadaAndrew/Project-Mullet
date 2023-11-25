@@ -19,8 +19,19 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
     const hairOptions = [
         {key: ' Mens Haircut', value: ' Mens Haircut'},
         {key: ' Womens Haircut', value: ' Womens Haircut'},
-        {key: ' Hair Color', value: ' Hair Color'},
-        {key: ' Extensions', value: ' Extensions'}
+        {key: ' Kids Haircut', value: ' Kids Haircut'},
+        {key: ' Partial Highlight', value: ' Partial Highlight'},
+        {key: ' Full Highlight', value: ' Full Highlight'},
+        {key: ' Root Touch Up', value: ' Root Touch Up'},
+        {key: ' Full Color', value: ' Full Color'},
+        {key: ' Extension Consultation', value: ' Extension Consultation'},
+        {key: ' Extension Installation', value: ' Extension Installation'},
+        {key: ' Extension Move-Up', value: ' Extension Move-Up'},
+        {key: ' Make-Up', value: ' Make-Up'},
+        {key: ' Special Occasion Hairstyle', value: ' Special Occasion Hairstyle'},
+        {key: ' Perm', value: ' Perm'},
+        {key: ' Deep Conditioning Treatment', value: ' Deep Conditioning Treatment'},
+        {key: ' Blow Dry and Style', value: 'Blow Dry and Style'}
     ];
         
     /*I have genuinely no idea why this function is needed*/
