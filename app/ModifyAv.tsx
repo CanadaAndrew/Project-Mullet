@@ -61,7 +61,7 @@ export default function ModifyAv() {
     // function that is called by the onDayPress built in function that in turn calls the setSelctedDate function
     const handleDayPress = (day) => {
         setSelectedDate(day);
-        console.log(`Selected day: ${day.day}`);     //For testing purposes
+        alert(`Selected day: ${day.day}`);     //For testing purposes
         console.log(`Selected month: ${day.month}`); //For testing purposes
         console.log(`Selected year: ${day.year}`);   //For testing purposes
         //add API call to database here using day and copy results over listOfTimes
