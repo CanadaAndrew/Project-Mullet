@@ -9,6 +9,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
+export let dateSelected: string[] = ['01-01-2000', '03-05-2005', '08-15-2017', '11-30-2023'];  // dummy dates
 
 export default function setUpAppoint1({navigation}) { // add navigation to default function for data transfer between pages
 
@@ -37,7 +38,6 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
     /*I have genuinely no idea why this function is needed*/
     const handleDatesSelected = (selectedDates: string[]) => {};
 
-    
 
     //the hairStyleSelected string array that is able to be given to different pages
     //let hairStyleSelected: string[] = [];
@@ -52,6 +52,18 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
         var temp = selected.toString();
         temparr = temp.split(",");
         hairStyleSelected = temparr;
+    }
+
+    // turns hairstyle and date arrays into strings for setupAppointment2
+    const arrayConcat = (array) => {
+        let result = '';
+        for (let i = 0; i < array.length; i++) {
+            result += array[i];
+            if (i < array.length - 1) {
+                result += ', '
+            }
+        }
+        return result;
     }
 
     return(
@@ -141,8 +153,10 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
                     <TouchableOpacity
                       style = {styles.appointmentButton}
                       onPress = {() => navigation.navigate("setupAppointment2", { 
-                        hairStyleData: hairStyleSelected, 
-                        dateData: "11-30-2023"
+                        hairStyleData: hairStyleSelected,
+                        hairStyleString: arrayConcat(hairStyleSelected),
+                        dateData: dateSelected,
+                        dateString: arrayConcat(dateSelected)
                       })}>
                         <Text style = {styles.appointButtonText}>Schedule Appointment</Text>
                     </TouchableOpacity>

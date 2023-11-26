@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Link } from 'expo-router';
 import axios from 'axios';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function SetupAppointment2({route}) { // added route for page navigation
     const [selectedDate, setSelectedDate] = useState(null);
@@ -20,7 +21,9 @@ export default function SetupAppointment2({route}) { // added route for page nav
 
     // for data transfer between appointment pages
     const {hairStyleData} = route.params;
+    const {hairStyleString} = route.params;
     const {dateData} = route.params;
+    const {dateString} = route.params;
 
     const database = axios.create({
         baseURL: 'http://10.0.0.192:3000',
@@ -30,14 +33,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
         '7:00am', '8:00am', '9:00am', '10:00am', '11:00am', '12:00pm', '1:00pm', '2:00pm'
     ];
 
-    const month = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
-    ];
-
-    const services = ['Women\'s Haircut'];
-
-    const dates = ['24th'];
-    const dummyDates = ['Tuesday, October 24th 2023', 'Wednesday, November 22th 2023'];
+    //const dummyDates = ['Tuesday, October 24th 2023', 'Wednesday, November 22th 2023'];  // keeping for formatting
 
     const legendWords = ['Available:', 'Selected:'];
 
@@ -61,130 +57,114 @@ export default function SetupAppointment2({route}) { // added route for page nav
     return (
         <>
             <StatusBar backgroundColor={'black'} />
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <View style={styles.backButton}>
-                        <Pressable
-                            style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText]}
-                        >
-                            {({ pressed }) => (
-                                <Link href="/">
-                                    <Text style={styles.backButtonText}>Back</Text>
-                                </Link>
-                            )}
-                        </Pressable>
-                    </View>
-                    <View style={styles.logoContainer}>
-                        <Image source={require('./images/logo.png')} style={styles.logo} />
-                    </View>
-                </View>
-
-                <LinearGradient locations={[0.8, 1]} colors={['#DDA0DD', 'white']} style={styles.linearGradientStyle}>
-                    <View style={styles.body}>
-                        <View style={styles.appointmentInfoContainer}>
-                            <View style={styles.appointmentHeader}>
-                                <Text style={styles.appointmentText}>Schedule an Appointment</Text>
-                            </View>
-                            <View style={styles.appointmentServicesSelected}>
-                                <Text style={styles.appointmentText}>Services Selected:</Text>
-                                <Text style={styles.appointmentText}>{hairStyleData}</Text> 
-                                <FlatList
-                                    data={services}
-                                    renderItem={({ item }) => (
-                                        <Text style={styles.appointmentText}>
-                                            {item}{', '}
-                                        </Text>
-                                    )}
-                                    horizontal={true}
-                                />
-                            </View>
-                            <View style={styles.appointmentDateChosen}>
-                                <Text style={styles.appointmentText}>Date Chosen:</Text>
-                                <Text style={styles.appointmentText}>{dateData}</Text>
-                                <FlatList
-                                    data={dates}
-                                    renderItem={({ item }) => (
-                                        <Text style={styles.appointmentText}>
-                                            {item}
-                                        </Text>
-                                    )}
-                                    horizontal={true}
-                                />
-                            </View>
-                        </View>
-                        <View style={styles.availableContainer}>
-                            <View style={styles.availableTimesHeader}>
-                                <Text style={styles.appointmentText}>Available Times:</Text>
-                            </View>
-                            <View style={styles.availableIterable}>
-                                <FlatList
-                                    data={dummyDates}
-                                    keyExtractor={(item, index) => index.toString()}
-                                    renderItem={({ item, index }) => (
-                                        <View style={styles.availableViewInFlatList}>
-                                            <View style={styles.availableDateContainer}>
-                                                <Text style={styles.availableDateText}>{item}</Text>
-                                            </View>
-                                            <View style={styles.availableTimeContainer}>
-                                                <FlatList
-                                                    data={listOfTimes}
-                                                    keyExtractor={(item, index) => index.toString()}
-                                                    renderItem={({ item }) => (
-                                                        <View style={styles.availableTimeCell}>
-                                                            <TouchableOpacity
-                                                                style={[styles.availableTimeCellButton, { backgroundColor: 'white' }]}
-                                                                onPress={() => handleAppointmentPress(item, dummyDates[index])}
-                                                            >
-                                                                <Text style={[styles.availableTimeCellText, { color: selectedTime === item && selectedDate === dummyDates[index] ? 'green' : 'black' }]}>
-                                                                    {item}
-                                                                </Text>
-                                                            </TouchableOpacity>
-                                                        </View>
-                                                    )}
-                                                    numColumns={4}
-                                                    contentContainerStyle={styles.availableTimeContainer}
-                                                />
-                                            </View>
-                                        </View>
-                                    )}
-                                    contentContainerStyle={styles.availableIterable}
-                                />
-                            </View>
-                            <View style={styles.availableLegendContainer}>
-                                <Text style={styles.availableLegendText}>{legendWords[0]}</Text>
-                                <View style={styles.availableLegendDotCell}>
-                                    <Image source={require('./images/black_dot.png')} style={styles.availableLegendDot} />
-                                </View>
-                                <Text style={styles.availableLegendText}>{legendWords[1]}</Text>
-                                <View style={styles.availableLegendDotCell}>
-                                    <Image source={require('./images/green_dot.png')} style={styles.availableLegendDot} />
-                                </View>
-                            </View>
-                        </View>
-                        <View style={styles.confirmButtonContainer}>
+            <ScrollView>
+                <View style={styles.container}>
+                    <View style={styles.header}>
+                        <View style={styles.backButton}>
                             <Pressable
-                                style={({ pressed }) => [{
-                                    backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
-                                },
-                                styles.confirmButton
-                                ]}
-                                onPress = {() => database.put('/confirmAppointment', null, {
-                                    params:{
-                                        date:selectedDate,
-                                        time:selectedTime,
-                                        userID: '321-422-4215'
-                                    }
-                                }).then(()=>{alert('success')}).catch(() => alert('error'))}
-                                >
+                                style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText]}
+                            >
                                 {({ pressed }) => (
-                                    <Text style={styles.confirmButtonText}>Confirm Appointment</Text>
-                                    
+                                    <Link href="/">
+                                        <Text style={styles.backButtonText}>Back</Text>
+                                    </Link>
                                 )}
                             </Pressable>
                         </View>
+                        <View style={styles.logoContainer}>
+                            <Image source={require('./images/logo.png')} style={styles.logo} />
+                        </View>
                     </View>
-                </LinearGradient>
-            </View>
+
+                    <LinearGradient locations={[0.8, 1]} colors={['#DDA0DD', 'white']} style={styles.linearGradientStyle}>
+                        <View style={styles.body}>
+                            <View style={styles.appointmentInfoContainer}>
+                                <View style={styles.appointmentHeader}>
+                                    <Text style={styles.appointmentText}>Schedule an Appointment</Text>
+                                </View>
+                                <View style={styles.appointmentServicesSelected}>
+                                    <Text style={styles.appointmentText}>Services Selected:</Text>
+                                    <Text style={styles.appointmentText}>{hairStyleString}</Text>
+                                </View>
+                                <View style={styles.appointmentDateChosen}>
+                                    <Text style={styles.appointmentText}>Date Chosen:</Text>
+                                    <Text style={styles.appointmentText}>{dateString}</Text>
+                                </View>
+                            </View>
+                            <View style={styles.availableContainer}>
+                                <View style={styles.availableTimesHeader}>
+                                    <Text style={styles.appointmentText}>Available Times:</Text>
+                                </View>
+                                <View style={styles.availableIterable}>
+                                    <FlatList
+                                        data={dateData}
+                                        keyExtractor={(item, index) => index.toString()}
+                                        renderItem={({ item, index }) => (
+                                            <View style={styles.availableViewInFlatList}>
+                                                <View style={styles.availableDateContainer}>
+                                                    <Text style={styles.availableDateText}>{item}</Text>
+                                                </View>
+                                                <View style={styles.availableTimeContainer}>
+                                                    <FlatList
+                                                        data={listOfTimes}
+                                                        keyExtractor={(item, index) => index.toString()}
+                                                        renderItem={({ item }) => (
+                                                            <View style={styles.availableTimeCell}>
+                                                                <TouchableOpacity
+                                                                    style={[styles.availableTimeCellButton, { backgroundColor: 'white' }]}
+                                                                    onPress={() => handleAppointmentPress(item, dateData[index])}
+                                                                >
+                                                                    <Text style={[styles.availableTimeCellText, { color: selectedTime === item && selectedDate === dateData[index] ? 'green' : 'black' }]}>
+                                                                        {item}
+                                                                    </Text>
+                                                                </TouchableOpacity>
+                                                            </View>
+                                                        )}
+                                                        numColumns={4}
+                                                        contentContainerStyle={styles.availableTimeContainer}
+                                                    />
+                                                </View>
+                                            </View>
+                                        )}
+                                        contentContainerStyle={styles.availableIterable}
+                                    />
+                                </View>
+                                <View style={styles.availableLegendContainer}>
+                                    <Text style={styles.availableLegendText}>{legendWords[0]}</Text>
+                                    <View style={styles.availableLegendDotCell}>
+                                        <Image source={require('./images/black_dot.png')} style={styles.availableLegendDot} />
+                                    </View>
+                                    <Text style={styles.availableLegendText}>{legendWords[1]}</Text>
+                                    <View style={styles.availableLegendDotCell}>
+                                        <Image source={require('./images/green_dot.png')} style={styles.availableLegendDot} />
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={styles.confirmButtonContainer}>
+                                <Pressable
+                                    style={({ pressed }) => [{
+                                        backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
+                                    },
+                                    styles.confirmButton
+                                    ]}
+                                    onPress={() => database.put('/confirmAppointment', null, {
+                                        params: {
+                                            date: selectedDate,
+                                            time: selectedTime,
+                                            userID: '321-422-4215'
+                                        }
+                                    }).then(() => { alert('success') }).catch(() => alert('error'))}
+                                >
+                                    {({ pressed }) => (
+                                        <Text style={styles.confirmButtonText}>Confirm Appointment</Text>
+
+                                    )}
+                                </Pressable>
+                            </View>
+                        </View>
+                    </LinearGradient>
+                </View>
+            </ScrollView>
         </>
     );
 }
