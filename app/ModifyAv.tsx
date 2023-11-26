@@ -13,50 +13,26 @@ import {
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
+import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
 
 
-export default function ModifyAv() { 
+export default function ModifyAv() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]);
      {/*demo data from queried db, used leading space to keep auto button width uniform*/}
-     const listOfTimes = [ 
+     const listOfTimes = [
         ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
     ]
 
-    //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend, 
+    //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
     //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
     const database = axios.create({
         baseURL: 'http://10.0.0.192:3000',
     })
 
-    const getSelectedDay = () => {
-        if (selectedDate) {
-            return selectedDate.day;
-        }
-        return null;
-    }
-
-    const getSelectedMonth = () => {
-        if (selectedDate) {
-            return selectedDate.month;
-        }
-        return null;
-    }
-
-    const getSelectedYear = () => {
-        if (selectedDate) {
-            return selectedDate.year;
-        }
-        return null;
-    }
-
-    const getSelectedFullDate = () => {
-        if (selectedDate) {
-            return `${selectedDate.day}-${selectedDate.month}-${selectedDate.year}`;
-        }
-        return null;
-    }
+    /*I have genuinely no idea why this function is needed*/
+    const handleDatesSelected = (selectedDates: string[]) => {};
 
     // function that is called by the onDayPress built in function that in turn calls the setSelctedDate function
     const handleDayPress = (day) => {
@@ -64,8 +40,8 @@ export default function ModifyAv() {
         alert(`Selected day: ${day.day}`);     //For testing purposes
         console.log(`Selected month: ${day.month}`); //For testing purposes
         console.log(`Selected year: ${day.year}`);   //For testing purposes
+    }
         //add API call to database here using day and copy results over listOfTimes
-    };
 
     useEffect(() => { //initialize appointmentTimes with demo data
         setAppointmentTimes(listOfTimes);
@@ -100,16 +76,22 @@ export default function ModifyAv() {
                             style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]}
                         >
                             {({ pressed }) => (
-                                <Link href = "/">
+                                <Link href = "/" asChild>
                                     <Text style={styles.backButtonText}>Back</Text>
                                 </Link>
                             )}
                         </Pressable>
                     </View>
-                    <Calendar onDayPress={(day) => handleDayPress(day)}/>
+
                     <View style={styles.dateContainer}>
                         <Text style={styles.dateText}>Thurs, October 4th</Text>
                     </View>
+
+                                        
+                    <View style={styles.calendar}>  
+                        <MyCalendar pageName='ModifyAv' onDatesSelected={handleDatesSelected} disabled={false}/>
+                    </View>
+                    
                     <FlatList              //adds buttons for available times from db
                         data={listOfTimes} //need to change later to items from db and account for empty set
                         keyExtractor={(item, index) => index.toString()}
@@ -128,6 +110,7 @@ export default function ModifyAv() {
                         numColumns={4}                               //number buttons per row
                         contentContainerStyle={styles.timeContainer} //adjust to style buttons
                     />
+
                     <View style={styles.bottomButtonContainer}>
                         <View style={styles.bottomButton}>
                             <Pressable
@@ -192,7 +175,7 @@ export default function ModifyAv() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 3,
         //backgroundColor: '#DDA0DD'
     },
     // header
@@ -230,9 +213,12 @@ const styles = StyleSheet.create({
     },
     // calendar.  calendarText is placeholder
     calendar: {
+        flex: 0,
         height: 200,
-        //backgroundColor: 'white',
-        alignItems: 'center'
+        backgroundColor: 'white',
+        marginTop: 30,
+        marginBottom: 50,
+        padding: 0,
     },
     calendarText: {
         color: 'black'
@@ -251,10 +237,12 @@ const styles = StyleSheet.create({
     },
     // for the time slots
     timeContainer: {
+        flex: 5,
         height: 100,
         paddingTop: 10,
         paddingBottom: 20,
         paddingLeft: 10,
+        marginTop: 30,
         //backgroundColor: 'grey'
     },
     timeRow: {
@@ -274,6 +262,7 @@ const styles = StyleSheet.create({
     // bottom three buttons
     bottomButtonContainer: {
         //backgroundColor: 'lightgreen',
+        flex: 5,
         height: 230,
         paddingTop: 10,
         alignItems: 'center',
@@ -302,6 +291,6 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontSize: 16,
-        fontWeight: 'bold',
-    },
+        fontWeight: 'bold', 
+    }, 
 });

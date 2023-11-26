@@ -17,7 +17,7 @@ web-build/
 *.mobileprovision
 
 #Leaith Rawashdeh ignores
-*.png
+#*.png
 **/babel
 
 # Metro
