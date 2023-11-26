@@ -1,8 +1,37 @@
 const sql = require('mssql')
 const express = require('express')
 const cors = require('cors');
-const app = express()
+const app = express();
+//Wanted to have these through exports, but exports do not seem to be working, will fix later.
+const monthsNum = {
+    January: '01',
+    February: '02',
+    March: '03',
+    April: '04',
+    May: '05',
+    June: '06',
+    July: '07',
+    August: '08',
+    September: '09',
+    October: '10',
+    November: '11',
+    December: '12'
+}
 
+const monthsWritten = {
+    January: 'January',
+    February: 'February',
+    March: 'March',
+    April: 'April',
+    May: 'May',
+    June: 'June',
+    July: 'July',
+    August: 'August',
+    September: 'September',
+    October: 'October',
+    November: 'November',
+    December: 'December'
+}
 /**
  * This is config, it creates an object that stores log information in order to connect to the server.
  * This will be passed on to connect, and if it is valid it will return an object.
@@ -205,6 +234,17 @@ async function customQuery(queryString){
         console.error(err.message);
     }
 }
+//Takes the formatted date, time, and userID and updates the appointment so it is taken.
+async function updateAppointment(date, time, userID){
+    try {
+        var poolConnection = await connect();
+        await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, PhoneNumberEmail = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+    }
+    
+}
 
 async function appointmentPost(queryString, values){
     try {
@@ -249,7 +289,7 @@ app.get('/queryNewClient', (req, res) => queryNewClients().then((ret) => res.sen
 app.get('/queryServicesWanted', (req, res) => queryServicesWanted().then((ret) => res.send(ret)).catch(() => console.log('error')))
 app.get('/queryNewClient', (req, res) => queryNewClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
 /**
- * This breaks down the params, getting the string and storing it before calling the query methd.
+ * This breaks down the params, getting the string and storing it before calling the query method.
  */
 app.get('/customQuery', (req, res) => {
     const query = req.query.query;
@@ -289,5 +329,56 @@ app.delete('/customDelete', async (req, res) => {
     }
 });
   
+//Formats the date and time before sending it to the method to update the appointments.
+//In the future might just format this in the front end and then send it over, might be a lot easier.
+app.put('/confirmAppointment', (req, res) => {
+    //Gets the date, time, and userID through parameters.
+    let date = req.query.date;
+    let time = req.query.time;
+    let userID = req.query.userID;
+    if(date && time){
+        //Deals with am/pm, turning it into military time. Want to do this with Enums if can get export working.
+        if(time.includes('pm')){
+            time = time.split('pm');
+            time = time[0].split(':');
+            if(parseInt(time[0]) === 12){
+                time = time[0]+':'+time[1]+':00';
+            }else{
+                time = (parseInt(time[0])+12)+':'+time[1]+':00';
+            }
+        }else{
+            time = time.split('am');
+            if(parseInt(time[0]) === 12){
+                time = '00:'+time[0]+':00';
+            }else{
+                time = time[0]+':00';
+            }
+        }
+        //Detects month and get's the number form, currently enums are copy/pasted in, want to switch to import if it can work.
+        let month;
+        for(month in monthsWritten){
+            if(date.includes(month)){
+                break;
+            }
+        }
+        month = monthsNum[month];
+        //Uses RE pattern matching, would rather do enums if it works, temporary solution.
+        let day = date.match(/[0-9][0-9]th|[0-9]?[0-9]st|[0-9]?[0-9]nd|[0-9]?[0-9]rd/)
+        day = parseInt(day);
+        if(day.length < 2){
+            day = '0'+day;
+        }
+        let year = date.match(/[0-9][0-9][0-9][0-9]/);
+
+        //Formats date and sends it to the backend function.
+        date = year+'-'+month+'-'+day;
+        console.log(date);
+        updateAppointment(date, time, userID).catch((err) => console.log(err));
+    }else{
+        console.log('date:' + date);
+        console.log('time:' + time);
+    }
+    res.send("ok");
+})
 //This opens the server, printing to console 'up' when it is up.
 app.listen(3000, () => console.log('up'));
