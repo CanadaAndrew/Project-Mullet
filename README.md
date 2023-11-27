@@ -9,3 +9,6 @@ Install the dependencies(if haven't):
 -npm install mssql
 -npm install express
 -npm install cors
+-npm install @react-navigation/native
+-npx expo install react-native-screens react-native-safe-area-context
+-npm install @react-navigation/native-stack

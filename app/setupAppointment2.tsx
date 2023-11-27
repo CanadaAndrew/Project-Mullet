@@ -13,10 +13,14 @@ import {
 import { Link } from 'expo-router';
 import axios from 'axios';
 
-export default function SetupAppointment2() {
+export default function SetupAppointment2({route}) { // added route for page navigation
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]); //list of selected times to push to db upon confirmation
     const [selectedTime, setSelectedTime] = useState(null);       //updates the selected time state
+
+    // for data transfer between appointment pages
+    const {hairStyleData} = route.params;
+    const {dateData} = route.params;
 
     const database = axios.create({
         baseURL: 'http://10.0.0.192:3000',
@@ -83,6 +87,7 @@ export default function SetupAppointment2() {
                             </View>
                             <View style={styles.appointmentServicesSelected}>
                                 <Text style={styles.appointmentText}>Services Selected:</Text>
+                                <Text style={styles.appointmentText}>{hairStyleData}</Text> 
                                 <FlatList
                                     data={services}
                                     renderItem={({ item }) => (
@@ -95,6 +100,7 @@ export default function SetupAppointment2() {
                             </View>
                             <View style={styles.appointmentDateChosen}>
                                 <Text style={styles.appointmentText}>Date Chosen:</Text>
+                                <Text style={styles.appointmentText}>{dateData}</Text>
                                 <FlatList
                                     data={dates}
                                     renderItem={({ item }) => (
