@@ -22,9 +22,8 @@ export default function ModifyAv() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]);
      {/*demo data from queried db, used leading space to keep auto button width uniform*/}
-     const listOfTimes = [ 
-        ' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'
-    ]
+     const [listOfTimes, setlistOfTimes] = useState([]);
+     
 
     //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend, 
     //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
@@ -70,7 +69,9 @@ export default function ModifyAv() {
     };
 
     useEffect(() => { //initialize appointmentTimes with demo data
+        setlistOfTimes([' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'])
         setAppointmentTimes(listOfTimes);
+       
     }, []);
 
     const handleAppointmentPress = (time) => {
@@ -105,7 +106,24 @@ export default function ModifyAv() {
 
         if(getTime1 < getTime2)
         {
+            var tempArray = [];
+            for(let i = (date1.getHours()); i < date2.getHours() ; i++)
+            {
+                console.log(i);
+                if(i > 12)
+                {
+                tempArray.push(" " + (i - 12) + ":00pm" )
+                }
+                else
+                {
+                    tempArray.push(" " + (i) + ":00am" )
+                }
+            }
+            tempArray.shift();
+            setlistOfTimes(tempArray);
+            tempArray = [];
           console.log('Time range is correct!'); 
+          
           //TODO: Call button constructors to create custom buttons with those time ranges with a gap
         }
         else
@@ -121,8 +139,24 @@ export default function ModifyAv() {
 
         if(getTime1 < getTime2)
         {
+            var tempArray = [];
+            for(let i = (date1.getHours()); i < date2.getHours() ; i++)
+            {
+                console.log(i);
+                if(i > 12)
+                {
+                tempArray.push(" " + (i - 12) + ":00pm" )
+                }
+                else
+                {
+                    tempArray.push(" " + (i) + ":00am" )
+                }
+            }
+           
+            tempArray.pop();
+            setlistOfTimes(tempArray);
+            tempArray = [];
           console.log('Time range is correct!'); 
-          //TODO: Call button constructors to create custom buttons with those time ranges with a gap
         }
         else
         {
@@ -249,9 +283,11 @@ export default function ModifyAv() {
 
 
                         <Text>time 1: {date1.getHours()} : {date1.getMinutes()}</Text>
-                        <Text>time 1 const: {getTime1()}</Text>
+                       
                         <Text>time 2: {date2.getHours()} : {date2.getMinutes()}</Text>
-                        <Text>time 2 const: {getTime2()}</Text>
+                       
+                        <Text>listOfTimes: {listOfTimes}</Text>
+                        
                         {show1 && (
                         <DateTimePicker
                         value={date1}
@@ -271,7 +307,7 @@ export default function ModifyAv() {
                         
                         />
                         )}
-
+                       
                         <Pressable //hide the popup window
                                     style={({ pressed }) => [{
                                         backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
@@ -279,6 +315,7 @@ export default function ModifyAv() {
                                 onPress={() => setModalVisible(!modalVisible)}>
                                 <Text >Hide Modal</Text>
                                 
+
                                 </Pressable>
                     </Modal>
                     </View>
