@@ -142,6 +142,8 @@ export default function ModifyAv() {
             var tempArray = [];
             for(let i = (date1.getHours()); i < date2.getHours() ; i++)
             {
+                //TODO: fix glitch when setting clock to 11pm
+                console.log(date2.getHours())
                 console.log(i);
                 if(i > 12)
                 {
