@@ -249,12 +249,12 @@ const styles = StyleSheet.create({
     },
     // calendar.  calendarText is placeholder
     calendar: {
-        //flex: 0,
+        flex: 0,
         height: 200,
         //backgroundColor: 'white',
-        //marginTop: 30,
-        //marginBottom: 50,
-        //padding: 0,
+        marginTop: 30,
+        marginBottom: 50,
+        padding: 0,
         alignItems: 'center',
     },
     calendarText: {
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     },
     // for the time slots
     timeContainer: {
-        //flex: 5,
+        flex: 5,
         height: 100,
         paddingTop: 10,
         paddingBottom: 20,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     bottomButtonContainer: {
         //backgroundColor: 'lightgreen',
         height: 50,
-        //flex: 5,
+        flex: .2,
         paddingTop: 10,
         alignItems: 'center',
         justifyContent: 'space-evenly'
