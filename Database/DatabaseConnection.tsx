@@ -226,8 +226,8 @@ async function queryAppointments(){
 //Custom Query is the same as the general queries except that a custom queryString is given.
 async function customQuery(queryString){
     try {
-        var poolConnection = await connect();
-        var resultSet = await poolConnection.request().query(queryString);
+        const poolConnection = await connect();
+        const resultSet = await poolConnection.request().query(queryString);
         poolConnection.close();
         return sortingResults(resultSet);
     } catch (err) {
@@ -245,6 +245,37 @@ async function updateAppointment(date, time, userID){
     }
     
 }
+
+async function appointmentPost(queryString, values){
+    try {
+        const poolConnection = await connect();
+        const resultSet = await poolConnection
+            .request()
+            .input('AppointmentDate', sql.DateTime2, values.AppointmentDate)
+            .input('VacancyStatus', sql.Int, values.VacancyStatus)
+            .query(queryString);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so that frontend can catch it
+    }
+}
+
+async function customDelete(queryString) {
+    try {
+      const poolConnection = await connect();
+      const resultSet = await poolConnection
+        .request()
+        .query(queryString);
+      poolConnection.close();
+      return sortingResults(resultSet);
+    } catch (err) {
+      console.error(err.message);
+      throw err;
+    }
+  }
+  
 
 app.use(cors());
 //For each query/function, a REST API needs to be created, a way for the frontend of our program to call methods to our backend.
@@ -264,10 +295,40 @@ app.get('/customQuery', (req, res) => {
     const query = req.query.query;
     console.log(query);
     customQuery(query)
-.then((ret) => res.send(ret))
-.catch(() => console.log('error'));
-}
-)
+    .then((ret) => res.send(ret))
+    .catch(() => console.log('error'));
+})
+
+app.post('/appointmentPost', async (req, res) => {
+    console.log('received request body: ');
+    try {
+        const { queryString, values } = req.body;
+        if (!queryString || !values) {
+            throw new Error('Invalid request body. Missing "queryString" or "values".');
+        }
+        const result = await appointmentPost(queryString, values);
+        res.send(result);
+    } catch (error) {
+        console.error(error.response.data);
+        res.status(400).send('Bad Request');
+    }
+});
+  
+  
+app.delete('/customDelete', async (req, res) => {
+    try {
+        const { queryString } = req.body;
+        if (!queryString) {
+            throw new Error('Invalid request body. Missing "queryString".');
+        }
+        await customDelete(queryString);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+  
 //Formats the date and time before sending it to the method to update the appointments.
 //In the future might just format this in the front end and then send it over, might be a lot easier.
 app.put('/confirmAppointment', (req, res) => {
