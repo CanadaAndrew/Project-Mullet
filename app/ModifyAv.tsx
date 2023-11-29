@@ -46,7 +46,7 @@ export default function ModifyAv() {
             let tomorrowString = day.year + '-' + day.month + '-' + tomorrow.toString();
             const response = await database.get('/customQuery', {
                 params: {
-                    query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${day.dateString}' AND AppointmentDate < '${tomorrowString}' AND VacancyStatus === 1;`
+                    query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${day.dateString}' AND AppointmentDate < '${tomorrowString}' AND VacancyStatus = 1;`
                 },
             });
             console.log(response); //for testing purposes
@@ -68,25 +68,7 @@ export default function ModifyAv() {
             setLoading(false);
         }
         return null;
-    }
-
-    const getSelectedFullDate = () => {
-        if (selectedDate) {
-            return `${selectedDate.day}-${selectedDate.month}-${selectedDate.year}`;
-        }
-        return null;
-    }
-    /*I have genuinely no idea why this function is needed*/
-    const handleDatesSelected = (selectedDates: string[]) => {};
-
-    // function that is called by the onDayPress built in function that in turn calls the setSelctedDate function
-    const handleDayPress = (day) => {
-        setSelectedDate(day);
-        alert(`Selected day: ${day.day}`);     //For testing purposes
-        console.log(`Selected month: ${day.month}`); //For testing purposes
-        console.log(`Selected year: ${day.year}`);   //For testing purposes
-    }
-        //add API call to database here using day and copy results over listOfTimes
+    };
 
     useEffect(() => { //initialize appointmentTimes with demo data
         setAppointmentTimes(listOfTimes);
@@ -171,30 +153,29 @@ export default function ModifyAv() {
                 <View style={styles.container}>
                     <View style={styles.header}>
                         <Text style={styles.headerText}>Modify Availability</Text>
-                </View>
+                    </View>
                     <View style={styles.backButton}>
                         <Pressable
                             style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText]}
                         >
-                            {({ pressed }) => (
-                                <Link href="/">
-                                    <Text style={styles.backButtonText}>Back</Text>
-                                </Link>
-                            )}
+                        {({ pressed }) => (
+                            <Link href="/">
+                                <Text style={styles.backButtonText}>Back</Text>
+                            </Link>
+                        )}
                         </Pressable>
                     </View>
-                  
-                <Calendar onDayPress={handleDayPress} />
-                <View style={styles.dateContainer}>
-                    <Text style={styles.dateText}>{displayedDate}</Text>
-                </View>
-                <FlatList
-                    data={listOfTimes}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => (
+                    <Calendar onDayPress={handleDayPress} />
+                    <View style={styles.dateContainer}>
+                        <Text style={styles.dateText}>{displayedDate}</Text>
+                    </View>
+                    <FlatList
+                        data={listOfTimes}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item }) => (
                         <View style={styles.timeCell}>
                             <TouchableOpacity
-                                style={[styles.button, { backgroundColor: 'white' }]}
+                                style={[styles.timeButton, { backgroundColor: 'white' }]}
                                 onPress={() => handleAppointmentPress(item)}
                             >
                             <Text style={[styles.buttonText, { color: appointmentTimes.includes(item) ? 'green' : 'red' }]}>
@@ -205,7 +186,7 @@ export default function ModifyAv() {
                     )}
                     numColumns={5}
                     contentContainerStyle={styles.timeContainer}
-                />
+                    />
                     <View style={styles.bottomButtonContainer}>
                         <View style={styles.bottomButton}>
                             <Pressable
@@ -230,7 +211,7 @@ export default function ModifyAv() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 3,
+        flex: 1,
         //backgroundColor: '#DDA0DD'
     },
     // header
@@ -268,12 +249,13 @@ const styles = StyleSheet.create({
     },
     // calendar.  calendarText is placeholder
     calendar: {
-        flex: 0,
+        //flex: 0,
         height: 200,
-        backgroundColor: 'white',
-        marginTop: 30,
-        marginBottom: 50,
-        padding: 0,
+        //backgroundColor: 'white',
+        //marginTop: 30,
+        //marginBottom: 50,
+        //padding: 0,
+        alignItems: 'center',
     },
     calendarText: {
         color: 'black'
@@ -292,12 +274,12 @@ const styles = StyleSheet.create({
     },
     // for the time slots
     timeContainer: {
-        flex: 5,
+        //flex: 5,
         height: 100,
         paddingTop: 10,
         paddingBottom: 20,
         paddingLeft: 10,
-        marginTop: 30,
+        //marginTop: 30,
         //backgroundColor: 'grey'
     },
     timeRow: {
@@ -317,8 +299,8 @@ const styles = StyleSheet.create({
     // bottom three buttons
     bottomButtonContainer: {
         //backgroundColor: 'lightgreen',
-        height: 100,
-        flex: 5,
+        height: 50,
+        //flex: 5,
         paddingTop: 10,
         alignItems: 'center',
         justifyContent: 'space-evenly'
@@ -333,13 +315,13 @@ const styles = StyleSheet.create({
         //backgroundColor: '#C154C1',
         textAlign: 'center',
         borderRadius: 15,
-        paddingTop: 10,
-        paddingBottom: 10,
+        paddingTop: 5,
+        paddingBottom: 5,
         //elevation: 10,
         shadowColor: 'black',
         shadowOpacity: 0.1
     },
-    button: {
+    timeButton: {
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
