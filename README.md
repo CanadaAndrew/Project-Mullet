@@ -23,6 +23,9 @@ This project is being completed by a team from Sacramento State University as pa
 
 ![Project Mullet EERD Diagram](./app/images/Demo_Images/ProjectMulletEERD.png)
 
+## Project Completion Timeline in Jira
+
+
 
 ## Installation
 
@@ -63,14 +66,8 @@ QR code that you can scan to run the app on your phone. We recommend you use 'np
 ### Temporary Home Screen of App
 ![Temporary Home Screen](./app/images/Demo_Images/Temp_Home_Nav_Screen.png)
 
-### SetUp Appointment Screen
-![](./app/images/Demo_Images/SetUpAppointment_Screen.png)
-
-### Modify Availability Screen
-![](./app/images/Demo_Images/Modify_Av_Screen.png)
-
-### Client Appointment Screen
-![](./app/images/Demo_Images/Client_Appointment_Screen.png)
+### SetUp Appointment, Modify Availability, Client Appointment Screen
+![](./app/images/Demo_Images/SetUpAppointment_Screen.png) ![](./app/images/Demo_Images/Modify_Av_Screen.png) ![](./app/images/Demo_Images/Client_Appointment_Screen.png)
 
 ### SetUp Appointment Screen 2
 ![](./app/images/Demo_Images/SetUpAppointment_Screen.png) ![](./app/images/Demo_Images/SetUpAppointment_Screen1.png)
