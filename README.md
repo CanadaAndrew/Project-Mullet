@@ -73,7 +73,4 @@ QR code that you can scan to run the app on your phone. We recommend you use 'np
 ![](./app/images/Demo_Images/Client_Appointment_Screen.png)
 
 ### SetUp Appointment Screen 2
-![](./app/images/Demo_Images/SetUpAppointment_Screen.png)
-
-### SetUp Appointment Screen 2 with timmes Selected
-![](./app/images/Demo_Images/SetUpAppointment_Screen1.png)
+![](./app/images/Demo_Images/SetUpAppointment_Screen.png) ![](./app/images/Demo_Images/SetUpAppointment_Screen1.png)
