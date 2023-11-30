@@ -23,10 +23,6 @@ This project is being completed by a team from Sacramento State University calle
 
 ![Project Mullet EERD Diagram](./app/images/Demo_Images/ProjectMulletEERD.png)
 
-## Project Completion Timeline in Jira
-
-
-
 ## Installation
 
 You can install the project to run locally by installing a few different dependencies and cloning the project. You can clone the project by using the terminal.
