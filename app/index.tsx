@@ -7,7 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import ClientAp from './ClientAp';
 import setUpAppoint1 from './setUpAppoint1';
 import ModifyAv from './ModifyAv';
-import NaviagateHome from './NaviagateHome';
+import NavigateHome from './NavigateHome';
 import SetupAppointment2 from './setupAppointment2';
 
 const Stack = createNativeStackNavigator()
@@ -16,7 +16,7 @@ export default function index() {
   return (
    <NavigationContainer independent={true}>
      <Stack.Navigator>
-         <Stack.Screen name = "NaviagateHome" component={NaviagateHome}/>
+         <Stack.Screen name = "NaviagateHome" component={NavigateHome}/>
          <Stack.Screen name = "setUpAppoint1" component={setUpAppoint1}/>
          <Stack.Screen name = "setupAppointment2" component={SetupAppointment2}/>
          <Stack.Screen name = "ClientAp" component={ClientAp}/>
