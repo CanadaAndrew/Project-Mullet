@@ -38,17 +38,17 @@ git clone https://github.com/CanadaAndrew/Project-Mullet
 In addition to the listed dependies below you will need npm and to create a expo app to run the app in.
 
 ```bash
-  npx expo install expo-linear-gradient
-  npm install --save react-native-calendars
-  npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar react-native-gesture-handler
-  npm install react-native-dropdown-select-list
-  npm install axios
-  npm install mssql
-  npm install express
-  npm install cors
+npx expo install expo-linear-gradient
+npm install --save react-native-calendars
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar react-native-gesture-handler
+npm install react-native-dropdown-select-list
+npm install axios
+npm install mssql
+npm install express
+npm install cors
 ```
     
-## Deployment
+### Running the Program
 
 To deploy this project type in the terminal:
 
@@ -62,6 +62,18 @@ npx expo start
 ```
 Both of these commands should start the prject and bring you to wall of text with a
 QR code that you can scan to run the app on your phone. We recommend you use 'npx expo start'. If you don't want to run this project on your phone using the QR code you can download a simulator and run it locally.
+
+## Testing
+
+*To Do Will be Completed in CSC 191*
+
+## Deployment
+
+*To Do Will be Completed in CSC 191*
+
+## Developer Instructions
+*To Do Will be Completed in CSC 191*
+
 
 ## Screenshots
 
