@@ -1,4 +1,4 @@
-# Project Mullet
+# Project Mullet ![](./app/images/logo.png)
 
 This project is a beauty app being developed for HairDoneWright530. HairDoneWright530 is located in Olivehurst, California and is privately owned by 
 Melissa Wright. 
@@ -19,7 +19,9 @@ This project is being completed by a team from Sacramento State University as pa
 - [@Wilson Toy](https://github.com/Wilson-Toy)
 
 
+## Project Flow (EERD)
 
+![Project Mullet EERD Diagram](./app/images/Demo_Images/ProjectMulletEERD.png)
 
 
 ## Installation
@@ -55,4 +57,23 @@ QR code that you can scan to run the app on your phone. We recommend you use 'np
 
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+### Terminal After Successfull Run
+![Terminal Image](./app/images/Demo_Images/Terminal.png)
+
+### Temporary Home Screen of App
+![Temporary Home Screen](./app/images/Demo_Images/Temp_Home_Nav_Screen.png)
+
+### SetUp Appointment Screen
+![](./app/images/Demo_Images/SetUpAppointment_Screen.png)
+
+### Modify Availability Screen
+![](./app/images/Demo_Images/Modify_Av_Screen.png)
+
+### Client Appointment Screen
+![](./app/images/Demo_Images/Client_Appointment_Screen.png)
+
+### SetUp Appointment Screen 2
+![](./app/images/Demo_Images/SetUpAppointment_Screen.png)
+
+### SetUp Appointment Screen 2 with timmes Selected
+![](./app/images/Demo_Images/SetUpAppointment_Screen1.png)
