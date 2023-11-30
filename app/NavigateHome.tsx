@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Pressable, Image, ImageBackground, ScrollView, 
 import { useNavigation } from '@react-navigation/native';
 
 
-export default function NaviagateHome(){
+export default function NavigateHome(){
     const navigation = useNavigation<any>()
     
     return(
