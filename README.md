@@ -3,7 +3,7 @@
 This project is a beauty app being developed for HairDoneWright530. HairDoneWright530 is located in Olivehurst, California and is privately owned by 
 Melissa Wright. 
 
-This project is being completed by a team from Sacramento State University as part of a Senior Project over the time span of 2 semesters. 
+This project is being completed by a team from Sacramento State University called the Recycling Team as part of a Senior Project over the time span of 2 semesters. 
 
 
 
