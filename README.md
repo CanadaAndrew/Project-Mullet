@@ -29,7 +29,12 @@ This project is being completed by a team from Sacramento State University as pa
 
 ## Installation
 
-You can install the project to run locally by installing a few different dependencies. 
+You can install the project to run locally by installing a few different dependencies and cloning the project. You can clone the project by using the terminal.
+
+```bash
+git clone https://github.com/CanadaAndrew/Project-Mullet
+```
+
 In addition to the listed dependies below you will need npm and to create a expo app to run the app in.
 
 ```bash
