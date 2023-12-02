@@ -24,11 +24,18 @@ export default function ClientAp(){
     //new list that makes it work better with filtering and acts more like actual data from the database
     let clientAppointments: Appointment[] = [
         {
+            name: "Melinda Jackson",
+            service: "Hair Extensions",
+            date: "11/15/23, Sat, 2:00pm",
+            stylist: 'Melissa Wright',
+            realDate: new Date("2023-11-15")
+        },
+        {
             name: "Will Smith",
             service: "Mens Haircut",
-            date: "10/27/23, Fri, 1:00pm",
+            date: "11/30/23, Fri, 1:00pm",
             stylist: 'Melissa Wright',
-            realDate: new Date("2023-10-27")
+            realDate: new Date("2023-11-30")
         },
         {
             name: "Bob Smith",
@@ -40,17 +47,11 @@ export default function ClientAp(){
         {
             name: "Jane Doe",
             service: "Womens Haircut",
-            date: "11/18/23, Fri, 3:00pm",
+            date: "11/29/23, Fri, 3:00pm",
             stylist: 'Melissa Wright',
-            realDate: new Date("2023-11-18")
+            realDate: new Date("2023-11-29")
         },
-        {
-            name: "Melinda Jackson",
-            service: "Hair Extensions",
-            date: "11/15/23, Sat, 2:00pm",
-            stylist: 'Melissa Wright',
-            realDate: new Date("2023-11-15")
-        }
+
     ]
     //setting the times like i did in the dummy data makes it a UTC date which will always be 1 day behind PST so i add one to the day
     //possibly need to get rid of this when the data base gets added

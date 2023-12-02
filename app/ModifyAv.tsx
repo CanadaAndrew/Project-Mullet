@@ -8,6 +8,7 @@ import {
     View,
     Pressable,
     FlatList,
+    ScrollView
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
@@ -31,12 +32,12 @@ export default function ModifyAv() {
     //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
     //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
     const database = axios.create({
-        //baseURL: 'http://10.0.0.192:3000',
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://10.0.0.192:3000',
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
     //function that is called by onDayPress built in function that in turn calls the setSelctedDate function
     const handleDayPress = async (day) => {
-        console.log(day.dateString)
+        //alert(day.dateString);
         setSelectedDate(day.dateString);
         setDisplayedDate(moment(day.dateString).format('ddd, MMMM Do'));
         try {
@@ -95,14 +96,13 @@ export default function ModifyAv() {
                 //create new row for each time to insert
                 const createPromises = timesToInsert.map(async (time) => {
                     const dateTimeString = `${selectedDate} ${time}:00`;
+                    //alert(dateTimeString);
                     try {
-                        const response = await database.post('/appointmentPost', {
-                            queryString: 'INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES (@AppointmentDate, @VacancyStatus);',
-                            values: {
-                                AppointmentDate: `${dateTimeString}`, 
-                                VacancyStatus: 1
+                        const response = await database.get('/customAdd', {
+                            params: {
+                                query: 'INSERT INTO Appointments(AppointmentDate, VacancyStatus) VALUES(\''+dateTimeString+'\', 0)'
                             }
-                        });
+                        }).then();
                         console.log(response);
                     } catch (error) {
                         console.error('Error creating appointment:', error.response.data);
@@ -114,6 +114,7 @@ export default function ModifyAv() {
             }
     
             //check if there are times to delete
+            /*
             const timesToDelete = listOfTimesDefault.filter(time => !appointmentTimes.includes(time));
             if (timesToDelete.length > 0) {
                 //delete rows for times in database but not in current list
@@ -137,7 +138,7 @@ export default function ModifyAv() {
     
             //log success or handle it as needed
             console.log('Schedule updated successfully');
-        } catch (error) {
+        */} catch (error) {
             console.error('Error updating schedule:', error);
         }
     };
@@ -148,9 +149,12 @@ export default function ModifyAv() {
      
     return (
         <>
-            <StatusBar backgroundColor={'black'} />
+        <ScrollView>
+            <View style={styles.container}>
             <LinearGradient locations={[0.7, 1]} colors={['#DDA0DD', 'white']} style={styles.container}>
-                <View style={styles.container}>
+            <StatusBar backgroundColor={'black'} />
+                
+                
                     <View style={styles.header}>
                         <Text style={styles.headerText}>Modify Availability</Text>
                     </View>
@@ -169,6 +173,7 @@ export default function ModifyAv() {
                     <View style={styles.dateContainer}>
                         <Text style={styles.dateText}>{displayedDate}</Text>
                     </View>
+                    <View style ={styles.container}>
                     <FlatList
                         data={listOfTimes}
                         keyExtractor={(item, index) => index.toString()}
@@ -187,6 +192,7 @@ export default function ModifyAv() {
                     numColumns={5}
                     contentContainerStyle={styles.timeContainer}
                     />
+                    </View>
                     <View style={styles.bottomButtonContainer}>
                         <View style={styles.bottomButton}>
                             <Pressable
@@ -203,15 +209,16 @@ export default function ModifyAv() {
                             </Pressable>
                         </View>
                     </View>
-                </View>
-            </LinearGradient>
+                    </LinearGradient>
+            </View>
+            </ScrollView>
         </>
     );
  };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        //flex: 1,
         //backgroundColor: '#DDA0DD'
     },
     // header
@@ -274,8 +281,8 @@ const styles = StyleSheet.create({
     },
     // for the time slots
     timeContainer: {
-        flex: 5,
-        height: 100,
+        //flex: 5,
+        //height: 100,
         paddingTop: 10,
         paddingBottom: 20,
         paddingLeft: 10,
@@ -300,7 +307,7 @@ const styles = StyleSheet.create({
     bottomButtonContainer: {
         //backgroundColor: 'lightgreen',
         height: 50,
-        flex: .2,
+        //flex: .2,
         paddingTop: 10,
         alignItems: 'center',
         justifyContent: 'space-evenly'

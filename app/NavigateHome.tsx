@@ -8,7 +8,7 @@ export default function NavigateHome(){
     
     return(
         <View>
-            <Text>Temporary home page using react naviagate to travel between pages</Text>
+            <Text>Temporary home page to travel between pages</Text>
             <Button  
                 title = "setUpAppointment1 page"
                 onPress={() => navigation.navigate("setUpAppoint1")} 

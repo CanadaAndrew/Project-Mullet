@@ -11,7 +11,6 @@ interface MyCalendarProps {
 
 const MyCalendar: React.FC<MyCalendarProps> = ({ pageName, disabled = false }) => {
     const [selectedDates, setSelectedDates] = useState<string[]>([]);
-
   const handleDayPress = (day: any) => {
     if (disabled) {
       // If disabled, do not update selected dates

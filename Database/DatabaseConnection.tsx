@@ -234,11 +234,22 @@ async function customQuery(queryString){
         console.error(err.message);
     }
 }
+
+async function customAdd(queryString){
+    try {
+        const poolConnection = await connect();
+        await poolConnection.request().query(queryString);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
 //Takes the formatted date, time, and userID and updates the appointment so it is taken.
-async function updateAppointment(date, time, userID){
+async function updateAppointment(date, time, userID, notes){
     try {
         var poolConnection = await connect();
-        await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, PhoneNumberEmail = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
+        await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, PhoneNumberEmail = \''+ userID + '\', TypeOfAppointment = \''+ notes +'\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
         poolConnection.close();
     } catch (err) {
         console.error(err.message);
@@ -299,10 +310,21 @@ app.get('/customQuery', (req, res) => {
     .catch(() => console.log('error'));
 })
 
+app.get('/customAdd', (req, res) => {
+    const query = req.query.query;
+    console.log(query);
+    customAdd(query)
+    .then(() => res.send("Success"))
+    .catch(() => console.log('error'));
+})
+
 app.post('/appointmentPost', async (req, res) => {
     console.log('received request body: ');
+    const query = req.query.AppointmentDate;
     try {
         const { queryString, values } = req.body;
+        console.log(queryString);
+        console.log(values);
         if (!queryString || !values) {
             throw new Error('Invalid request body. Missing "queryString" or "values".');
         }
@@ -332,10 +354,12 @@ app.delete('/customDelete', async (req, res) => {
 //Formats the date and time before sending it to the method to update the appointments.
 //In the future might just format this in the front end and then send it over, might be a lot easier.
 app.put('/confirmAppointment', (req, res) => {
-    //Gets the date, time, and userID through parameters.
+    //Gets the date, time, userID, and services(notes) through parameters.
     let date = req.query.date;
     let time = req.query.time;
     let userID = req.query.userID;
+    let services = req.query.services;
+    console.log(services);
     if(date && time){
         //Deals with am/pm, turning it into military time. Want to do this with Enums if can get export working.
         if(time.includes('pm')){
@@ -363,8 +387,7 @@ app.put('/confirmAppointment', (req, res) => {
         }
         month = monthsNum[month];
         //Uses RE pattern matching, would rather do enums if it works, temporary solution.
-        let day = date.match(/[0-9][0-9]th|[0-9]?[0-9]st|[0-9]?[0-9]nd|[0-9]?[0-9]rd/)
-        day = parseInt(day);
+        let day = date.match(/[0-9]?[0-9]th|[0-9]?[0-9]st|[0-9]?[0-9]nd|[0-9]?[0-9]rd/)
         if(day.length < 2){
             day = '0'+day;
         }
@@ -373,7 +396,7 @@ app.put('/confirmAppointment', (req, res) => {
         //Formats date and sends it to the backend function.
         date = year+'-'+month+'-'+day;
         console.log(date);
-        updateAppointment(date, time, userID).catch((err) => console.log(err));
+        updateAppointment(date, time, userID, services).catch((err) => console.log(err));
     }else{
         console.log('date:' + date);
         console.log('time:' + time);

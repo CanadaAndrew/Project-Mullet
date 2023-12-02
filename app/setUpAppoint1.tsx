@@ -10,7 +10,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
-export default function setUpAppoint1({navigation}) { // add navigation to default function for data transfer between pages
+export default function SetUpAppoint1({navigation}) { // add navigation to default function for data transfer between pages
 
     //useState for drop down menu
     const [selected, setSelected] = React.useState("");
@@ -35,9 +35,8 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
     ];
         
     /*I have genuinely no idea why this function is needed*/
-    const handleDatesSelected = (selectedDates: string[]) => {};
+    const handleDatesSelected = (selectedDates: string[]) => {alert(selectedDates)};
 
-    
 
     //the hairStyleSelected string array that is able to be given to different pages
     //let hairStyleSelected: string[] = [];
@@ -121,7 +120,7 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
                 {/*Basic calendar implementation. Currently logs selected dates to the console and highlights them.*/
                 /*Setting disabled to true will disable the higlighting feature.*/}
                 <View style = {[styles.dummyCalendar, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                    <MyCalendar pageName='setUpAppoint1' onDatesSelected={handleDatesSelected} disabled={false}/>
+                    <MyCalendar  pageName='setUpAppoint1' onDatesSelected={handleDatesSelected} disabled={false} />
                 </View>
 
                 {/*appointment button no functionality yet*/}
@@ -141,8 +140,8 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
                     <TouchableOpacity
                       style = {styles.appointmentButton}
                       onPress = {() => navigation.navigate("setupAppointment2", { 
-                        hairStyleData: hairStyleSelected, 
-                        dateData: "11-30-2023"
+                        hairStyleData: hairStyleSelected.join(', '), 
+                        dateData: 'Monday, December 4th, 2023'
                       })}>
                         <Text style = {styles.appointButtonText}>Schedule Appointment</Text>
                     </TouchableOpacity>

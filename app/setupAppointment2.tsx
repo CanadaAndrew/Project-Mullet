@@ -27,17 +27,17 @@ export default function SetupAppointment2({route}) { // added route for page nav
     })
 
     const listOfTimes = [ //dummy data for testing purposes -> get data from db either from query in setupAppointment1 or this screen on initialization with date from setupAppointment1
-        '7:00am', '8:00am', '9:00am', '10:00am', '11:00am', '12:00pm', '1:00pm', '2:00pm'
+        '7:00am', '8:00am', '9:00am', '10:00am', '11:00am', '12:00pm', '1:00pm', '2:00pm', '3:00pm', '4:00pm'
     ];
 
     const month = [
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
 
-    const services = ['Women\'s Haircut'];
+    const services = [];
 
-    const dates = ['24th'];
-    const dummyDates = ['Tuesday, October 24th 2023', 'Wednesday, November 22th 2023'];
+    const dates = [''];
+    const dummyDates = ['Monday, December 4th, 2023'];
 
     const legendWords = ['Available:', 'Selected:'];
 
@@ -47,13 +47,13 @@ export default function SetupAppointment2({route}) { // added route for page nav
 
     const handleAppointmentPress = (time, date) => {
         setSelectedDate((prevDate) => {
-            const newDate = prevDate === date ? null : date;
-            alert('selected date: ' + newDate); //for testing purposes
+            const newDate = prevDate === date && selectedTime === time? null : date;
+            //alert('selected date: ' + newDate); //for testing purposes
             return newDate;
         });
         setSelectedTime((prevTime) => {
-            const newTime = prevTime === time ? null : time;
-            alert('selected time: ' + newTime); //for testing purposes
+            const newTime = prevTime === time && selectedDate === date ? null : time;
+            //alert('selected time: ' + newTime); //for testing purposes
             return newTime;
         });
     };
@@ -63,7 +63,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
             <StatusBar backgroundColor={'black'} />
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={styles.backButton}>
+                   <View style={styles.backButton}>
                         <Pressable
                             style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText]}
                         >
@@ -172,9 +172,10 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                     params:{
                                         date:selectedDate,
                                         time:selectedTime,
-                                        userID: '321-422-4215'
+                                        userID: '321-422-4215',
+                                        services: hairStyleData
                                     }
-                                }).then(()=>{alert('success')}).catch(() => alert('error'))}
+                                }).then((res)=>{alert(JSON.stringify(res.data))}).catch(() => alert('error'))}
                                 >
                                 {({ pressed }) => (
                                     <Text style={styles.confirmButtonText}>Confirm Appointment</Text>
@@ -191,7 +192,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        //flex: 1,
         backgroundColor: 'white'
     },
     body: {
