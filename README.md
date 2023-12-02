@@ -3,7 +3,30 @@
 This project is a beauty app being developed for HairDoneWright530. HairDoneWright530 is located in Olivehurst, California and is privately owned by 
 Melissa Wright. 
 
-This project is being completed by a team from Sacramento State University called the Recycling Team as part of a Senior Project over the time span of 2 semesters. 
+This project is being completed by a team from Sacramento State University called the Recycling Team as part of a Senior Project over the time span of 2 semesters.
+
+# Table of Contents
+- [Authors](#authors)
+- [Project Flow (EERD)](#project-flow-eerd)
+- [Installation](#installation)
+- [Running the Program](#running-the-program)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Developer Instructions](#developer-instructions)
+- [Screenshots](#screenshots)
+  - [Terminal After Successfull Run](#terminal-after-successfull-run)
+  - [Temporary Home Screen of App](#temporary-home-screen-of-app)
+  - [3 Different Screens](#setup-appointment-modify-availability-client-appointment-screen)
+  - [SetUp Appointment Screen 2](#setup-appointment-screen-2)
+- [Jira Timeline](#jira-timeline)
+  - [Sprint 1](#sprint-1)
+  - [Sprint 2](#sprint-2)
+  - [Sprint 3](#sprint-3)
+  - [Sprint 4](#sprint-4)
+  - [Sprint 5](#sprint-5)
+  - [Sprint 6](#sprint-6)
+  - [Sprint 7](#sprint-7)
+  - [Sprint 8](#sprint-8)
 
 
 
@@ -92,16 +115,16 @@ Sprint Start Date: 2023/9/17
 Sprint End Date: 2023/10/2
 
 Goals for the Sprint: 
-Find a client to work with and Create a Project Proposal to complete said project. After a Successful project proposal and approval being working with client to design the project.
+Find a client to work with and Create a Project Proposal to complete said project. After a Successful project proposal and approval begin working with client to design the project.
 
-Completion Status: Succesfully completed all goals this sprint. Recycling Team working together with HairDoneWright530 to create a beauty app for connecting to clients and managing appointments all within one app.
+Completion Status: Succesfully completed all goals this sprint. Recycling Team will be working together with HairDoneWright530 to create a beauty app for connecting to clients and managing appointments all within one app.
 
 ### Sprint 2
 Sprint Start Date: 2023/10/08
 
 Sprint End Date: 2023/10/22
 
-Goals for the Sprint: Create all documentation ncesary for the project and begin researching database providers and all other elements of the technology stack that will be used in this project with budget proposals for the app's development and continued use after Senior Project in May of 2024. 
+Goals for the Sprint: Create all documentation necessary for the project and begin researching database providers and all other elements of the technology stack that will be used in this project with budget proposals for the app's development and continued use after Senior Project in May of 2024. 
 
 Completion Status: All tasks completed with documentation sent and approved by the professor, Lab Advisor and the client Melissa Wright. Research into Technology Stack was completed with a decision to use Microsoft Azure for backend Storage in SQl.
 
@@ -110,9 +133,9 @@ Sprint Start Date: 2023/10/14
 
 Sprint End Date: 2023/11/12
 
-Goals for the Sprint: Begining coding of the app using Expo in Visual Studio Code. Tasks were assigned to team members in Jira to complete and were instructed to from now on when submitting a Pull Request into main to put their Jira task number they were completing. Microsoft Azure account is to be set up for Sprint 4 development. 
+Goals for the Sprint: Begin coding of the app using Expo in Visual Studio Code. Tasks were assigned to team members in Jira to complete and were instructed to from now on when submitting a Pull Request into main to put their Jira task number they were completing. Microsoft Azure account is to be set up for Sprint 4 development. 
 
-Completion Status: Amost every task was completed. Calendar functionality was implemented into the different pages that were created for this Sprint. Dummy Data is currently being displayed for the pages with no connection to backend yet. All work that was to be completed with backend could not be completed due to issues with setting up MicroSoft Azure Account. Will be resolved by Sprint 4.
+Completion Status: Almost every task was completed. Calendar functionality was implemented into the different pages that were created for this Sprint. Dummy Data is currently being displayed for the pages with no connection to backend yet. All work that was to be completed with backend could not be completed due to issues with setting up MicroSoft Azure Account. Will be resolved by Sprint 4.
 
 ### Sprint 4
 Sprint Start Date: 2023/11/13
