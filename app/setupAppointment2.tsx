@@ -96,7 +96,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
     const services = ['Women\'s Haircut'];
 
     const dates = ['24th'];
-    const dummyDates = ['Tuesday, October 24th 2023', 'Wednesday, November 22th 2023'];
+    const dummyDates = ['Monday, December 4th 2023'];
 
     const legendWords = ['Available:', 'Selected:'];
 
