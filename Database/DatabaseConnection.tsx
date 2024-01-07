@@ -288,6 +288,7 @@ app.get('/queryCurrentClient', (req, res) => queryCurrentClients().then((ret) =>
 app.get('/queryNewClient', (req, res) => queryNewClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
 app.get('/queryServicesWanted', (req, res) => queryServicesWanted().then((ret) => res.send(ret)).catch(() => console.log('error')))
 app.get('/queryNewClient', (req, res) => queryNewClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
+app.get('/queryAppointments', (req, res) => queryAppointments().then((ret) => res.send(ret)).catch(() => console.log('error')))
 /**
  * This breaks down the params, getting the string and storing it before calling the query method.
  */
