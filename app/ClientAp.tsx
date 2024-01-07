@@ -6,9 +6,17 @@ import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
 import { SelectList } from 'react-native-dropdown-select-list';
 import MyCalendar from './MyCalendar';
+import axios from 'axios';  //Used to get data from the backend nodejs
 
 
 export default function ClientAp(){ 
+
+    //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
+    //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
+    const database = axios.create({
+        baseURL: 'http://10.0.0.192:3000', //Andrew pc local
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+    })
 
     interface Appointment {
         name: string;
@@ -22,7 +30,7 @@ export default function ClientAp(){
 
 
     //new list that makes it work better with filtering and acts more like actual data from the database
-    let clientAppointments: Appointment[] = [
+    let clientAppointmentsDefault: Appointment[] = [
         {
             name: "Will Smith",
             service: "Mens Haircut",
@@ -52,13 +60,19 @@ export default function ClientAp(){
             realDate: new Date("2023-11-15")
         }
     ]
+
+    //updateAppointments("2023-12-01")
+
+    /*
     //setting the times like i did in the dummy data makes it a UTC date which will always be 1 day behind PST so i add one to the day
     //possibly need to get rid of this when the data base gets added
     clientAppointments.forEach(val => val.realDate.setDate(val.realDate.getDate() + 1));
+    */
 
     //filteredAps is used as an global array to hold the filtered appointments if there is any that need to be filtered by date
     let filteredAps: Appointment[] = [];
 
+    const [clientAppointments, setClientAppointments] = React.useState(clientAppointmentsDefault);
 
     //for the drop down list below
     const [selected, setSelected] = React.useState("");
@@ -79,6 +93,35 @@ export default function ClientAp(){
         return `${mm}/${dd}/${yy}`;
     }
 
+    //Updates the upcoming appointments given a date.
+    function updateAppointments(date){
+        let data;
+        database.get('/queryUpcomingAppointments', {
+            params: {
+                queryDate : date 
+            }
+        })
+        .then((ret) => data = ret.data)
+        .then(() => updateAppointmentsDisplay(data))
+        .catch(() => {alert("error");});
+    }
+
+    function updateAppointmentsDisplay(data){
+        let appointmentList : Appointment[] = [];
+        let i = 0;
+        data.forEach((appointment) => {
+            let newAppointment = {
+                name: appointment.PhoneNumberEmail,
+                service: appointment.TypeOfAppointment,
+                date: appointment.AppointmentDate,
+                stylist: 'Melissa Wright',
+                realDate: appointment.AppointmentDate
+            }
+            appointmentList[i] = newAppointment;
+        }
+        )
+        setClientAppointments(appointmentList);
+    }
     //handleSelection is called whenever a change is made in the drop down menu. It is passed the key value from the filter array above
     //it then decides which filtering option to use on the data based upon the key that it is passed in this function
     //it modifies the filteredAps global array and passes it back to the flatlist down below and the flatlist displays what was filtered

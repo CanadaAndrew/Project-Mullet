@@ -31,8 +31,8 @@ export default function ModifyAv() {
     //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
     //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
     const database = axios.create({
-        //baseURL: 'http://10.0.0.192:3000',
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://10.0.0.192:3000', //Andrew pc local
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
     //function that is called by onDayPress built in function that in turn calls the setSelctedDate function
     const handleDayPress = async (day) => {

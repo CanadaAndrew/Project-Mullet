@@ -300,6 +300,20 @@ app.get('/customQuery', (req, res) => {
     .catch(() => console.log('error'));
 })
 
+/**
+ * This breaks down the params, getting the string and storing it before calling the query method.
+ */
+app.get('/queryUpcomingAppointments', (req, res) => {
+    const date = req.query.queryDate;
+    console.log(date);
+    let queryString = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + date + " 00:00:00' AND VacancyStatus = 1";
+    console.log(queryString);
+    customQuery(queryString)
+    .then((ret) => res.send(ret))
+    .catch(() => console.log('error'));
+})
+
+
 app.post('/appointmentPost', async (req, res) => {
     console.log('received request body: ');
     try {
