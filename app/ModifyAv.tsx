@@ -103,33 +103,23 @@ export default function ModifyAv() {
         const currentDate = selectedDate;
         setShow1(false);
         setDate1(currentDate);
+        //setDate doesn't update immediately, which is why currentDate and Time1 are still different
+        //getTime1 changes when function ends.
+        var tempArray = []
 
-        if(getTime1 < getTime2)
+        for(let i = currentDate.getHours(); i < getTime2(); i++)
         {
-            var tempArray = [];
-            for(let i = (date1.getHours()); i < date2.getHours() ; i++)
-            {
-                console.log(i);
-                if(i > 12)
-                {
-                tempArray.push(" " + (i - 12) + ":00pm" )
-                }
-                else
-                {
-                    tempArray.push(" " + (i) + ":00am" )
-                }
-            }
-            tempArray.shift();
-            setlistOfTimes(tempArray);
-            tempArray = [];
-          console.log('Time range is correct!'); 
-          
-          //TODO: Call button constructors to create custom buttons with those time ranges with a gap
+            tempArray.push(i + " ");
         }
-        else
-        {
-            console.log('Time range is incorrect!');
-        }
+
+        setlistOfTimes(tempArray);
+        tempArray = [];
+
+        console.log("Time 1: " + getTime1())
+        console.log("Time 2: " + getTime2())
+        console.log(currentDate.getHours())
+
+    
       };
 
       const onChange2 = (event, selectedDate) => {
@@ -137,41 +127,27 @@ export default function ModifyAv() {
         setShow2(false);
         setDate2(currentDate);
 
-        if(getTime1 < getTime2)
+        var tempArray = []
+
+        for(let i = getTime1(); i < currentDate.getHours(); i++)
         {
-            var tempArray = [];
-            for(let i = (date1.getHours()); i < date2.getHours() ; i++)
-            {
-                //TODO: fix glitch when setting clock to 11pm
-                console.log(date2.getHours())
-                console.log(i);
-                if(i > 12)
-                {
-                tempArray.push(" " + (i - 12) + ":00pm" )
-                }
-                else
-                {
-                    tempArray.push(" " + (i) + ":00am" )
-                }
-            }
-           
-            tempArray.pop();
-            setlistOfTimes(tempArray);
-            tempArray = [];
-          console.log('Time range is correct!'); 
+            tempArray.push(i + " ");
         }
-        else
-        {
-            console.log('Time range is incorrect!');
-        }
+
+        setlistOfTimes(tempArray);
+        tempArray = [];
+
+        console.log("Time 1: " + getTime1())
+        console.log("Time 2: " + getTime2())
+        console.log(currentDate.getHours())
       };
   
       const showTimePicker1 = () => {setShow1(true); };
       const showTimePicker2 = () => {setShow2(true); };
 
       //return time in hhmm format
-      const getTime1 = () => {return (date1.getHours()*100) + date1.getMinutes();}
-      const getTime2 = () => {return (date2.getHours()*100) + date2.getMinutes();}
+      const getTime1 = () => {return (date1.getHours());}
+      const getTime2 = () => {return (date2.getHours());}
 
      
       
