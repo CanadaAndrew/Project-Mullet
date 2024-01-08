@@ -250,7 +250,10 @@ export default function ModifyAv() {
                     </View>
                     
                     <Modal visible={modalVisible} //popup that displays the two times to input
+                     animationType="fade"
+                     transparent = {true}
                     > 
+                     <View style={styles.modal}>
                         <Pressable onPress={showTimePicker1}  >
                         <Text>Show time picker #1!</Text>
                         </Pressable>
@@ -295,6 +298,7 @@ export default function ModifyAv() {
                                 
 
                                 </Pressable>
+                                </View>
                     </Modal>
                     </View>
 
@@ -419,4 +423,22 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    modal: {
+      
+        flex: 0.5,
+        justifyContent: "flex-start",
+        alignItems: "center",
+        backgroundColor: "rgba(211, 211, 255,0.979)",
+        height: 500,
+        marginTop: 200,
+        marginLeft: 10,
+        marginRight: 10,
+        borderRadius: 36,
+        elevation: 8,
+        shadowOpacity: 0.55,
+        shadowOffset: { width: 2, height: 2 },
+        shadowRadius: 6
+        
+       
+      },
 });
