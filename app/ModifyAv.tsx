@@ -291,24 +291,35 @@ export default function ModifyAv() {
                      animationType="fade"
                      transparent = {true}
                     > 
-                     <View style={styles.modal}>
+                     <View style={styles.modal} >
 
                      <View style={{ flexDirection:"row", flex: 0, columnGap: 50}}>
-                        <Pressable onPress={showTimePicker1}  >
+                       
                         <Text>Opening Time</Text>
-                        </Pressable>
-
-                        <Pressable onPress={showTimePicker2}  >
+                      
+                       
                         <Text>Closing Time</Text>
-                        </Pressable>
+                      
                         </View>
 
-                        <View style={{ flexDirection:"row", flex: .4, columnGap: 85}}>
+                        <View style={{ flexDirection:"row", flex: .2, columnGap: 85}}>
                         <Text>{getTime1()}</Text>
                        
                         <Text>{getTime2()}</Text>
                         </View>
-                        <Text>listOfTimes: {listOfTimes}</Text>
+
+                        <View style={{ flexDirection:"row", flex: .23, columnGap: 30}}>
+                        <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]} onPress={showTimePicker1}  >
+                        <Text style={styles.backButtonText}>{"  Change Opening  "}</Text>
+                        </Pressable>
+
+                        <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]} onPress={showTimePicker2}  >
+                        <Text style={styles.backButtonText}>{"   Change Closing   "}</Text>
+                        </Pressable>
+                        </View>
+
+
+                       
                         
                         {show1 && (
                         <DateTimePicker
@@ -329,17 +340,17 @@ export default function ModifyAv() {
                         
                         />
                         )}
-                       
+                        <Text>Schedule: {listOfTimes}</Text>
                         <Pressable //hide the popup window
-                                    style={({ pressed }) => [{
-                                        backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
-                                    }, styles.bottomButtonText]}
+                                  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]}
                                 onPress={() => setModalVisible(!modalVisible)}>
-                                <Text >Hide Modal</Text>
+                                <Text  style={styles.backButtonText} >    Close    </Text>
                                 
 
                                 </Pressable>
                                 </View>
+
+                                
                     </Modal>
                     </View>
 
@@ -474,6 +485,7 @@ const styles = StyleSheet.create({
         marginTop: 200,
         marginLeft: 10,
         marginRight: 10,
+        marginBottom: 10,
         borderRadius: 36,
         elevation: 8,
         shadowOpacity: 0.55,
