@@ -107,9 +107,13 @@ export default function ModifyAv() {
         //getTime1 changes when function ends.
         var tempArray = []
 
-        for(let i = currentDate.getHours(); i < getTime2(); i++)
+        for(let i = currentDate.getHours(); i < date2.getHours(); i++)
         {
-            tempArray.push(i + " ");
+            if (i <= 12)
+                tempArray.push(i + ":00am");
+            else
+                tempArray.push(i - 12 + ":00pm");
+
         }
 
         setlistOfTimes(tempArray);
@@ -129,9 +133,12 @@ export default function ModifyAv() {
 
         var tempArray = []
 
-        for(let i = getTime1(); i < currentDate.getHours(); i++)
+        for(let i = date1.getHours(); i < currentDate.getHours(); i++)
         {
-            tempArray.push(i + " ");
+            if (i <= 12)
+            tempArray.push(i + ":00am");
+        else
+            tempArray.push(i - 12 + ":00pm");
         }
 
         setlistOfTimes(tempArray);
@@ -145,9 +152,40 @@ export default function ModifyAv() {
       const showTimePicker1 = () => {setShow1(true); };
       const showTimePicker2 = () => {setShow2(true); };
 
-      //return time in hhmm format
-      const getTime1 = () => {return (date1.getHours());}
-      const getTime2 = () => {return (date2.getHours());}
+      //return time in hhmm am/pm format
+      const getTime1 = () => {
+
+        if(date1.getHours() <= 12)
+        {
+            if( date1.getMinutes() < 10)
+                return (date1.getHours() + ":" +  "0" + date1.getMinutes() + "am");
+            else
+                return (date1.getHours() + ":" + date1.getMinutes() + "am");
+        }
+        else
+        {
+            if( date1.getMinutes() < 10)
+                return (date1.getHours() - 12 + ":" +  "0" + date1.getMinutes() + "pm");
+            else
+                return (date1.getHours() - 12 + ":" + date1.getMinutes() + "pm");
+        }
+    }
+      const getTime2 = () => {
+        if(date2.getHours() <= 12)
+        {
+            if( date2.getMinutes() < 10)
+                return (date2.getHours() + ":" +  "0" + date2.getMinutes() + "am");
+            else
+                return (date2.getHours() + ":" + date2.getMinutes() + "am");
+        }
+        else
+        {
+            if( date2.getMinutes() < 10)
+                return (date2.getHours() - 12 + ":" +  "0" + date2.getMinutes() + "pm");
+            else
+                return (date2.getHours() - 12 + ":" + date2.getMinutes() + "pm");
+        }
+    }
 
      
       
@@ -254,19 +292,22 @@ export default function ModifyAv() {
                      transparent = {true}
                     > 
                      <View style={styles.modal}>
+
+                     <View style={{ flexDirection:"row", flex: 0, columnGap: 50}}>
                         <Pressable onPress={showTimePicker1}  >
-                        <Text>Show time picker #1!</Text>
+                        <Text>Opening Time</Text>
                         </Pressable>
 
                         <Pressable onPress={showTimePicker2}  >
-                        <Text>Show time picker #2!</Text>
+                        <Text>Closing Time</Text>
                         </Pressable>
+                        </View>
 
-
-                        <Text>time 1: {date1.getHours()} : {date1.getMinutes()}</Text>
+                        <View style={{ flexDirection:"row", flex: .4, columnGap: 85}}>
+                        <Text>{getTime1()}</Text>
                        
-                        <Text>time 2: {date2.getHours()} : {date2.getMinutes()}</Text>
-                       
+                        <Text>{getTime2()}</Text>
+                        </View>
                         <Text>listOfTimes: {listOfTimes}</Text>
                         
                         {show1 && (
@@ -438,6 +479,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.55,
         shadowOffset: { width: 2, height: 2 },
         shadowRadius: 6
+        
         
        
       },
