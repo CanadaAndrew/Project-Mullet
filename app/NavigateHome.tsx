@@ -21,6 +21,10 @@ export default function NavigateHome(){
                 title = "Client Appointment page"
                 onPress={() => navigation.navigate("ClientAp")} 
             />
+            <Button
+                title = "Home Screen page"
+                onPress={() => navigation.navigate("HomeScreen")}
+            />
             <Button  
                 title = "setupAppointment2 page"
                 onPress={() => navigation.navigate("setupAppointment2", {
