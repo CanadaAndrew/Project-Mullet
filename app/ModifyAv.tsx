@@ -297,22 +297,27 @@ export default function ModifyAv() {
                     > 
                      <View style={styles.modal} >
                      <Text>{"\n"}</Text>
-                     <View style={{ flexDirection:"row", flex: 0, columnGap: 50}}>
+                     <View style={{ flexDirection:"row", flex: 0, columnGap: 10}}>
                        
                      
                         <Text>Opening Time</Text>
                       
                        
-                        <Text>Closing Time</Text>
-                      
+                        <Text>                   Closing Time</Text>
+                        <Text>{"\n"}</Text>
                         </View>
-
-                        <View style={{ flexDirection:"row", flex: .2, columnGap: 85}}>
-                        <Text>{getTime1()}</Text>
                        
-                        <Text>{getTime2()}</Text>
+                        <View style={{ flexDirection:"row", flex: .2, columnGap: 85}}>
+                        <TouchableOpacity style={{ backgroundColor: '#FFFFFF', padding: 10, borderRadius: 4 }}>
+                        <Text style={{fontWeight: "bold"}}>{getTime1()}</Text>
+                        </TouchableOpacity>
+                       
+                        <TouchableOpacity style={{ backgroundColor: '#FFFFFF', padding: 10, borderRadius: 4 }}>
+                        <Text style={{fontWeight: "bold"}}>{getTime2()}</Text>
+                        </TouchableOpacity>
                         </View>
 
+                        <Text>{"\n"}</Text>
                         <View style={{ flexDirection:"row", flex: .23, columnGap: 30}}>
                         <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]} onPress={showTimePicker1}  >
                         <Text style={styles.backButtonText}>{"  Change Opening  "}</Text>
@@ -485,11 +490,11 @@ const styles = StyleSheet.create({
         flex: 0.5,
         justifyContent: "flex-start",
         alignItems: "center",
-        backgroundColor: "rgba(211, 211, 255,0.979)",
+        backgroundColor: "rgba(211, 211, 250,0.979)",
         marginTop: 140,
         marginLeft: 10,
         marginRight: 10,
-        marginBottom: -40,
+        marginBottom: -160,
         borderRadius: 36,
         elevation: 8,
         shadowOpacity: 0.55,
