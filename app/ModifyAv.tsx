@@ -97,7 +97,7 @@ export default function ModifyAv() {
     const [date2, setDate2] = useState(new Date(1700355600000));
     const [show1, setShow1] = useState(false);
     const [show2, setShow2] = useState(false);
-
+    
     //changes time with time picker
     const onChange1 = (event, selectedDate) => {
         const currentDate = selectedDate;
@@ -144,6 +144,10 @@ export default function ModifyAv() {
         setlistOfTimes(tempArray);
         tempArray = [];
 
+        if(date1.getHours() <= currentDate.getHours())
+        {
+
+        }
         console.log("Time 1: " + getTime1())
         console.log("Time 2: " + getTime2())
         console.log(currentDate.getHours())
@@ -292,9 +296,10 @@ export default function ModifyAv() {
                      transparent = {true}
                     > 
                      <View style={styles.modal} >
-
+                     <Text>{"\n"}</Text>
                      <View style={{ flexDirection:"row", flex: 0, columnGap: 50}}>
                        
+                     
                         <Text>Opening Time</Text>
                       
                        
@@ -340,7 +345,7 @@ export default function ModifyAv() {
                         
                         />
                         )}
-                        <Text>Schedule: {listOfTimes}</Text>
+                         <Text>{"\n\n"}</Text>
                         <Pressable //hide the popup window
                                   style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]}
                                 onPress={() => setModalVisible(!modalVisible)}>
@@ -481,11 +486,10 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         alignItems: "center",
         backgroundColor: "rgba(211, 211, 255,0.979)",
-        height: 500,
-        marginTop: 200,
+        marginTop: 140,
         marginLeft: 10,
         marginRight: 10,
-        marginBottom: 10,
+        marginBottom: -40,
         borderRadius: 36,
         elevation: 8,
         shadowOpacity: 0.55,
