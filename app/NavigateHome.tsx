@@ -28,6 +28,10 @@ export default function NavigateHome(){
                     dataDate: ""
                 })}  
             />
+            <Button
+                title="FAQ page"
+                onPress={() => navigation.navigate("FAQ")}
+            />
             
         </View>
     )
