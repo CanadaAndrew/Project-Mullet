@@ -3,6 +3,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
+// button viewablility based on workflow in google drive green = new clients, blue = existing clients, and red = Admin with some 
+// overlap. comments have been added above each button for clarification.
+
 export default function HomeScreen({navigation}){
     return(
         <ScrollView>
@@ -25,7 +28,63 @@ export default function HomeScreen({navigation}){
                 {/*add title for homepage*/}
                 <Text style = {styles.objectTitle}> Home</Text>
 
+                {/*button to modify calendar availability*/}
+                {/*Viewable by Admin only*/}
+                <View>
+                    <TouchableOpacity
+                      style = {styles.homeButton}
+                      onPress = {() => navigation.navigate("ModifyAv")}
+                    >  
+                    <Text style = {styles.homeButtonText}>Modify Calendar</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                {/*button to navigate to viewing existing client appointments*/}
+                {/*Viewable by Admin only*/}
+                <View>
+                    <TouchableOpacity
+                      style = {styles.homeButton}
+                      onPress = {() => navigation.navigate("ClientAp")}
+                    >  
+                    <Text style = {styles.homeButtonText}>Existing Appointments</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                {/*button to edit client info page is WIP so no button functionality yet*/}
+                {/*Viewable by Admin only*/}
+                <View>
+                    <TouchableOpacity
+                      style = {styles.homeButton}
+                      onPress = {() => navigation.navigate("Client info")}
+                    >  
+                    <Text style = {styles.homeButtonText}>modify Client Info</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                {/*button to view client history page is WIP so no button functionality yet*/}
+                {/*Viewable by Admin only*/}
+                <View>
+                    <TouchableOpacity
+                      style = {styles.homeButton}
+                      onPress = {() => navigation.navigate("Client history")}
+                    >  
+                    <Text style = {styles.homeButtonText}>Client History</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                {/*button to view approval/denial of new clients page is WIP so no button functionality yet*/}
+                {/*Viewable by Admin only*/}
+                <View>
+                    <TouchableOpacity
+                      style = {styles.homeButton}
+                      onPress = {() => navigation.navigate("New Client approval")}
+                    >  
+                    <Text style = {styles.homeButtonText}>New Client approval</Text>
+                    </TouchableOpacity>
+                  </View>
+
                   {/*button to navigate to scheduling appointments*/}
+                  {/*Viewable by Old Clients and Admin*/}
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
@@ -35,17 +94,19 @@ export default function HomeScreen({navigation}){
                     </TouchableOpacity>
                   </View>
 
-                  {/*button to navigate to viewing existing appointments*/}
+                  {/*button to view all personal appointments page is WIP so no button functionality yet*/}
+                  {/*Viewable by Old Clients only*/}
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("ClientAp")}
-                    >  
-                    <Text style = {styles.homeButtonText}>Existing Appointments</Text>
+                      onPress = {() => navigation.navigate("Your Appointments")}
+                    >
+                    <Text style = {styles.homeButtonText}>Your Appointments</Text>
                     </TouchableOpacity>
                   </View>
 
-                  {/*button to navigate to services offered wont work until services offered page is done*/}
+                  {/*button to navigate to services offered page is WIP so no button functionality yet*/}
+                  {/*Viewable by New Clients, Old Clients, and Admin*/}
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
@@ -55,7 +116,8 @@ export default function HomeScreen({navigation}){
                     </TouchableOpacity>
                   </View>
 
-                  {/*button to navigate to about me wont work until about me page is done*/}
+                  {/*button to navigate to about me page is WIP so no button functionality yet*/}
+                  {/*Viewable by New Clients, Old Clients, and Admin*/}
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
@@ -65,7 +127,8 @@ export default function HomeScreen({navigation}){
                     </TouchableOpacity>
                   </View>
 
-                  {/*button to navigate to FAQ wont work until FAQ page is done*/}
+                  {/*button to navigate to FAQ page is WIP so no button functionality yet*/}
+                  {/*Viewable by New Clients, Old Clients, and Admin*/}
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}

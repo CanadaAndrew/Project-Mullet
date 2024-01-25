@@ -151,20 +151,7 @@ export default function ModifyAv() {
             <StatusBar backgroundColor={'black'} />
             <LinearGradient locations={[0.7, 1]} colors={['#DDA0DD', 'white']} style={styles.container}>
                 <View style={styles.container}>
-                    <View style={styles.header}>
-                        <Text style={styles.headerText}>Modify Availability</Text>
-                    </View>
-                    <View style={styles.backButton}>
-                        <Pressable
-                            style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText]}
-                        >
-                        {({ pressed }) => (
-                            <Link href="/">
-                                <Text style={styles.backButtonText}>Back</Text>
-                            </Link>
-                        )}
-                        </Pressable>
-                    </View>
+                    <View style={styles.backButton}></View>
                     <Calendar onDayPress={handleDayPress} />
                     <View style={styles.dateContainer}>
                         <Text style={styles.dateText}>{displayedDate}</Text>

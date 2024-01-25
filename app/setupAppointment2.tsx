@@ -64,15 +64,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={styles.backButton}>
-                        <Pressable
-                            style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText]}
-                        >
-                            {({ pressed }) => (
-                                <Link href="/">
-                                    <Text style={styles.backButtonText}>Back</Text>
-                                </Link>
-                            )}
-                        </Pressable>
+                        
                     </View>
                     <View style={styles.logoContainer}>
                         <Image source={require('./images/logo.png')} style={styles.logo} />
@@ -216,13 +208,14 @@ const styles = StyleSheet.create({
     // logo styling
     logo: {
         width: 170,
-        height: 150
+        height: 150,
     },
     logoContainer: {
         //height: 60,
         alignItems: 'center',
         paddingTop: 50,
-        paddingBottom: 10
+        paddingBottom: 10,
+        paddingLeft: 30
         //resizeMode: 'contain'
     },
     // back button styling
