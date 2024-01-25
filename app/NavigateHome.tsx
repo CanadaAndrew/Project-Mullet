@@ -28,6 +28,10 @@ export default function NavigateHome(){
                     dataDate: ""
                 })}  
             />
+            <Button
+                title="Client History page"
+                onPress={() => navigation.navigate("ClientHistory")}
+            />
             
         </View>
     )
