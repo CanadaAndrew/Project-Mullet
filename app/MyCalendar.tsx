@@ -27,6 +27,12 @@ const MyCalendar: React.FC<MyCalendarProps> = ({ pageName, disabled = false }) =
     handleDatesSelected(newSelectedDates, pageName);
   };
 
+  /* Getter to allow other pages to grab dates from calendar
+  Example: const selectedDates = calendarContainerRef.current.getSelectedDates();*/
+  const getSelectedDates = () => {
+    return selectedDates;
+  };
+
   return (
     <View style={styles.container}>
       <Calendar
