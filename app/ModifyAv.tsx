@@ -296,6 +296,7 @@ export default function ModifyAv() {
                      transparent = {true}
                     > 
                      <View style={styles.modal} >
+                        <Text style={{fontSize: 24}}>{"\n"}Set Schedule</Text>
                      <Text>{"\n"}</Text>
                      <View style={{ flexDirection:"row", flex: 0, columnGap: 10}}>
                        
@@ -319,11 +320,11 @@ export default function ModifyAv() {
 
                         <Text>{"\n"}</Text>
                         <View style={{ flexDirection:"row", flex: .23, columnGap: 30}}>
-                        <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]} onPress={showTimePicker1}  >
+                        <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText, styles.shadow ]} onPress={showTimePicker1}  >
                         <Text style={styles.backButtonText}>{"  Change Opening  "}</Text>
                         </Pressable>
 
-                        <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]} onPress={showTimePicker2}  >
+                        <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText, styles.shadow ]} onPress={showTimePicker2}  >
                         <Text style={styles.backButtonText}>{"   Change Closing   "}</Text>
                         </Pressable>
                         </View>
@@ -352,7 +353,7 @@ export default function ModifyAv() {
                         )}
                          <Text>{"\n\n"}</Text>
                         <Pressable //hide the popup window
-                                  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]}
+                                  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText, styles.shadow ]}
                                 onPress={() => setModalVisible(!modalVisible)}>
                                 <Text  style={styles.backButtonText} >    Close    </Text>
                                 
@@ -407,7 +408,9 @@ const styles = StyleSheet.create({
         //elevation: 10,
         shadowColor: 'black',
         shadowOpacity: 0.1,
-        alignItems: 'center'
+        alignItems: 'center',
+        
+        
     },
     // calendar.  calendarText is placeholder
     calendar: {
@@ -494,7 +497,7 @@ const styles = StyleSheet.create({
         marginTop: 140,
         marginLeft: 10,
         marginRight: 10,
-        marginBottom: -160,
+        marginBottom: -280,
         borderRadius: 36,
         elevation: 8,
         shadowOpacity: 0.55,
@@ -504,4 +507,9 @@ const styles = StyleSheet.create({
         
        
       },
+      shadow: {
+       
+        elevation: 15,
+        
+      }
 });
