@@ -10,6 +10,7 @@ import ModifyAv from './ModifyAv';
 import NavigateHome from './NavigateHome';
 import SetupAppointment2 from './setupAppointment2';
 import HomeScreen from './HomeScreen';
+import appointmentsClientView from './appointmentsClientView';
 
 const Stack = createNativeStackNavigator()
 
@@ -51,6 +52,11 @@ export default function index() {
          <Stack.Screen name = "HomeScreen" component={HomeScreen}
            options = {{
             title: "Home"
+           }}
+         />
+         <Stack.Screen name = "appointmentsClientView" component={appointmentsClientView}
+           options = {{
+            title: "Your Appointments"
            }}
          />
       </Stack.Navigator>

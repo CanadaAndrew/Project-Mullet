@@ -26,7 +26,7 @@ export default function HomeScreen({navigation}){
                 <View style = {styles.background}>
 
                 {/*add title for homepage*/}
-                <Text style = {styles.objectTitle}> Home</Text>
+                <Text style = {styles.objectTitle}> Home </Text>
 
                 {/*button to modify calendar availability*/}
                 {/*Viewable by Admin only*/}
@@ -94,12 +94,12 @@ export default function HomeScreen({navigation}){
                     </TouchableOpacity>
                   </View>
 
-                  {/*button to view all personal appointments page is WIP so no button functionality yet*/}
+                  {/*button to view all personal appointments as a Client*/}
                   {/*Viewable by Old Clients only*/}
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("Your Appointments")}
+                      onPress = {() => navigation.navigate("appointmentsClientView")}
                     >
                     <Text style = {styles.homeButtonText}>Your Appointments</Text>
                     </TouchableOpacity>
@@ -185,31 +185,6 @@ const styles = StyleSheet.create({
     // shadow for objects Android
     boxShadowAndroid: {
         elevation: 10
-    },
-    // backButton style
-    backButton: {
-        width: 100,
-        height: 65,
-        paddingLeft: 20,
-        paddingTop: 10,
-        margin: 5,
-        shadowColor: 'black',
-        shadowOffset: {
-            width: 4,
-            height: 4,
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 3
-    },
-    // backButton text style
-    backButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 18,
-        textAlign: 'center',
-        borderRadius: 20,
-        paddingTop: 5,
-        paddingBottom: 5
     },
     // home button style
     homeButton: {
