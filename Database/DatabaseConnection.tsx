@@ -487,6 +487,16 @@ app.get('/queryAllAppointmentsByUserID', (req, res) =>{
     .catch(res.send("error"));
 })
 
+app.get('/queryAdminPermissionsByUserID', (req, res) =>{
+    const userID = req.query.userID;
+    const query = "SELECT AdminPriv FROM Users WHERE UserID = " + userID +";";
+    customQuery(query)
+    .then((ret) => res.send(ret))
+    .catch(() => errorHandle(customQuery, query))
+    .then((ret) => res.send(ret))
+    .catch(res.send("error"));
+})
+
 
 //This opens the server, printing to console 'up' when it is up.
 app.listen(3000, () => console.log('up'));
