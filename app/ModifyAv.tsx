@@ -36,21 +36,25 @@ export default function ModifyAv() {
     })
     //function that is called by onDayPress built in function that in turn calls the setSelctedDate function
     const handleDayPress = async (day) => {
-        console.log(day.dateString)
+        //console.log(day.dateString); //for testing purposes
         setSelectedDate(day.dateString);
         setDisplayedDate(moment(day.dateString).format('ddd, MMMM Do'));
         try {
             setLoading(true);
             //console.log(`Selected date: ${day.dateString}`);
-            let tomorrow = day.day + 1;
-            let tomorrowString = day.year + '-' + day.month + '-' + tomorrow.toString();
+            //let tomorrow = day.day + 1;
+            //let tomorrowString = day.year + '-' + day.month + '-' + tomorrow.toString();
+            const todayStart = day.dateString + 'T00:00:00.000Z'; //sql DateTime2 format
+            const todayEnd = day.dateString + 'T23:59:59.999Z'; //sql DateTime2 format
             const response = await database.get('/customQuery', {
                 params: {
-                    query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${day.dateString}' AND AppointmentDate < '${tomorrowString}' AND VacancyStatus = 1;`
+                    //query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${day.dateString}' AND AppointmentDate < '${tomorrowString}' AND VacancyStatus = 1;`
+                    //query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${day.dateString}' AND AppointmentDate < '${tomorrowString}';`
+                    query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${todayStart}' AND AppointmentDate <= '${todayEnd}';`
                 },
             });
-            console.log(response); //for testing purposes
-            const newData = response.data ? response.data.map((appointment) => {
+            console.log(response.data); //for testing purposes
+            const newAppointmentTimes = response.data ? response.data.map((appointment) => {
                 // Extract hours and minutes from dateTime2 value
                 const date = new Date(appointment.AppointmentDate);
                 const hours = date.getHours().toString().padStart(2, '0');
@@ -58,9 +62,8 @@ export default function ModifyAv() {
                 return `${hours}:${minutes}`;
             }) : null;            
             //update the state only if newData is not null
-            if (newData !== null) {
-                setAppointmentTimes(newData);
-                console.log(newData);
+            if (newAppointmentTimes.length > 0) {
+                setAppointmentTimes(newAppointmentTimes);
             }
         } catch (error) {
             console.error(error);  //if there's an error, do not update state and keep current listOfTimes          
@@ -69,10 +72,6 @@ export default function ModifyAv() {
         }
         return null;
     };
-
-    useEffect(() => { //initialize appointmentTimes with demo data
-        setAppointmentTimes(listOfTimes);
-    }, []);
 
     const handleAppointmentPress = (time) => {
         setAppointmentTimes((prevAppointments) => {
@@ -90,49 +89,53 @@ export default function ModifyAv() {
     const handleSetSchedule = async (day) => {
         try {
             const timesToInsert = listOfTimesDefault.filter(time => appointmentTimes.includes(time)); 
+            //console.log('timesToInsert', timesToInsert); //for testing purposes
+            //console.log('listOfTimes', listOfTimes); //for testing purposes
+            //console.log('appointmentTimes', appointmentTimes); //for testing purposes
+            //console.log('listOfTimesDefault', listOfTimesDefault); //for testing purposes
             //check if there are times to insert
             if (timesToInsert.length > 0) {
                 //create new row for each time to insert
-                const createPromises = timesToInsert.map(async (time) => {
-                    const dateTimeString = `${selectedDate} ${time}:00`;
+                const addPromises = timesToInsert.map(async (time) => {
+                    const addDateTimeString = `${selectedDate}T${time}:00.000Z`; //sql DateTime2 format
+                    //console.log('addDateTimeString', addDateTimeString); //for testing purposes
+                    const booked = 0; //vacancy status
                     try {
-                        const response = await database.post('/appointmentPost', {
-                            queryString: 'INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES (@AppointmentDate, @VacancyStatus);',
-                            values: {
-                                AppointmentDate: `${dateTimeString}`, 
-                                VacancyStatus: 1
-                            }
+                        const response = await database.post('/addAvailability', {
+                            addDateTimeString: addDateTimeString,
+                            booked: booked
                         });
-                        console.log(response);
+                        //console.log(response); //for testing purposes
                     } catch (error) {
-                        console.error('Error creating appointment:', error.response.data);
+                        console.error('Error adding appointment time slot:', error.response.data);
                     }
-                });
-    
+                });  
                 //wait for all create operations to complete
-                await Promise.all(createPromises);
+                await Promise.all(addPromises);
             }
     
             //check if there are times to delete
             const timesToDelete = listOfTimesDefault.filter(time => !appointmentTimes.includes(time));
+            console.log('timesToDelete', timesToDelete); //for testing purposes
             if (timesToDelete.length > 0) {
                 //delete rows for times in database but not in current list
-                const deletePromises = timesToDelete.map(async (time) => {
-                    const dateTimeString = `${selectedDate} ${time}:00`;
+                const removePromises = timesToDelete.map(async (time) => {
+                    const removeDateTimeString = `${selectedDate}T${time}:00.000Z`; //sql DateTime2 format
+                    //console.log('removeDateTimeString', removeDateTimeString); //for testing purposes
                     try {
-                        const response = await database.delete('/customDelete', { 
-                            params: {
-                                query: `DELETE FROM AppointmentDate WHERE AppointmentDate = '${dateTimeString}';`
+                        const response = await database.delete('/removeAvailability', { 
+                            data: {
+                                removeDateTimeString: removeDateTimeString
                             }
                         });
-                        console.log(response); //for testing purposes
+                        //console.log(response); //for testing purposes
                     } catch (error) {
-                        console.error('Error deleting appointment:', error);
+                        console.error('Error deleting appointment time slot:', error);
                     }
                 });
     
                 //wait for all delete operations to complete
-                await Promise.all(deletePromises);
+                await Promise.all(removePromises);
             }
     
             //log success or handle it as needed
@@ -141,7 +144,7 @@ export default function ModifyAv() {
             console.error('Error updating schedule:', error);
         }
     };
-    
+
     useEffect(() => {
         setAppointmentTimes(listOfTimes);
       }, [loading]);
