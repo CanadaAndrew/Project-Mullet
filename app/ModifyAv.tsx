@@ -77,7 +77,7 @@ export default function ModifyAv() {
     };
 
     useEffect(() => { //initialize appointmentTimes with demo data
-        setlistOfTimes([' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'])
+        setListOfTimes([' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'])
         setAppointmentTimes(listOfTimes);
        
     }, []);
@@ -127,7 +127,7 @@ export default function ModifyAv() {
 
         }
 
-        setlistOfTimes(tempArray);
+        setListOfTimes(tempArray);
         tempArray = [];
 
         console.log("Time 1: " + getTime1())
@@ -152,7 +152,7 @@ export default function ModifyAv() {
             tempArray.push(i - 12 + ":00pm");
         }
 
-        setlistOfTimes(tempArray);
+        setListOfTimes(tempArray);
         tempArray = [];
 
         if(date1.getHours() <= currentDate.getHours())
@@ -206,7 +206,7 @@ export default function ModifyAv() {
       
 
     
-    const handleSetSchedule = async (day) => {
+    const handleSend = async (day) => {  //Orignally the name was handleSetSchedule, conflicted so it has been changed.
         try {
             const timesToInsert = listOfTimesDefault.filter(time => appointmentTimes.includes(time)); 
             //check if there are times to insert
