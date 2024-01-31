@@ -5,9 +5,10 @@ import {SafeAreaView} from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
 import { SelectList } from 'react-native-dropdown-select-list';
+import MyCalendar from './MyCalendar';
 
 
-export default function ClientAp(){
+export default function ClientAp(){ 
 
     interface Appointment {
         name: string;
@@ -16,6 +17,8 @@ export default function ClientAp(){
         stylist: string;
         realDate: Date;
     }
+    /*I have genuinely no idea why this function is needed*/
+    const handleDatesSelected = (selectedDates: string[]) => {};
 
 
     //new list that makes it work better with filtering and acts more like actual data from the database
@@ -158,7 +161,7 @@ export default function ClientAp(){
         style = {styles.container}>
             <View style = {styles.container}>
                 <View style = {styles.header}>
-                     <Text style = {styles.headerTitle}>Client Appointments</Text>
+                     <Text style = {styles.headerTitle}>Client Appointments</Text> 
                 </View>
                 <View style = {styles.backButton}>     
                     
@@ -179,9 +182,13 @@ export default function ClientAp(){
             </View>
 
             <View>
-                <SafeAreaView style={styles.container}>
-                    <Calendar />
+
+                <SafeAreaView style={styles.calendar}>
+                                    
+                <MyCalendar pageName='ClientAp' onDatesSelected={handleDatesSelected} disabled={true}/>
+
                 </SafeAreaView>
+
             </View>
 
             {/*drop down list formatting and rendering */}
@@ -241,10 +248,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white'
     },
+    calendar: {
+        flex: 0,
+        height: 200,
+        backgroundColor: 'white',
+        marginBottom: 80,
+
+    },
     // header color
     header: {
         backgroundColor: '#942989',
-        paddingTop: 60,
+        paddingTop: 30,
         paddingBottom: 20,
         alignItems: 'center'
     },
@@ -290,7 +304,9 @@ const styles = StyleSheet.create({
         height: 65,
         paddingLeft: 20,
         paddingTop: 10,
+        paddingBottom: 10,
         margin: 5,
+        marginBottom: 30,
         shadowColor: 'black',
         shadowOffset: {
             width: 4,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, } from 'react';
 import {LinearGradient} from 'expo-linear-gradient';
 import {
     StatusBar,
@@ -6,66 +6,74 @@ import {
     Text,
     TouchableOpacity,
     View,
-    SafeAreaView,
-    ScrollView,
     Pressable,
     FlatList,
     Modal,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
+
 import DateTimePicker from '@react-native-community/datetimepicker';
+
+import moment from 'moment'; //used to format dates and times
+import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
 
 
-export default function ModifyAv() { 
+export default function ModifyAv() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]);
-     {/*demo data from queried db, used leading space to keep auto button width uniform*/}
-     const [listOfTimes, setlistOfTimes] = useState([]);
-     
 
-    //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend, 
+    const [loading, setLoading] = useState(false);
+    const [displayedDate, setDisplayedDate] = useState(null);
+    const listOfTimesDefault = [ //used initially and if row is empty for selected date
+        '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00',
+        '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00',
+        '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00',
+      ];
+    const [listOfTimes, setListOfTimes] = useState(listOfTimesDefault);
+
+
+    //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
     //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000',
+        //baseURL: 'http://10.0.0.192:3000',
+        baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
-
-    const getSelectedDay = () => {
-        if (selectedDate) {
-            return selectedDate.day;
+    //function that is called by onDayPress built in function that in turn calls the setSelctedDate function
+    const handleDayPress = async (day) => {
+        console.log(day.dateString)
+        setSelectedDate(day.dateString);
+        setDisplayedDate(moment(day.dateString).format('ddd, MMMM Do'));
+        try {
+            setLoading(true);
+            //console.log(`Selected date: ${day.dateString}`);
+            let tomorrow = day.day + 1;
+            let tomorrowString = day.year + '-' + day.month + '-' + tomorrow.toString();
+            const response = await database.get('/customQuery', {
+                params: {
+                    query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${day.dateString}' AND AppointmentDate < '${tomorrowString}' AND VacancyStatus = 1;`
+                },
+            });
+            console.log(response); //for testing purposes
+            const newData = response.data ? response.data.map((appointment) => {
+                // Extract hours and minutes from dateTime2 value
+                const date = new Date(appointment.AppointmentDate);
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }) : null;            
+            //update the state only if newData is not null
+            if (newData !== null) {
+                setAppointmentTimes(newData);
+                console.log(newData);
+            }
+        } catch (error) {
+            console.error(error);  //if there's an error, do not update state and keep current listOfTimes          
+        } finally {
+            setLoading(false);
         }
         return null;
-    }
-
-    const getSelectedMonth = () => {
-        if (selectedDate) {
-            return selectedDate.month;
-        }
-        return null;
-    }
-
-    const getSelectedYear = () => {
-        if (selectedDate) {
-            return selectedDate.year;
-        }
-        return null;
-    }
-
-    const getSelectedFullDate = () => {
-        if (selectedDate) {
-            return `${selectedDate.day}-${selectedDate.month}-${selectedDate.year}`;
-        }
-        return null;
-    }
-
-    // function that is called by the onDayPress built in function that in turn calls the setSelctedDate function
-    const handleDayPress = (day) => {
-        setSelectedDate(day);
-        console.log(`Selected day: ${day.day}`);     //For testing purposes
-        console.log(`Selected month: ${day.month}`); //For testing purposes
-        console.log(`Selected year: ${day.year}`);   //For testing purposes
-        //add API call to database here using day and copy results over listOfTimes
     };
 
     useEffect(() => { //initialize appointmentTimes with demo data
@@ -75,15 +83,18 @@ export default function ModifyAv() {
     }, []);
 
     const handleAppointmentPress = (time) => {
-        const updatedAppointments = [...appointmentTimes];  
-        if (updatedAppointments.includes(time)) {
-            const index = updatedAppointments.indexOf(time);
-            updatedAppointments.splice(index, 1);
-        } else {
-            updatedAppointments.push(time);
-        }
-        setAppointmentTimes(updatedAppointments);
+        setAppointmentTimes((prevAppointments) => {
+            const updatedAppointments = [...prevAppointments];
+            const index = updatedAppointments.indexOf(time);          
+            if (index !== -1) {
+                updatedAppointments.splice(index, 1);
+            } else {
+                updatedAppointments.push(time);
+            }
+            return updatedAppointments;
+        });
     };
+
 
     const [modalVisible, setModalVisible] = useState(false); //popup for set schedule
     const handleSetSchedule = () => {
@@ -193,6 +204,68 @@ export default function ModifyAv() {
 
      
       
+
+    
+    const handleSetSchedule = async (day) => {
+        try {
+            const timesToInsert = listOfTimesDefault.filter(time => appointmentTimes.includes(time)); 
+            //check if there are times to insert
+            if (timesToInsert.length > 0) {
+                //create new row for each time to insert
+                const createPromises = timesToInsert.map(async (time) => {
+                    const dateTimeString = `${selectedDate} ${time}:00`;
+                    try {
+                        const response = await database.post('/appointmentPost', {
+                            queryString: 'INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES (@AppointmentDate, @VacancyStatus);',
+                            values: {
+                                AppointmentDate: `${dateTimeString}`, 
+                                VacancyStatus: 1
+                            }
+                        });
+                        console.log(response);
+                    } catch (error) {
+                        console.error('Error creating appointment:', error.response.data);
+                    }
+                });
+    
+                //wait for all create operations to complete
+                await Promise.all(createPromises);
+            }
+    
+            //check if there are times to delete
+            const timesToDelete = listOfTimesDefault.filter(time => !appointmentTimes.includes(time));
+            if (timesToDelete.length > 0) {
+                //delete rows for times in database but not in current list
+                const deletePromises = timesToDelete.map(async (time) => {
+                    const dateTimeString = `${selectedDate} ${time}:00`;
+                    try {
+                        const response = await database.delete('/customDelete', { 
+                            params: {
+                                query: `DELETE FROM AppointmentDate WHERE AppointmentDate = '${dateTimeString}';`
+                            }
+                        });
+                        console.log(response); //for testing purposes
+                    } catch (error) {
+                        console.error('Error deleting appointment:', error);
+                    }
+                });
+    
+                //wait for all delete operations to complete
+                await Promise.all(deletePromises);
+            }
+    
+            //log success or handle it as needed
+            console.log('Schedule updated successfully');
+        } catch (error) {
+            console.error('Error updating schedule:', error);
+        }
+    };
+    
+    useEffect(() => {
+        setAppointmentTimes(listOfTimes);
+      }, [loading]);
+     
+
     return (
         <>
             <StatusBar backgroundColor={'black'} />
@@ -203,90 +276,50 @@ export default function ModifyAv() {
                     </View>
                     <View style={styles.backButton}>
                         <Pressable
-                            style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText ]}
+                            style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText]}
                         >
-                            {({ pressed }) => (
-                                <Link href = "/">
-                                    <Text style={styles.backButtonText}>Back</Text>
-                                </Link>
-                            )}
+                        {({ pressed }) => (
+                            <Link href="/">
+                                <Text style={styles.backButtonText}>Back</Text>
+                            </Link>
+                        )}
                         </Pressable>
                     </View>
-                    <Calendar onDayPress={(day) => handleDayPress(day)}/>
+                    <Calendar onDayPress={handleDayPress} />
                     <View style={styles.dateContainer}>
-                        <Text style={styles.dateText}>Thurs, October 4th</Text>
+                        <Text style={styles.dateText}>{displayedDate}</Text>
                     </View>
-                    <FlatList              //adds buttons for available times from db
-                        data={listOfTimes} //need to change later to items from db and account for empty set
+                    <FlatList
+                        data={listOfTimes}
                         keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item }) => (               
-                            <View style={styles.timeCell}>
-                                <TouchableOpacity
-                                    style={[styles.button, { backgroundColor: 'white' }]}
-                                    onPress={() => handleAppointmentPress(item)}
-                                >
-                                    <Text style={[styles.buttonText, { color: appointmentTimes.includes(item) ? 'green' : 'red' }]}>
-                                        {item}
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                        numColumns={4}                               //number buttons per row
-                        contentContainerStyle={styles.timeContainer} //adjust to style buttons
+                        renderItem={({ item }) => (
+                        <View style={styles.timeCell}>
+                            <TouchableOpacity
+                                style={[styles.timeButton, { backgroundColor: 'white' }]}
+                                onPress={() => handleAppointmentPress(item)}
+                            >
+                            <Text style={[styles.buttonText, { color: appointmentTimes.includes(item) ? 'green' : 'red' }]}>
+                                {item}
+                            </Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    numColumns={5}
+                    contentContainerStyle={styles.timeContainer}
                     />
                     <View style={styles.bottomButtonContainer}>
                         <View style={styles.bottomButton}>
                             <Pressable
                                 style={({ pressed }) => [{
-                                    backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
+                                backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
                                 },
-                                //styles.backButtonText
                                 styles.bottomButtonText
                                 ]}
-                                /**
-                                 * Example on how to custom query, for the basic queries the second arguement is not needed
-                                 * Please form exactly how it is for a custom query with params:{query: queryString}
-                                 */
-                                onPress={() => database.get('/customQuery',{
-                                    params:{
-                                        query: 
-                                        "SELECT * FROM ServicesWanted WHERE PhoneNumberEmail = '321-422-4215';"
-                                    }
-                                }
-                                )
-                                /**
-                                 * Note the JSON.stringify, it turns whatever object it is into a string with keys and values,
-                                 * might be a better way to handle it for a string as this prints the {} as well.
-                                 * Should include ret.data, otherwise you get additional internet header stuff.
-                                 */
-                                .then((ret) => {alert(JSON.stringify(ret.data[0]))})
-                                .catch(() =>alert('error'))}
-                                >
-                                {({ pressed }) => (
-                                    <Text style={styles.bottomButtonText}>Add Times</Text>
-                                )}
-                            </Pressable>
-                        </View>
-                        <View style={styles.bottomButton}>
-                            <Pressable
-                                style={({ pressed }) => [{
-                                    backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
-                                },
-                                styles.bottomButtonText
-                                ]}>
-                                {({ pressed }) => (
-                                    <Text style={styles.bottomButtonText}>Delete Times</Text>
-                                )}
-                            </Pressable>
-                        </View>
-                        <View style={styles.bottomButton}>
-                            <Pressable
-                                style={({ pressed }) => [{
-                                    backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
-                                }, styles.bottomButtonText]}
-                                onPress={handleSetSchedule} // Attach the function to the onPress event
-                                >
-                                <Text style={styles.bottomButtonText}>Set Schedule</Text>
+                                onPress={handleSetSchedule}
+                            >
+                            {({ pressed }) => (
+                            <Text style={styles.bottomButtonText}>Set Schedule</Text>
+                            )}
                             </Pressable>
                         </View>
                     </View>
@@ -369,8 +402,8 @@ export default function ModifyAv() {
 
 
         </>
-    );    
-};
+    );
+ };
 
 const styles = StyleSheet.create({
     container: {
@@ -414,9 +447,13 @@ const styles = StyleSheet.create({
     },
     // calendar.  calendarText is placeholder
     calendar: {
+        flex: 0,
         height: 200,
         //backgroundColor: 'white',
-        alignItems: 'center'
+        marginTop: 30,
+        marginBottom: 50,
+        padding: 0,
+        alignItems: 'center',
     },
     calendarText: {
         color: 'black'
@@ -435,10 +472,12 @@ const styles = StyleSheet.create({
     },
     // for the time slots
     timeContainer: {
+        flex: 5,
         height: 100,
         paddingTop: 10,
         paddingBottom: 20,
         paddingLeft: 10,
+        //marginTop: 30,
         //backgroundColor: 'grey'
     },
     timeRow: {
@@ -449,16 +488,17 @@ const styles = StyleSheet.create({
     timeCell: {
         //width: 80,
         paddingRight: 10,
-        width: '25%',             //Adjust width to 25% for four buttons per row
+        width: '20%',             //Adjust width to 20% for five buttons per row
         justifyContent: 'center', //center content vertically
         alignItems: 'center',     //center content horizontally
         marginBottom: 10,         //add marginBottom for spacing
-        height: 50,               //add uniform height to buttons
+        height: 40,               //add uniform height to buttons
     },
     // bottom three buttons
     bottomButtonContainer: {
         //backgroundColor: 'lightgreen',
-        height: 230,
+        height: 50,
+        flex: .2,
         paddingTop: 10,
         alignItems: 'center',
         justifyContent: 'space-evenly'
@@ -473,19 +513,20 @@ const styles = StyleSheet.create({
         //backgroundColor: '#C154C1',
         textAlign: 'center',
         borderRadius: 15,
-        paddingTop: 10,
-        paddingBottom: 10,
+        paddingTop: 5,
+        paddingBottom: 5,
         //elevation: 10,
         shadowColor: 'black',
         shadowOpacity: 0.1
     },
-    button: {
+    timeButton: {
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
     },
     buttonText: {
         fontSize: 16,
+
         fontWeight: 'bold',
     },
     modal: {
@@ -512,4 +553,5 @@ const styles = StyleSheet.create({
         elevation: 15,
         
       }
+
 });
