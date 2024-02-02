@@ -276,19 +276,28 @@ async function customDelete(queryString) {
     }
   }
   
-async function errorHandle(currentFunction, arguement){
+async function errorHandle(currentFunction, arguement, res){
     let i = 0;
     let ret;
+    console.log("Retrying error, beginning first retry.");
     while(i < 3){
+        console.log("i = " + i);
         try{
+            console.log("About to retry");
             ret = await currentFunction(arguement);
+            console.log("Worked, heading back.");
             break;
         }catch{
+            console.log("Another error");
             i++;
+            if(i >= 3){
+                console.log("Reached max retries, sending error.")
+                res.send("Error");
+            }
             continue;
         }
     }
-    return ret;
+    res.send(ret);
 }
 app.use(cors());
 //For each query/function, a REST API needs to be created, a way for the frontend of our program to call methods to our backend.
@@ -310,9 +319,7 @@ app.get('/customQuery', (req, res) => {
     console.log(query);
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
+    .catch(() => errorHandle(customQuery, query, res))
 })
 
 /**
@@ -325,7 +332,7 @@ app.get('/queryUpcomingAppointments', (req, res) => {
     console.log(queryString);
     customQuery(queryString)
     .then((ret) => res.send(ret))
-    .catch(() => console.log('error'));
+    .catch(() => errorHandle(customQuery, queryString, res))
 })
 
 
@@ -415,9 +422,7 @@ app.get('/findUserByID', (req, res) =>{
     const query = "SELECT * FROM Users WHERE UserID = " + queryId + ";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
+    .catch(() => errorHandle(customQuery, query, res))
 })
 
 app.get('/findUserId', (req, res) =>{
@@ -425,9 +430,7 @@ app.get('/findUserId', (req, res) =>{
     const query = "SELECT UserID FROM Users WHERE Email = '" + emailOrPhoneNum + "' OR PhoneNumber = '" + emailOrPhoneNum + "';";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
+    .catch(() => errorHandle(customQuery, query, res))
 })
 
 app.get('/findCurrentClientByID', (req, res) =>{
@@ -435,9 +438,16 @@ app.get('/findCurrentClientByID', (req, res) =>{
     const query = "SELECT * FROM CurrentClientView WHERE UserID = " + queryId + ";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
+    .catch(() => errorHandle(customQuery, query, res))
+})
+
+app.get('/findCurrentClientFullNameByID', (req, res) =>{
+    const queryId = req.query.Id;
+    const query = "SELECT FirstName, MiddleName, LastName FROM CurrentClientView WHERE UserID = " + queryId + ";";
+    console.log(query);
+    customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(res.send("error"));
+    .catch(() => errorHandle(customQuery, query, res))
 })
 
 app.get('/findNewClientViewByID', (req, res) =>{
@@ -445,9 +455,7 @@ app.get('/findNewClientViewByID', (req, res) =>{
     const query = "SELECT * FROM NewClientView WHERE UserID = " + queryId + ";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
+    .catch(() => errorHandle(customQuery, query, res))
 })
 
 app.get('/findPasswordByID', (req, res) =>{
@@ -455,9 +463,7 @@ app.get('/findPasswordByID', (req, res) =>{
     const query = "SELECT Pass FROM Users WHERE UserID = " + queryId + ";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
+    .catch(() => errorHandle(customQuery, query, res))
 })
 
 app.get('/findAvailableTimesGivenDate', (req, res) => {
@@ -465,9 +471,7 @@ app.get('/findAvailableTimesGivenDate', (req, res) => {
     const query =  "SELECT * FROM Appointments WHERE AppointmentDate >= '" + date + " 00:00:00' AND AppointmentDate <= '" + date + " 23:59:59' AND VacancyStatus = 0;";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
+    .catch(() => errorHandle(customQuery, query, res))
 })
 
 app.get('/queryUpcomingAppointmentsByUserIDAndDate', (req, res) =>{
@@ -476,9 +480,7 @@ app.get('/queryUpcomingAppointmentsByUserIDAndDate', (req, res) =>{
     const query = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + date + " 00:00:00' AND UserID = " + userID +";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
+    .catch(() => errorHandle(customQuery, query, res))
 })
 
 app.get('/queryPastAppointmentsByUserIDAndDate', (req, res) =>{
@@ -487,9 +489,7 @@ app.get('/queryPastAppointmentsByUserIDAndDate', (req, res) =>{
     const query = "SELECT * FROM Appointments WHERE AppointmentDate <= '" + date + " 00:00:00' AND UserID = " + userID +";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
+    .catch(() => errorHandle(customQuery, query, res))
 })
 
 app.get('/queryAllAppointmentsByUserID', (req, res) =>{
@@ -497,9 +497,7 @@ app.get('/queryAllAppointmentsByUserID', (req, res) =>{
     const query = "SELECT * FROM Appointments WHERE UserID = " + userID +";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
+    .catch(() => errorHandle(customQuery, query, res))
 })
 
 

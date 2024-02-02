@@ -28,7 +28,6 @@ export default function ClientAp(){
     /*I have genuinely no idea why this function is needed*/
     const handleDatesSelected = (selectedDates: string[]) => {};
 
-
     //new list that makes it work better with filtering and acts more like actual data from the database
     let clientAppointmentsDefault: Appointment[] = [
         {
@@ -75,7 +74,7 @@ export default function ClientAp(){
     const [clientAppointments, setClientAppointments] = React.useState(clientAppointmentsDefault);
 
     //for the drop down list below
-    const [selected, setSelected] = React.useState("");
+    const [selected, setSelected] = React.useState("All");
 
     const filter = [
         {key: 'All', value: 'All'},
@@ -93,6 +92,17 @@ export default function ClientAp(){
         return `${mm}/${dd}/${yy}`;
     }
 
+
+    const [first, setFirst] = React.useState(0);
+    firstUpdate();
+    function firstUpdate(){
+        if(first === 0 ){
+            setFirst(1);
+            let date = new Date;
+            let dateString = date.toISOString(); //NOTE THAT THE DATE IS CURRENTLY OFF, NEED TO FIX IN ANOTHER SPRINT
+            updateAppointments(dateString.split("T")[0]);
+        }
+    }
     //Updates the upcoming appointments given a date.
     function updateAppointments(date){
         let data;
@@ -102,25 +112,42 @@ export default function ClientAp(){
             }
         })
         .then((ret) => data = ret.data)
-        .then(() => updateAppointmentsDisplay(data))
+        .then(() => {updateAppointmentsDisplay(data)})
         .catch(() => {alert("error");});
     }
 
-    function updateAppointmentsDisplay(data){
+    async function updateAppointmentsDisplay(data){
         let appointmentList : Appointment[] = [];
         let i = 0;
-        data.forEach((appointment) => {
-            let newAppointment = {
-                name: appointment.PhoneNumberEmail,
+        data.forEach(async (appointment) => {
+            let dateTimeArray = appointment.AppointmentDate.split("T");
+            let newDate = dateTimeArray[0];
+            let newTime = dateTimeArray[1].split("Z")[0];
+            let newAppointment : Appointment = {
+                name: appointment.UserID,
                 service: appointment.TypeOfAppointment,
-                date: appointment.AppointmentDate,
+                date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
-                realDate: appointment.AppointmentDate
+                realDate: new Date(newDate)
             }
             appointmentList[i] = newAppointment;
         }
         )
         setClientAppointments(appointmentList);
+        const prevSelect = selected;
+        handleSelection(selected);
+        setSelected("Adding new Info");
+        setSelected(prevSelect);
+    }
+
+    //Work on another sprint. Query for name instead of having userID as name.
+    function getName(userID){
+        database.get('/findCurrentClientFullNameByID', {
+            params: {
+                queryId : userID 
+            }
+        })
+        .then()
     }
     //handleSelection is called whenever a change is made in the drop down menu. It is passed the key value from the filter array above
     //it then decides which filtering option to use on the data based upon the key that it is passed in this function
@@ -227,9 +254,9 @@ export default function ClientAp(){
             <View>
 
                 <SafeAreaView style={styles.calendar}>
-                                    
-                <MyCalendar pageName='ClientAp' onDatesSelected={handleDatesSelected} disabled={true}/>
 
+                <MyCalendar pageName='ClientAp' onDatesSelected={handleDatesSelected} disabled={true}/>
+                
                 </SafeAreaView>
 
             </View>
@@ -253,7 +280,6 @@ export default function ClientAp(){
             {/* flat list is replacing the hard coded list from before as this can work with database data and print out the entire
             list at once */}
             <FlatList
-
                 data = {filteredAps}
                 horizontal = {true}
                 renderItem = {({item}) => (
