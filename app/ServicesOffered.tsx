@@ -23,10 +23,10 @@ export default function ServicesOffered() {
     })
     
     // placeholder for service names and prices
-    const services = [['Kid\'s Haircut', '1 Hour'],['Men\'s Haircut','1 Hour'], ['Women\'s Haircut', '1 Hour'], ['Partial Highlight', '3 Hours']
-                    ,['Full Highlight', '3 Hours'], ['Root Touch-Up', '2 Hours'], ['Full Color', '2 Hours'], ['Extension Consultation', '1 Hour']
-                    , ['Extension Installation', '3 Hours'], ['Extension Move-Up', '3 Hours'], ['Make-Up', '1 Hour'], ['Specialty Occasion Hairstyle', '1 Hour']
-                    , ['Perm', '2 Hours'], ['Deep Conditioning Treatment', '1 Hour'], ['Blow Dry and Style', '1 Hour']]
+    const services = [['Kid\'s Haircut'],['Men\'s Haircut'], ['Women\'s Haircut'], ['Partial Highlight']
+                    ,['Full Highlight'], ['Root Touch-Up'], ['Full Color'], ['Extension Consultation']
+                    , ['Extension Installation'], ['Extension Move-Up'], ['Make-Up'], ['Specialty Occasion Hairstyle']
+                    , ['Perm'], ['Deep Conditioning Treatment'], ['Blow Dry and Style'], ['Waxing Service']]
 
     return (
         <>
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
         paddingRight: 10
     },
     serviceText: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
         color: 'white',
         textAlign: 'left'
