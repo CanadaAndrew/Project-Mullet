@@ -15,8 +15,16 @@ import moment from 'moment'; //used to format dates and times
 import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
 
+//add route as a param to the function of every page that requires data from the const established in HomeScreen
+//You can also make another const here and transfer data as well here up to you
+export default function ModifyAv({ route }) {
+    //make a local const this way using route.params
+    const { userData } = route.params;
 
-export default function ModifyAv() {
+    //Tester lines for console
+   // console.log("Test");
+   // console.log('UserData in ModifyAv: ', userData);
+
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -27,6 +35,7 @@ export default function ModifyAv() {
         '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00',
       ];
     const [listOfTimes, setListOfTimes] = useState(listOfTimesDefault);
+
 
     //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
     //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
@@ -190,6 +199,12 @@ export default function ModifyAv() {
                             </Pressable>
                         </View>
                     </View>
+                    {/* 
+                        Tester text that shows the userData Const from HomeScreen to see if it works. 
+                    */}
+                    {/* <Text>
+                        UserId: {userData.UserId}, AdminPriv: {userData.AdminPriv.toString()}, NewClient: {userData.NewClient.toString()}
+                    </Text> */}
                 </View>
             </LinearGradient>
         </>

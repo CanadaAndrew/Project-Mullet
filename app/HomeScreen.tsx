@@ -7,6 +7,20 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 // overlap. comments have been added above each button for clarification.
 
 export default function HomeScreen({navigation}){
+
+  /*
+    Creates a const of data to be sent to the other pages in the app
+    You can add other consts or just add another variable to the existing userData const
+  */
+
+  const userData = {
+
+    UserId: '1',
+    AdminPriv: true,
+    NewClient: false
+
+  };
+
     return(
         <ScrollView>
             <View style = {styles.container}>
@@ -33,7 +47,9 @@ export default function HomeScreen({navigation}){
                 <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("ModifyAv")}
+                      //Pass the userData const into the navigate function. This has to be done for every page you are using navigate to pass
+                      //data into
+                      onPress = {() => navigation.navigate("ModifyAv", {userData})}
                     >  
                     <Text style = {styles.homeButtonText}>Modify Calendar</Text>
                     </TouchableOpacity>
@@ -44,7 +60,7 @@ export default function HomeScreen({navigation}){
                 <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("ClientAp")}
+                      onPress = {() => navigation.navigate("ClientAp", {userData})}
                     >  
                     <Text style = {styles.homeButtonText}>Existing Appointments</Text>
                     </TouchableOpacity>
@@ -55,7 +71,7 @@ export default function HomeScreen({navigation}){
                 <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("Client info")}
+                      onPress = {() => navigation.navigate("Client info", {userData})}
                     >  
                     <Text style = {styles.homeButtonText}>modify Client Info</Text>
                     </TouchableOpacity>
@@ -66,7 +82,7 @@ export default function HomeScreen({navigation}){
                 <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("Client history")}
+                      onPress = {() => navigation.navigate("Client history", {userData})}
                     >  
                     <Text style = {styles.homeButtonText}>Client History</Text>
                     </TouchableOpacity>
@@ -77,7 +93,7 @@ export default function HomeScreen({navigation}){
                 <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("New Client approval")}
+                      onPress = {() => navigation.navigate("New Client approval", {userData})}
                     >  
                     <Text style = {styles.homeButtonText}>New Client approval</Text>
                     </TouchableOpacity>
@@ -88,7 +104,7 @@ export default function HomeScreen({navigation}){
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("setUpAppoint1")}
+                      onPress = {() => navigation.navigate("setUpAppoint1", {userData})}
                     >
                     <Text style = {styles.homeButtonText}>Schedule Appointments</Text>
                     </TouchableOpacity>
@@ -99,7 +115,7 @@ export default function HomeScreen({navigation}){
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("Your Appointments")}
+                      onPress = {() => navigation.navigate("Your Appointments", {userData})}
                     >
                     <Text style = {styles.homeButtonText}>Your Appointments</Text>
                     </TouchableOpacity>
@@ -110,7 +126,7 @@ export default function HomeScreen({navigation}){
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("Services Offered")}
+                      onPress = {() => navigation.navigate("Services Offered", {userData})}
                     >
                     <Text style = {styles.homeButtonText}>Services Offered</Text>
                     </TouchableOpacity>
@@ -121,7 +137,7 @@ export default function HomeScreen({navigation}){
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("About Me")}
+                      onPress = {() => navigation.navigate("About Me", {userData})}
                     >
                     <Text style = {styles.homeButtonText}>About Me</Text>
                     </TouchableOpacity>
@@ -132,7 +148,7 @@ export default function HomeScreen({navigation}){
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("FAQ")}
+                      onPress = {() => navigation.navigate("FAQ", {userData})}
                     >
                     <Text style = {styles.homeButtonText}>FAQ</Text>
                     </TouchableOpacity>

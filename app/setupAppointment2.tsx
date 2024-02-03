@@ -21,6 +21,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
     // for data transfer between appointment pages
     const {hairStyleData} = route.params;
     const {dateData} = route.params;
+    const { userData } = route.params;
 
     const database = axios.create({
         baseURL: 'http://10.0.0.192:3000',

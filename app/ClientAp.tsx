@@ -9,7 +9,9 @@ import MyCalendar from './MyCalendar';
 import { ScrollView } from 'react-native-gesture-handler';
 
 
-export default function ClientAp(){ 
+export default function ClientAp({ route }){ 
+
+    const { userData } = route.params;
 
     interface Appointment {
         name: string;
