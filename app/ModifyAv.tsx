@@ -14,6 +14,7 @@ import { Link } from 'expo-router';
 import moment from 'moment'; //used to format dates and times
 import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
+import { displayHours } from './Enums/Enums';
 
 
 export default function ModifyAv() {
@@ -21,22 +22,19 @@ export default function ModifyAv() {
     const [appointmentTimes, setAppointmentTimes] = useState([]);
     const [loading, setLoading] = useState(false);
     const [displayedDate, setDisplayedDate] = useState(null);
-    const listOfTimesDefault = [ //used initially and if row is empty for selected date
-        '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00',
-        '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00',
-        '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00',
-      ];
+    const listOfTimesDefault = []; //used initially and if row is empty for selected date
     const [listOfTimes, setListOfTimes] = useState(listOfTimesDefault);
 
     //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
     //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000', //Andrew pc local
+        //baseURL: 'http://10.0.0.192:3000', //Andrew pc local
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://10.0.0.14:3000'
     })
     //function that is called by onDayPress built in function that in turn calls the setSelctedDate function
     const handleDayPress = async (day) => {
-        console.log(day.dateString)
+        //alert(day.dateString)
         setSelectedDate(day.dateString);
         setDisplayedDate(moment(day.dateString).format('ddd, MMMM Do'));
         try {
@@ -49,7 +47,7 @@ export default function ModifyAv() {
                     query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${day.dateString}' AND AppointmentDate < '${tomorrowString}' AND VacancyStatus = 1;`
                 },
             });
-            console.log(response); //for testing purposes
+            //alert(response.data); //for testing purposes
             const newData = response.data ? response.data.map((appointment) => {
                 // Extract hours and minutes from dateTime2 value
                 const date = new Date(appointment.AppointmentDate);
@@ -67,6 +65,43 @@ export default function ModifyAv() {
         } finally {
             setLoading(false);
         }
+
+        //Makes an iterable and Times array when the calendar is pressed
+        let iterable;
+        let Times = [];
+        try 
+        {
+            //formats the day passed into this function to include the information needed to query it
+            const beginDay = day.dateString + 'T00:00:00.000Z';
+            const endDay = day.dateString + 'T23:59:59.000Z';
+            //Queries the database with the beginning and end of the day selected 
+            const responseToQ = await database.get('/customQuery', {
+                params: {
+                    query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${beginDay}' AND AppointmentDate <= '${endDay}' AND VacancyStatus = 0;`
+                },
+            });
+            //appointmentData then gets the data from the responding query
+            let appointmentData = responseToQ.data;
+
+            //For each that loops through the appointmentData dates and slices it up to get just the time slot
+            //converts time using the Enums and pushes it to the Times array
+            for(iterable in appointmentData)
+            {
+                let apptTime = appointmentData[iterable].AppointmentDate.slice(11,19)
+                let formattedTime = displayHours[apptTime];
+                Times.push(formattedTime)
+                
+
+            }
+            //sets the list of times to the times array so it is updated to reflect that in the app.
+            setListOfTimes(Times);
+
+        } 
+        catch(error)
+        {
+            console.error(error);
+        }
+
         return null;
     };
 
@@ -184,7 +219,7 @@ export default function ModifyAv() {
                             </TouchableOpacity>
                         </View>
                     )}
-                    numColumns={5}
+                    numColumns={3}
                     contentContainerStyle={styles.timeContainer}
                     />
                     <View style={styles.bottomButtonContainer}>
@@ -290,7 +325,7 @@ const styles = StyleSheet.create({
     timeCell: {
         //width: 80,
         paddingRight: 10,
-        width: '20%',             //Adjust width to 20% for five buttons per row
+        width: '30%',             //Adjust width to 20% for five buttons per row
         justifyContent: 'center', //center content vertically
         alignItems: 'center',     //center content horizontally
         marginBottom: 10,         //add marginBottom for spacing
