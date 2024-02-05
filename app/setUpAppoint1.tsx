@@ -6,9 +6,23 @@ import MyCalendar from './MyCalendar';
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useRef } from 'react';
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
+
+//Variable is interchangeable in terms of function with the calendar
+const calendarContainerRef = useRef(null);
+
+//I made this function to try and render the dates separately from the component. Didn't seem to work
+//but is worth leaving for now
+const renderSelectedDates = () => {
+    const markedDates = calendarContainerRef.current?.markedDates;
+
+    if (!markedDates) {
+      return null;
+    }
+}
 
 export default function setUpAppoint1({navigation}) { // add navigation to default function for data transfer between pages
 
@@ -121,7 +135,7 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
                 {/*Basic calendar implementation. Currently logs selected dates to the console and highlights them.*/
                 /*Setting disabled to true will disable the higlighting feature.*/}
                 <View style = {[styles.dummyCalendar, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                    <MyCalendar pageName='setUpAppoint1' onDatesSelected={handleDatesSelected} disabled={false}/>
+                    <MyCalendar pageName='setUpAppoint1' onDatesSelected={handleDatesSelected} disabled={false} ref={calendarContainerRef}/>
                 </View>
 
                 {/*appointment button no functionality yet*/}
@@ -139,13 +153,17 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
                 only sending data for hairstyles, data for dates is placeholder data for now*/}
                 <View>
                     <TouchableOpacity
-                      style = {styles.appointmentButton}
-                      onPress = {() => navigation.navigate("setupAppointment2", { 
-                        hairStyleData: hairStyleSelected, 
-                        dateData: "11-30-2023"
-                      })}>
-                        <Text style = {styles.appointButtonText}>Schedule Appointment</Text>
+                        style={styles.appointmentButton}
+                        onPress={() => {
+                            const selectedDates = calendarContainerRef.current?.markedDates;
+                            navigation.navigate('setupAppointment2', { 
+                            hairStyleData: hairStyleSelected, 
+                            dateData: selectedDates,
+                            });
+                            }}>
+                        <Text style={styles.appointButtonText}>Schedule Appointment</Text>
                     </TouchableOpacity>
+
                 </View>
 
             </View>
