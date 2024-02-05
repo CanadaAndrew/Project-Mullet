@@ -1,8 +1,110 @@
 import { StyleSheet, Text, View, ScrollView} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
+import axios from 'axios';
 
 export default function appointmentsClientView(){
+    interface Appointment {
+        name: string;
+        service: string;
+        date: string;
+        stylist: string;
+        realDate: Date;
+    }
+
+    let defaultAppointment : Appointment[] = [];
+    const [upcomingClientAppointments, setUpcomingClientAppointments] = React.useState(defaultAppointment);
+    const [pastClientAppointments, setPastClientAppointments] = React.useState(defaultAppointment);
+
+    const database = axios.create({
+        baseURL: 'http://10.0.0.192:3000',
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+    })
+
+    const [first, setFirst] = React.useState(0);
+    firstUpdate();
+    function firstUpdate(){
+        if(first === 0 ){
+            setFirst(1);
+            let date = new Date;
+            let dateString = date.toISOString(); //NOTE THAT THE DATE IS CURRENTLY OFF, NEED TO FIX IN ANOTHER SPRINT
+            updateUpcomingAppointments(dateString.split("T")[0], 1); //Note that currently using ID 1 until the use of UserID transfer comes in
+            updatePastAppointments(dateString.split("T")[0], 1);
+        }
+    }
+    //Updates the upcoming appointments given a date.
+    function updateUpcomingAppointments(date, userID){
+        let data;
+        database.get('/queryUpcomingAppointmentsByUserIDAndDate', {
+            params: {
+                date : date,
+                userID: userID //temp value, will be changed
+            }
+        })
+        .then((ret) => data = ret.data)
+        .then(() => {updateUpcomingAppointmentsDisplay(data)})
+        .catch(() => {alert("error");});
+    }
+
+    function updatePastAppointments(date, userID){
+        let data;
+        database.get('/queryPastAppointmentsByUserIDAndDate', {
+            params: {
+                date : date,
+                userID: userID //temp value, will be changed
+            }
+        })
+        .then((ret) => data = ret.data)
+        .then(() => {updatePastAppointmentsDisplay(data)})
+        .catch(() => {alert("error");});
+    }
+
+    function updateUpcomingAppointmentsDisplay(data){
+        //alert(JSON.stringify(data));
+        //alert(JSON.stringify(data[0]));
+        let appointmentList : Appointment[] = [];
+        let i = 0;
+        data.forEach((appointment) => {
+            let dateTimeArray = appointment.AppointmentDate.split("T");
+            let newDate = dateTimeArray[0];
+            let newTime = dateTimeArray[1].split("Z")[0];
+            let newAppointment : Appointment = {
+                name: appointment.UserID,
+                service: appointment.TypeOfAppointment,
+                date: newDate + ", " + newTime,
+                stylist: 'Melissa Wright',
+                realDate: new Date(newDate)
+            }
+            appointmentList[i] = newAppointment;
+            i += 1;
+        }
+        )
+        setUpcomingClientAppointments(appointmentList);
+        alert("Upcoming List: " + JSON.stringify(appointmentList));
+    }
+
+    function updatePastAppointmentsDisplay(data){
+        let appointmentList : Appointment[] = [];
+        let i = 0;
+        data.forEach((appointment) => {
+            let dateTimeArray = appointment.AppointmentDate.split("T");
+            let newDate = dateTimeArray[0];
+            let newTime = dateTimeArray[1].split("Z")[0];
+            let newAppointment : Appointment = {
+                name: appointment.UserID,
+                service: appointment.TypeOfAppointment,
+                date: newDate + ", " + newTime,
+                stylist: 'Melissa Wright',
+                realDate: new Date(newDate)
+            }
+            appointmentList[i] = newAppointment;
+            i += 1;
+        }
+        )
+        setPastClientAppointments(appointmentList);
+        //Test: alert("Past list: " + JSON.stringify(appointmentList));
+    }
+
     return(
         <ScrollView>
             <View style = {styles.container}>
