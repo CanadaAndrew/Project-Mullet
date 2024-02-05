@@ -8,9 +8,13 @@ import {
     View,
     Pressable,
     FlatList,
+    Modal,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
+
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 import moment from 'moment'; //used to format dates and times
 import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
@@ -19,6 +23,7 @@ import axios from 'axios';  //Used to get data from the backend nodejs
 export default function ModifyAv() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]);
+
     const [loading, setLoading] = useState(false);
     const [displayedDate, setDisplayedDate] = useState(null);
     const listOfTimesDefault = [ //used initially and if row is empty for selected date
@@ -27,6 +32,7 @@ export default function ModifyAv() {
         '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00',
       ];
     const [listOfTimes, setListOfTimes] = useState(listOfTimesDefault);
+
 
     //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
     //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
@@ -71,7 +77,9 @@ export default function ModifyAv() {
     };
 
     useEffect(() => { //initialize appointmentTimes with demo data
+        setListOfTimes([' 7:00am', ' 8:00am', ' 9:00am', '10:00am', '11:00am', '12:00pm', ' 1:00pm', ' 2:00pm'])
         setAppointmentTimes(listOfTimes);
+       
     }, []);
 
     const handleAppointmentPress = (time) => {
@@ -86,8 +94,119 @@ export default function ModifyAv() {
             return updatedAppointments;
         });
     };
+
+
+    const [modalVisible, setModalVisible] = useState(false); //popup for set schedule
+    const handleSetSchedule = () => {
+        // Push the appointmentTimes array to the database here
+        setModalVisible(!modalVisible); //toggle popup to select time range
+        console.log('Appointment Times:', appointmentTimes);       
+    };
+
+    //note: Date is in UNIX format, including milliseconds, using a converter is recommended
+    const [date1, setDate1] = useState(new Date(1700326800000));
+    const [date2, setDate2] = useState(new Date(1700355600000));
+    const [show1, setShow1] = useState(false);
+    const [show2, setShow2] = useState(false);
     
-    const handleSetSchedule = async (day) => {
+    //changes time with time picker
+    const onChange1 = (event, selectedDate) => {
+        const currentDate = selectedDate;
+        setShow1(false);
+        setDate1(currentDate);
+        //setDate doesn't update immediately, which is why currentDate and Time1 are still different
+        //getTime1 changes when function ends.
+        var tempArray = []
+
+        for(let i = currentDate.getHours(); i < date2.getHours(); i++)
+        {
+            if (i <= 12)
+                tempArray.push(i + ":00am");
+            else
+                tempArray.push(i - 12 + ":00pm");
+
+        }
+
+        setListOfTimes(tempArray);
+        tempArray = [];
+
+        console.log("Time 1: " + getTime1())
+        console.log("Time 2: " + getTime2())
+        console.log(currentDate.getHours())
+
+    
+      };
+
+      const onChange2 = (event, selectedDate) => {
+        const currentDate = selectedDate;
+        setShow2(false);
+        setDate2(currentDate);
+
+        var tempArray = []
+
+        for(let i = date1.getHours(); i < currentDate.getHours(); i++)
+        {
+            if (i <= 12)
+            tempArray.push(i + ":00am");
+        else
+            tempArray.push(i - 12 + ":00pm");
+        }
+
+        setListOfTimes(tempArray);
+        tempArray = [];
+
+        if(date1.getHours() <= currentDate.getHours())
+        {
+
+        }
+        console.log("Time 1: " + getTime1())
+        console.log("Time 2: " + getTime2())
+        console.log(currentDate.getHours())
+      };
+  
+      const showTimePicker1 = () => {setShow1(true); };
+      const showTimePicker2 = () => {setShow2(true); };
+
+      //return time in hhmm am/pm format
+      const getTime1 = () => {
+
+        if(date1.getHours() <= 12)
+        {
+            if( date1.getMinutes() < 10)
+                return (date1.getHours() + ":" +  "0" + date1.getMinutes() + "am");
+            else
+                return (date1.getHours() + ":" + date1.getMinutes() + "am");
+        }
+        else
+        {
+            if( date1.getMinutes() < 10)
+                return (date1.getHours() - 12 + ":" +  "0" + date1.getMinutes() + "pm");
+            else
+                return (date1.getHours() - 12 + ":" + date1.getMinutes() + "pm");
+        }
+    }
+      const getTime2 = () => {
+        if(date2.getHours() <= 12)
+        {
+            if( date2.getMinutes() < 10)
+                return (date2.getHours() + ":" +  "0" + date2.getMinutes() + "am");
+            else
+                return (date2.getHours() + ":" + date2.getMinutes() + "am");
+        }
+        else
+        {
+            if( date2.getMinutes() < 10)
+                return (date2.getHours() - 12 + ":" +  "0" + date2.getMinutes() + "pm");
+            else
+                return (date2.getHours() - 12 + ":" + date2.getMinutes() + "pm");
+        }
+    }
+
+     
+      
+
+    
+    const handleSend = async (day) => {  //Orignally the name was handleSetSchedule, conflicted so it has been changed.
         try {
             const timesToInsert = listOfTimesDefault.filter(time => appointmentTimes.includes(time)); 
             //check if there are times to insert
@@ -146,6 +265,7 @@ export default function ModifyAv() {
         setAppointmentTimes(listOfTimes);
       }, [loading]);
      
+
     return (
         <>
             <StatusBar backgroundColor={'black'} />
@@ -190,8 +310,84 @@ export default function ModifyAv() {
                             </Pressable>
                         </View>
                     </View>
-                </View>
-            </LinearGradient>
+                    
+                    <Modal visible={modalVisible} //popup that displays the two times to input
+                     animationType="fade"
+                     transparent = {true}
+                    > 
+                     <View style={styles.modal} >
+                        <Text style={{fontSize: 24}}>{"\n"}Set Schedule</Text>
+                     <Text>{"\n"}</Text>
+                     <View style={{ flexDirection:"row", flex: 0, columnGap: 10}}>
+                       
+                     
+                        <Text>Opening Time</Text>
+                      
+                       
+                        <Text>                   Closing Time</Text>
+                        <Text>{"\n"}</Text>
+                        </View>
+                       
+                        <View style={{ flexDirection:"row", flex: .2, columnGap: 85}}>
+                        <TouchableOpacity style={{ backgroundColor: '#FFFFFF', padding: 10, borderRadius: 4 }}>
+                        <Text style={{fontWeight: "bold"}}>{getTime1()}</Text>
+                        </TouchableOpacity>
+                       
+                        <TouchableOpacity style={{ backgroundColor: '#FFFFFF', padding: 10, borderRadius: 4 }}>
+                        <Text style={{fontWeight: "bold"}}>{getTime2()}</Text>
+                        </TouchableOpacity>
+                        </View>
+
+                        <Text>{"\n"}</Text>
+                        <View style={{ flexDirection:"row", flex: .23, columnGap: 30}}>
+                        <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText, styles.shadow ]} onPress={showTimePicker1}  >
+                        <Text style={styles.backButtonText}>{"  Change Opening  "}</Text>
+                        </Pressable>
+
+                        <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText, styles.shadow ]} onPress={showTimePicker2}  >
+                        <Text style={styles.backButtonText}>{"   Change Closing   "}</Text>
+                        </Pressable>
+                        </View>
+
+
+                       
+                        
+                        {show1 && (
+                        <DateTimePicker
+                        value={date1}
+                        mode={'time'}
+                        is24Hour={false}
+                        onChange={onChange1}
+                        
+                        />
+                        )}
+
+                        {show2 && (
+                        <DateTimePicker
+                        value={date2}
+                        mode={'time'}
+                        is24Hour={false}
+                        onChange={onChange2}
+                        
+                        />
+                        )}
+                         <Text>{"\n\n"}</Text>
+                        <Pressable //hide the popup window
+                                  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText, styles.shadow ]}
+                                onPress={() => setModalVisible(!modalVisible)}>
+                                <Text  style={styles.backButtonText} >    Close    </Text>
+                                
+
+                                </Pressable>
+                                </View>
+
+                                
+                    </Modal>
+                    </View>
+
+</LinearGradient>
+
+
         </>
     );
  };
@@ -232,7 +428,9 @@ const styles = StyleSheet.create({
         //elevation: 10,
         shadowColor: 'black',
         shadowOpacity: 0.1,
-        alignItems: 'center'
+        alignItems: 'center',
+        
+        
     },
     // calendar.  calendarText is placeholder
     calendar: {
@@ -315,6 +513,32 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontSize: 16,
-        fontWeight: 'bold', 
-    }, 
+
+        fontWeight: 'bold',
+    },
+    modal: {
+      
+        flex: 0.5,
+        justifyContent: "flex-start",
+        alignItems: "center",
+        backgroundColor: "rgba(211, 211, 250,0.979)",
+        marginTop: 140,
+        marginLeft: 10,
+        marginRight: 10,
+        marginBottom: -280,
+        borderRadius: 36,
+        elevation: 8,
+        shadowOpacity: 0.55,
+        shadowOffset: { width: 2, height: 2 },
+        shadowRadius: 6
+        
+        
+       
+      },
+      shadow: {
+       
+        elevation: 15,
+        
+      }
+
 });
