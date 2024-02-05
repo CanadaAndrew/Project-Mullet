@@ -19,7 +19,7 @@ export default function index() {
      <Stack.Navigator>
          <Stack.Screen name = "NaviagateHome" component={NavigateHome}/>
          <Stack.Screen name = "setUpAppoint1" component={setUpAppoint1}/>
-         <Stack.Screen name = "setupAppointment2" component={SetupAppointment2}/>
+         <Stack.Screen name = "setupAppointment2" component={setupAppointment2}/>
          <Stack.Screen name = "ClientAp" component={ClientAp}/>
          <Stack.Screen name = "ModifyAv" component={ModifyAv}/>
          <Stack.Screen name = "ClientHistory" component={ClientHistory} />
