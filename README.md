@@ -66,6 +66,7 @@ npm install mssql
 npm install express
 npm install cors
 npm install moment-timezone
+npm install @react-native-community/datetimepicker --save
 ```
     
 ### Running the Program
@@ -182,3 +183,4 @@ Sprint End Date: 2024/03/18
 Goals for the Sprint: Complete any tasks leftover from Sprint 7 and after these are completed use whatever left over time to polish the program and fix any bugs we can.
 
 Completion Status: *Hasn't Started*
+
