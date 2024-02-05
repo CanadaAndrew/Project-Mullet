@@ -1,149 +1,169 @@
 import { StyleSheet, Text, View, Pressable, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'expo-router';
 import { SelectList } from 'react-native-dropdown-select-list';
-
+import axios from 'axios'; //used to get data from the backend nodejs
+import moment from 'moment-timezone';
 export default function ClientHistory() {
 
-    interface Appointment {
-        name: string;
-        service: string;
-        date: string;
-        stylist: string;
-        realDate: Date;
-    }
-    /*I have genuinely no idea why this function is needed*/
-    const handleDatesSelected = (selectedDates: string[]) => { };
+    const database = axios.create({
+        baseURL: 'http://192.168.1.150:3000', //Chris pc local
+    });
+    const [upcomingClientAppointments, setUpcomingClientAppointments] = useState([]);
+    const [pastClientAppointments, setPastClientAppointments] = useState([]);
 
-
-    //new list that makes it work better with filtering and acts more like actual data from the database
-    let clientAppointments: Appointment[] = [
-        {
-            name: "Will Smith",
-            service: "Men's Haircut",
-            date: "10/27/23, Fri, 1:00pm",
-            stylist: 'Melissa Wright',
-            realDate: new Date("2023-10-27")
-        },
-        {
-            name: "Bob Smith",
-            service: "Men's Haircut",
-            date: "11/27/23, Mon, 2:00pm",
-            stylist: 'Melissa Wright',
-            realDate: (new Date("2023-11-27"))
-        },
-        {
-            name: "Jane Doe",
-            service: "Women's Haircut",
-            date: "11/18/23, Fri, 3:00pm",
-            stylist: 'Melissa Wright',
-            realDate: new Date("2023-11-18")
-        },
-        {
-            name: "Melinda Jackson",
-            service: "Hair Extensions",
-            date: "11/15/23, Sat, 2:00pm",
-            stylist: 'Melissa Wright',
-            realDate: new Date("2023-11-15")
-        }
-    ]
-    //setting the times like i did in the dummy data makes it a UTC date which will always be 1 day behind PST so i add one to the day
-    //possibly need to get rid of this when the data base gets added
-    clientAppointments.forEach(val => val.realDate.setDate(val.realDate.getDate() + 1));
-
-    //filteredAps is used as an global array to hold the filtered appointments if there is any that need to be filtered by date
-    let filteredAps: Appointment[] = [];
-
+    //get today's date and convert it to PST
+    const today = new Date();
+    const pstDateString =  moment(today).tz('America/Los_Angeles').format('YYYY-MM-DDTHH:mm:ss.SSS');
+    const todaysDate = pstDateString.slice(0, 10) + "T00:00:00.000Z";
+    //console.log('todaysDate: ', todaysDate); //for debugging
 
     //for the drop down list below
     const [selected, setSelected] = React.useState("");
 
     const filter = [
-        { key: 'All', value: 'All' },
         { key: 'Today', value: 'Today' },
         { key: 'This Week', value: 'This Week' },
-        { key: 'This Month', value: 'This Month' }
+        { key: 'This Month', value: 'This Month' },
+        { key: 'All', value: 'All' },
     ]
 
+    //handleSelection is called whenever a change is made in the drop down menu. 
+    //It passes it back to the flatlist down below
+    async function handleSelection(selected) {       
+        if (selected == 'All') { //all appointments   
 
-    //will probably remove this when the database is added and just work with the date objects it has in it
-    const dateFormat = (date) => {
-        const dd = String(date.getDate()).padStart(2, '0');
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const yy = String(date.getFullYear()).slice(2);
-        return `${mm}/${dd}/${yy}`;
+            //past appointments
+            try {
+                const response = await database.get('/allPastAppointmentsQuery', {
+                    params: {
+                        todaysDate: todaysDate
+                    }             
+                });
+                setPastClientAppointments(response.data);
+                //console.log('response', response.data); //for debugging
+            } catch (error) {
+                console.error('Error getting all past appointments: ', error);
+            }
+
+            //upcoming appointments
+            try {
+                const response = await database.get('/allUpcomingAppointmentsQuery', {
+                    params: {
+                        todaysDate: todaysDate
+                    }
+                });
+                setUpcomingClientAppointments(response.data);
+            } catch (error) {
+                console.error('Error getting all upcoming appointments: ', error);
+            }
+        } else if (selected == 'Today') { //today's appointments  
+
+            const endOfDay = todaysDate.slice(0, 10) + "T23:59:59.999Z";   //sql DateTime2 format
+            //console.log('startOfDay: ', todaysDate); //for debugging
+            //console.log('endOfDay: ', endOfDay); //for debugging
+
+            //past and appointments
+            try {
+                const response = await database.get('/clientHistoryAppointmentsQuery', {
+                    params: {
+                        startDate: todaysDate,
+                        endDate: endOfDay
+                    }
+                });
+                //console.log(response.data); //for debugging   
+                setPastClientAppointments(response.data); 
+                setUpcomingClientAppointments(response.data);           
+            } catch (error) {
+                console.error("Error getting today's appointment", error);
+            }
+        } else if (selected == 'This Week') { //this week's appointments
+
+            //need to fix later for compensating for start/end of month
+            //going three days back for past and three days forward for upcoming
+            const day = todaysDate.slice(8, 10);
+            const pastDay = String(parseInt(day) - 3);
+            const upcomingDay = String(parseInt(day) + 3);
+            //console.log('day: ', day); //for debugging
+            //console.log('pastDay: ', pastDay); //for debugging
+            //console.log('upcomingDay: ', upcomingDay); //for debugging
+            const firstDayOfWeek = todaysDate.slice(0, 8) + pastDay + "T00:00:00.000Z"; //sql DateTime2 format
+            const lastDayOfWeek = todaysDate.slice(0, 8) + upcomingDay + "T23:59:59.999Z"; //sql DateTime2 format
+            
+            //past appointments
+            try {
+             const response = await database.get('/clientHistoryAppointmentsQuery', {
+                params: {
+                        startDate: firstDayOfWeek,
+                        endDate: todaysDate
+                    }
+                });
+                setPastClientAppointments(response.data);
+            } catch (error) {
+                console.error("Error getting this week's past appointments", error);
+            }
+
+            //upcoming appointments
+            try {
+                const response = await database.get('/clientHistoryAppointmentsQuery', {
+                    params: {
+                        startDate: todaysDate,
+                        endDate: lastDayOfWeek
+                    }
+                });
+                setUpcomingClientAppointments(response.data);
+            } catch (error) {
+                console.error("Error getting this week's upcoming appointments", error);
+            }
+        } else if (selected == "This Month") { //this month's appointments
+            
+            //need to fix later to compensate for days in month
+            //choosing start day of 01 and end day of 28 for now
+
+            const month = todaysDate.slice(5, 7); //will use later to get month from string
+            const firstDay = '01';
+            const lastDay = '28';
+            //console.log('month: ', month); //for debugging
+            //console.log('firstDay: ', firstDay); //for debugging
+            //console.log('lastDay: ', lastDay); //for debugging
+            const firstDayOfMonth = todaysDate.slice(0, 8) + firstDay + "T00:00:00.000Z"; //sql DateTime2 format
+            const lastDayOfMonth = todaysDate.slice(0, 8) + lastDay + "T23:59:59.999Z"; //sql DateTime2 format
+            //console.log('firstDayOfMonth: ', firstDayOfMonth); //for debugging
+            //console.log('lastDayOfMonth: ', lastDayOfMonth); //for debugging
+
+            //past appointments
+            try {
+                const response = await database.get('/clientHistoryAppointmentsQuery', {
+                    params: {
+                        startDate: firstDayOfMonth,
+                        endDate: todaysDate
+                    }
+                });
+                setPastClientAppointments(response.data);
+            } catch (error) {
+                console.error("Error getting this month's past appointments", error);
+            }
+
+            //upcoming appointments
+            try {
+                const response = await database.get('/clientHistoryAppointmentsQuery', {
+                    params: {
+                        startDate: todaysDate,
+                        endDate: lastDayOfMonth
+                    }
+                });
+                setUpcomingClientAppointments(response.data);
+            } catch (error) {
+                console.error("Error getting this month's upcoming appointments", error);
+            }
+        }
     }
 
-    //handleSelection is called whenever a change is made in the drop down menu. It is passed the key value from the filter array above
-    //it then decides which filtering option to use on the data based upon the key that it is passed in this function
-    //it modifies the filteredAps global array and passes it back to the flatlist down below and the flatlist displays what was filtered
-    function handleSelection(selected) {
-        if (selected == 'All') {
-            //this just grabs all appointments available in the database
-            clientAppointments.forEach(val => filteredAps.push(Object.assign({}, val)));
-
-            //alert(filteredAps[0].realDate.toLocaleDateString());
-            //const curDay = new Date();
-            //alert(curDay.toLocaleDateString())
-        }
-        else if (selected == 'Today') {
-            //this filters out the appointments that are not today
-
-            //making a new date object with the systems current time
-            const curDay = new Date();
-
-            //filters the appointments by adding the appointments that have the date in the date string, to the filteredAps array
-            //with a temp array as a mediator because javascript is stupid and won't let me copy directly over between the two
-            let temp: Appointment[] = [];
-            //this line converts both dates to strings(mm/dd/yyy) and compares them storing the ones that are the same in temp
-            temp = clientAppointments.filter((item) => item.realDate.toLocaleDateString() === curDay.toLocaleDateString());
-            temp.forEach(val => filteredAps.push(Object.assign({}, val)));
-
-        }
-        else if (selected == 'This Week') {
-            //kinda the same thing as filtering by today but a little more in depth getting todays date from the system and
-            //calculating the first and last days of the week for comparison down below
-            const today = new Date();
-            const firstDayOfWeek = new Date(today);
-            const lastDayOfWeek = new Date(today);
-            firstDayOfWeek.setDate(today.getDate() - today.getDay());
-            lastDayOfWeek.setDate(today.getDate() + (6 - today.getDay()));
-
-            //making another temp array
-            let temp: Appointment[] = [];
-
-            //this filters the client appointments using the Date Objects instead of strings similar to what was done for 
-            //filter by today
-            temp = clientAppointments.filter((item) => {
-                return item.realDate >= firstDayOfWeek && item.realDate <= lastDayOfWeek;
-            })
-
-            //copies each value of temp into the global filteredAps array
-            temp.forEach(val => filteredAps.push(Object.assign({}, val)));
-
-        }
-        else if (selected == "This Month") {
-            //very similar to filter by week except you are getting the first and last day of the month instead of the week
-            const today = new Date();
-            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-
-
-            //making another temp array
-            let temp: Appointment[] = [];
-
-            //filtering out appointments that aren't in this month
-            temp = clientAppointments.filter((item) => {
-                return item.realDate >= firstDayOfMonth && item.realDate <= lastDayOfMonth;
-            });
-
-            //copies each value of temp into the global filteredAps array
-            temp.forEach(val => filteredAps.push(Object.assign({}, val)));
-
-
-        }
-    }
+    useEffect(() => {
+        //console.log('pastClientAppointments: ', pastClientAppointments); //for debugging
+        //console.log('upcomingClientAppointments: ', upcomingClientAppointments); //for debugging
+    }, [pastClientAppointments, upcomingClientAppointments]);
 
     return (
         <>
@@ -185,7 +205,7 @@ export default function ClientHistory() {
                             dropdownStyles={{ backgroundColor: 'white' }}
                             save='value'
                             search={false}
-                            defaultOption={{ key: 'All', value: 'All' }}
+                            defaultOption={{ key: 'Today', value: 'Today' }}
                             onSelect={() => handleSelection(selected)}
                             
                         />
@@ -193,25 +213,25 @@ export default function ClientHistory() {
 
                     {/* flat list is replacing the hard coded list from before as this can work with database data and print out the entire list at once */}
                     <FlatList
-                        data={filteredAps}
+                        data={upcomingClientAppointments}
                         horizontal={true}
                         renderItem={({ item }) => (
                             <View style={[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
                                 <View style={styles.textAlignment}>
                                     <Text style={styles.appointText}>Customer:</Text>
-                                    <Text style={styles.appointText}> {item.name}</Text>
+                                    <Text style={styles.appointText}> {item.FirstName + ' ' + item.LastName}</Text>
                                 </View>
                                 <View style={styles.textAlignment}>
                                     <Text style={styles.appointText}>Service:</Text>
-                                    <Text style={styles.appointText}>{item.service}</Text>
+                                    <Text style={styles.appointText}>{item.TypeOfAppointment}</Text>
                                 </View>
                                 <View style={styles.textAlignment}>
                                     <Text style={styles.appointText}>Date:</Text>
-                                    <Text style={styles.appointText}>{item.date}</Text>
+                                    <Text style={styles.appointText}>{item.AppointmentDate.substring(0, 10)}</Text>
                                 </View>
-                                <View style={styles.textAlignment}>
-                                    <Text style={styles.appointText}>Stylist:</Text>
-                                    <Text style={styles.appointText}>{item.stylist}</Text>
+                                <View style = {styles.textAlignment}>
+                                    <Text style={styles.appointText}>Time:</Text>
+                                    <Text style={styles.appointText}>{item.AppointmentDate.substring(11, 16)}</Text>
                                 </View>
                             </View>
                         )}
@@ -231,37 +251,36 @@ export default function ClientHistory() {
                             dropdownStyles={{ backgroundColor: 'white' }}
                             save='value'
                             search={false}
-                            defaultOption={{ key: 'All', value: 'All' }}
+                            defaultOption={{ key: 'Today', value: 'Today' }}
                             onSelect={() => handleSelection(selected)}
                         />
                     </View>
 
                     {/* flat list is replacing the hard coded list from before as this can work with database data and print out the entire list at once */}
                     <FlatList
-                        data={filteredAps}
+                        data={pastClientAppointments}
                         horizontal={true}
                         renderItem={({ item }) => (
                             <View style={[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
                                 <View style={styles.textAlignment}>
                                     <Text style={styles.appointText}>Customer:</Text>
-                                    <Text style={styles.appointText}> {item.name}</Text>
+                                    <Text style={styles.appointText}> {item.FirstName + ' ' + item.LastName}</Text>
                                 </View>
                                 <View style={styles.textAlignment}>
                                     <Text style={styles.appointText}>Service:</Text>
-                                    <Text style={styles.appointText}>{item.service}</Text>
+                                    <Text style={styles.appointText}>{item.TypeOfAppointment}</Text>
                                 </View>
                                 <View style={styles.textAlignment}>
                                     <Text style={styles.appointText}>Date:</Text>
-                                    <Text style={styles.appointText}>{item.date}</Text>
+                                    <Text style={styles.appointText}>{item.AppointmentDate.substring(0, 10)}</Text>
                                 </View>
                                 <View style={styles.textAlignment}>
-                                    <Text style={styles.appointText}>Stylist:</Text>
-                                    <Text style={styles.appointText}>{item.stylist}</Text>
+                                    <Text style={styles.appointText}>Time:</Text>
+                                    <Text style={styles.appointText}>{item.AppointmentDate.substring(11, 16)}</Text>
                                 </View>
                             </View>
                         )}
                     />
-
                 </View>
             </LinearGradient>
         </>
@@ -355,5 +374,4 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         padding: 5,
     }
-})
-
+});
