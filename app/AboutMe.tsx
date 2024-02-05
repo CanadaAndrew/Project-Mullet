@@ -9,6 +9,13 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function AboutMe() {
     return (
+<>
+
+<LinearGradient locations={[0.7, 1]} colors={['#DDA0DD', 'white']} style={styles.container}>
+   
+<View style={styles.header}>
+<Text style={styles.headerText}>About Me</Text>
+</View>
 
         <View style={styles.backButton}>
                         <Pressable
@@ -16,136 +23,166 @@ export default function AboutMe() {
                         >
                             {({ pressed }) => (
                                 <Link href="/">
-                                    <Text style={styles.backButtonText}>    Back</Text>
+                                    <Text style={styles.backButtonText}>Back</Text>
                                 </Link>
                             )}
                         </Pressable>
                     </View>
-   
-   
+
+                    <Text style={styles.backButtonText}>Picture{"\n"}{"\n"}{"\n"}{"\n"}{"\n"}{"\n"}</Text>
+                    <Text style={styles.backButtonText}>Bio</Text>
 
 
-
-
-
-
-
-    
+                    </LinearGradient>
+</>  
 )}
 
 const styles = StyleSheet.create({
-    container:{
-        borderRadius: 90
+    container: {
+        flex: 1,
+        //backgroundColor: '#DDA0DD'
     },
-    // title styling for dropdown menu and calendar 
-    objectTitle: {
+    // header
+    header: {
+        alignItems: 'center',
+        paddingTop: 30,
+        paddingBottom: 20,
+        backgroundColor: '#880085'
+    },
+    headerText: {
         fontSize: 25,
         fontWeight: 'bold',
         color: 'white'
     },
-    // temporary dummy drop down
-    dropDown: {
-        backgroundColor: 'white',
-        margin: 15,
-        paddingTop: 10,
-        //paddingBottom: 10,
-        //paddingRight: 150,
-        //paddingLeft: 100,
-        padding: 100
-    },
-    // temporary dummy calendar
-    dummyCalendar: {
-        backgroundColor: 'white',
-        margin: 15,
-        paddingTop: 5,
-        paddingBottom: 50,
-        paddingLeft: 50,
-        paddingRight: 50,
-    },
-    // background under logo image
-    background: {
-        paddingTop: 20,
-        paddingBottom: 20,
-        alignItems: 'center',
-        borderRadius: 30
-    },
-    // logo image
-    logo: {
-        width: 435,
-        height: 250,
-    },
-    // shadow for objects IOS
-    boxShadowIOS: {
-        shadowColor: 'black',
-        shadowOffset: {
-            width: 5,
-            height: 5
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 4
-    },
-    // shadow for objects Android
-    boxShadowAndroid: {
-        elevation: 10
-    },
-    // backButton style
+    // back button
     backButton: {
         width: 100,
         height: 65,
         paddingLeft: 20,
-        paddingTop: 10,
-        margin: 5,
-        shadowColor: 'black',
-        shadowOffset: {
-            width: 4,
-            height: 4,
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 3
+        paddingTop: 10
     },
-    // backButton text style
     backButtonText: {
-        color: 'white',
+        fontSize: 16,
         fontWeight: 'bold',
-        fontSize: 18,
-        textAlign: 'center',
-        borderRadius: 20,
-        paddingTop: 5,
-        paddingBottom: 5
-    },
-    // schedule appointment button style
-    appointmentButton: {
-        width: 350, //
-        height: 50, //
-        paddingTop: 15,
-        margin: 5,
-        shadowColor: 'black',
-        shadowOffset: {
-            width: 4,
-            height: 4,
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 3,
-        //alignItems: 'center',
+        color: 'white',
         //backgroundColor: '#C154C1',
-        backgroundColor: '#BE42B2',
         borderRadius: 20,
-    },
-    // schedule appointment button text style
-    appointButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 18,
         textAlign: 'center',
-        borderRadius: 20,
-        //paddingTop: 5,
-        //paddingBottom: 5,
-        //alignItems: 'center'
+        paddingTop: 5,
+        paddingBottom: 5,
+        //elevation: 10,
+        shadowColor: 'black',
+        shadowOpacity: 0.1,
+        alignItems: 'center',
         
-
+        
     },
-    badgeStyle: {
+    // calendar.  calendarText is placeholder
+    calendar: {
+        flex: 0,
+        height: 200,
+        //backgroundColor: 'white',
+        marginTop: 30,
+        marginBottom: 50,
+        padding: 0,
+        alignItems: 'center',
+    },
+    calendarText: {
+        color: 'black'
+    },
+    // date
+    dateContainer: {
+        //backgroundColor: 'lightblue',
+        height: 35
+    },
+    dateText: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+        paddingTop: 5,
+        paddingLeft: 20
+    },
+    // for the time slots
+    timeContainer: {
+        flex: 5,
+        height: 100,
+        paddingTop: 10,
+        paddingBottom: 20,
+        paddingLeft: 10,
+        //marginTop: 30,
+        //backgroundColor: 'grey'
+    },
+    timeRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        paddingBottom: 15
+    },
+    timeCell: {
+        //width: 80,
+        paddingRight: 10,
+        width: '20%',             //Adjust width to 20% for five buttons per row
+        justifyContent: 'center', //center content vertically
+        alignItems: 'center',     //center content horizontally
+        marginBottom: 10,         //add marginBottom for spacing
+        height: 40,               //add uniform height to buttons
+    },
+    // bottom three buttons
+    bottomButtonContainer: {
+        //backgroundColor: 'lightgreen',
+        height: 50,
+        flex: .2,
+        paddingTop: 10,
+        alignItems: 'center',
+        justifyContent: 'space-evenly'
+    },
+    bottomButton: {
+        width: 250
+    },
+    bottomButtonText: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        color: 'white',
+        //backgroundColor: '#C154C1',
         textAlign: 'center',
-        backgroundColor: '#C154C1',
-    }
+        borderRadius: 15,
+        paddingTop: 5,
+        paddingBottom: 5,
+        //elevation: 10,
+        shadowColor: 'black',
+        shadowOpacity: 0.1
+    },
+    timeButton: {
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        fontSize: 16,
+
+        fontWeight: 'bold',
+    },
+    modal: {
+      
+        flex: 0.5,
+        justifyContent: "flex-start",
+        alignItems: "center",
+        backgroundColor: "rgba(211, 211, 250,0.979)",
+        marginTop: 140,
+        marginLeft: 10,
+        marginRight: 10,
+        marginBottom: -280,
+        borderRadius: 36,
+        elevation: 8,
+        shadowOpacity: 0.55,
+        shadowOffset: { width: 2, height: 2 },
+        shadowRadius: 6
+        
+        
+       
+      },
+      shadow: {
+       
+        elevation: 15,
+        
+      }
 })
