@@ -7,9 +7,13 @@ import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-lis
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
+const aboutMeText = "HairDoneWright530 is a place for your entire family.  Passion for hair is something I have enjoyed my entire life.  I love color, cut and specialize in Blonding Services.  I believe every client is a masterpiece.  Message me.  Let’s work together to achieve your hair dreams. -Melissa";
+
 export default function AboutMe() {
     return (
+      
 <>
+
 
 <LinearGradient locations={[0.7, 1]} colors={['#DDA0DD', 'white']} style={styles.container}>
    
@@ -29,8 +33,10 @@ export default function AboutMe() {
                         </Pressable>
                     </View>
 
-                    <Text style={styles.backButtonText}>Picture{"\n"}{"\n"}{"\n"}{"\n"}{"\n"}{"\n"}</Text>
+                   
+                    <Image style = {styles.logo} source={require('./images/Melissa.jpg')} />
                     <Text style={styles.backButtonText}>Bio</Text>
+                    <Text style={{color: 'black', fontSize: 16}}>{aboutMeText}</Text>
 
 
                     </LinearGradient>
@@ -184,5 +190,13 @@ const styles = StyleSheet.create({
        
         elevation: 15,
         
-      }
+      },
+      picture:{
+       
+        resizeMode: 'contain'
+      },
+      logo: {
+        width: 435,
+        height: 250,
+    }
 })
