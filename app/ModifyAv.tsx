@@ -8,6 +8,7 @@ import {
     View,
     Pressable,
     FlatList,
+    ScrollView,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
@@ -22,7 +23,11 @@ export default function ModifyAv() {
     const [appointmentTimes, setAppointmentTimes] = useState([]);
     const [loading, setLoading] = useState(false);
     const [displayedDate, setDisplayedDate] = useState(null);
-    const listOfTimesDefault = []; //used initially and if row is empty for selected date
+    const listOfTimesDefault = [
+        "12:00AM", "01:00AM", "02:00AM", "03:00AM", "04:00AM", "05:00AM", "06:00AM", "07:00AM", "08:00AM", "09:00AM",
+        "10:00AM", "11:00AM", "12:00PM", "01:00PM","02:00PM","03:00PM","04:00PM","05:00PM","06:00PM","07:00PM","08:00PM",
+        "09:00PM","10:00PM","11:00PM"
+    ]; //used initially and if row is empty for selected date
     const [listOfTimes, setListOfTimes] = useState(listOfTimesDefault);
 
     //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
