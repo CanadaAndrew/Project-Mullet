@@ -249,11 +249,11 @@ async function updateAppointment(date, time, userID){
     
 }
 
-async function addAvailability(addDateTimeString, booked) {
+async function addAvailability(addDateTimeString, notBooked) {
     try {
         const poolConnection = await connect();
         poolConnection.setMaxListeners(24);
-        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${booked});`;
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${notBooked});`;
         await poolConnection.request()
             .query(query);
         poolConnection.close();
@@ -347,14 +347,14 @@ app.get('/customQuery', (req, res) => {
 
 app.post('/addAvailability', async (req, res) => {
     try {
-        const { addDateTimeString, booked } = req.body;
+        const { addDateTimeString, notBooked } = req.body;
         if (!addDateTimeString) {
             throw new Error('Invalid request body. Missing "addDateTimeString".');
         }
-        if (booked === undefined || booked === null) {
+        if (notBooked === undefined || notBooked === null) {
             throw new Error('Invalid request body. Missing "booked".');
         }
-        await addAvailability(addDateTimeString, booked);
+        await addAvailability(addDateTimeString, notBooked);
         res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
