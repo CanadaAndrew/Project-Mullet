@@ -9,6 +9,8 @@ import setUpAppoint1 from './setUpAppoint1';
 import ModifyAv from './ModifyAv';
 import NavigateHome from './NavigateHome';
 import setupAppointment2 from './setupAppointment2';
+import AboutMe from './AboutMe';
+
 
 const Stack = createNativeStackNavigator()
 
@@ -21,6 +23,7 @@ export default function index() {
          <Stack.Screen name = "setupAppointment2" component={setupAppointment2}/>
          <Stack.Screen name = "ClientAp" component={ClientAp}/>
          <Stack.Screen name = "ModifyAv" component={ModifyAv}/>
+         <Stack.Screen name = "AboutMe" component={AboutMe}/>
       </Stack.Navigator>
    </NavigationContainer>
   

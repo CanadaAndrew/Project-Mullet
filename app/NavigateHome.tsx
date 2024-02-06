@@ -28,6 +28,13 @@ export default function NavigateHome(){
                     dataDate: ""
                 })}  
             />
+            <Button  
+                title = "AboutMe page"
+                onPress={() => navigation.navigate("AboutMe", {
+                    hairStyleData: "",
+                    dataDate: ""
+                })}  
+            />
             
         </View>
     )
