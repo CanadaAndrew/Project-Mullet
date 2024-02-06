@@ -10,6 +10,7 @@ import ModifyAv from './ModifyAv';
 import NavigateHome from './NavigateHome';
 import SetupAppointment2 from './setupAppointment2';
 import HomeScreen from './HomeScreen';
+import setupAppointment2 from './setupAppointment2';
 
 const Stack = createNativeStackNavigator()
 
