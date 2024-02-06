@@ -23,6 +23,7 @@
     "expo-status-bar": "~1.6.0",
     "expo-updates": "~0.18.17",
     "express": "^4.18.2",
+    "moment-timezone": "^0.5.45",
     "mssql": "^10.0.1",
     "react": "18.2.0",
     "react-native": "0.72.6",

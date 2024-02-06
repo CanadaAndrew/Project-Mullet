@@ -65,6 +65,7 @@ npm install axios
 npm install mssql
 npm install express
 npm install cors
+npm install moment-timezone
 npm install @react-native-community/datetimepicker --save
 ```
     

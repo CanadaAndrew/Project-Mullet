@@ -28,6 +28,9 @@ export default function NavigateHome(){
                     dataDate: ""
                 })}  
             />
+            <Button
+                title="Client History page"
+                onPress={() => navigation.navigate("ClientHistory")}
             <Button  
                 title = "AboutMe page"
                 onPress={() => navigation.navigate("AboutMe", {
