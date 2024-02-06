@@ -21,7 +21,7 @@ export default function AboutMe() {
 <Text style={styles.headerText}>About Me</Text>
 </View>
 
-        <View style={styles.backButton}>
+     {/*  <View style={styles.backButton}> //obsolete?
                         <Pressable
                             style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, styles.backButtonText]}
                         >
@@ -31,12 +31,12 @@ export default function AboutMe() {
                                 </Link>
                             )}
                         </Pressable>
-                    </View>
+                    </View>*/} 
 
                    
                     <Image style = {styles.logo} source={require('./images/Melissa.jpg')} />
-                    <Text style={styles.backButtonText}>Bio</Text>
-                    <Text style={{color: 'black', fontSize: 16}}>{aboutMeText}</Text>
+                    <Text style={{textAlign: 'center', color: 'black', fontSize: 18}}>Bio</Text>
+                    <Text style={{color: 'black', fontSize: 16}}>{"\n"}{aboutMeText}</Text>
 
 
                     </LinearGradient>
