@@ -2,6 +2,9 @@ const sql = require('mssql')
 const express = require('express')
 const cors = require('cors');
 const app = express();
+app.use(cors());
+app.use(express.json()); //middleware to parse JSON request bodies
+
 //Wanted to have these through exports, but exports do not seem to be working, will fix later.
 const monthsNum = {
     January: '01',
@@ -246,6 +249,34 @@ async function updateAppointment(date, time, userID){
     
 }
 
+async function addAvailability(addDateTimeString, booked) {
+    try {
+        const poolConnection = await connect();
+        poolConnection.setMaxListeners(24);
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${booked});`;
+        await poolConnection.request()
+            .query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+        throw err; // rethrow error so it can be caught in calling code
+    }
+}
+
+async function removeAvailability(removeDateTimeString){
+    try {
+        const poolConnection = await connect();
+        poolConnection.setMaxListeners(24);
+        const query = `DELETE FROM Appointments WHERE AppointmentDate='${removeDateTimeString}';`;
+        await poolConnection.request()
+            .query(query);
+        poolConnection.close();   
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so it can be caught in calling code
+    } 
+}
+
 async function appointmentPost(queryString, values){
     try {
         const poolConnection = await connect();
@@ -290,7 +321,7 @@ async function errorHandle(currentFunction, arguement){
     }
     return ret;
 }
-app.use(cors());
+
 //For each query/function, a REST API needs to be created, a way for the frontend of our program to call methods to our backend.
 //app.get means the front end will GET stuff from the backend
 //app.post means the front end will POST stuff to the backend(read up on the Axion api for more information.)
@@ -314,22 +345,38 @@ app.get('/customQuery', (req, res) => {
     .catch(res.send("error"));
 })
 
-app.post('/appointmentPost', async (req, res) => {
-    console.log('received request body: ');
+app.post('/addAvailability', async (req, res) => {
     try {
-        const { queryString, values } = req.body;
-        if (!queryString || !values) {
-            throw new Error('Invalid request body. Missing "queryString" or "values".');
+        const { addDateTimeString, booked } = req.body;
+        if (!addDateTimeString) {
+            throw new Error('Invalid request body. Missing "addDateTimeString".');
         }
-        const result = await appointmentPost(queryString, values);
-        res.send(result);
+        if (booked === undefined || booked === null) {
+            throw new Error('Invalid request body. Missing "booked".');
+        }
+        await addAvailability(addDateTimeString, booked);
+        res.status(204).send(); // 204 means success with no content
     } catch (error) {
-        console.error(error.response.data);
-        res.status(400).send('Bad Request');
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
-});
+})
 
-app.delete('/customDelete', async (req, res) => {
+app.delete('/removeAvailability', async (req, res) => {
+    try {
+        const { removeDateTimeString } = req.body;
+        if (!removeDateTimeString) {
+            throw new Error('Invalid request body. Missing "removeDateTimeString".');
+        }
+        await removeAvailability(removeDateTimeString);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
+app.delete('/customDelete', async (req, res) => { // Provide explicit types for the 'req' and 'res' parameters
     try {
         const { queryString } = req.body;
         if (!queryString) {
@@ -481,6 +528,8 @@ app.get('/queryAllAppointmentsByUserID', (req, res) =>{
     .catch(res.send("error"));
 })
 
-
 //This opens the server, printing to console 'up' when it is up.
-app.listen(3000, () => console.log('up'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is up and listening on port ${PORT}`);
+});
