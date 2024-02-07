@@ -20,7 +20,7 @@ export default function HomeScreen({navigation}){
     NewClient: false
 
   };
-
+        
     return(
         <ScrollView>
             <View style = {styles.container}>
@@ -40,7 +40,7 @@ export default function HomeScreen({navigation}){
                 <View style = {styles.background}>
 
                 {/*add title for homepage*/}
-                <Text style = {styles.objectTitle}> Home</Text>
+                <Text style = {styles.objectTitle}> Home </Text>
 
                 {/*button to modify calendar availability*/}
                 {/*Viewable by Admin only*/}
@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
     boxShadowAndroid: {
         elevation: 10
     },
+
     // backButton style
     backButton: {
         width: 100,

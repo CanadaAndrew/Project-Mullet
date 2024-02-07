@@ -18,16 +18,36 @@ export default function NavigateHome(){
                 onPress={() => navigation.navigate("ModifyAv")} 
             />
             <Button  
-                title = "Client Appointment page"
+                title = "Client Appointment page admin View"
                 onPress={() => navigation.navigate("ClientAp")} 
             />
             <Button
                 title = "Home Screen page"
                 onPress={() => navigation.navigate("HomeScreen")}
             />
+            <Button
+                title = "Client Appointment page Client View"
+                onPress={() => navigation.navigate("appointmentsClientView")}
+            />
             <Button  
                 title = "setupAppointment2 page"
                 onPress={() => navigation.navigate("setupAppointment2", {
+                    hairStyleData: "",
+                    dataDate: ""
+                })}  
+            />
+            <Button
+                title="Services Offered page"
+                onPress={() => navigation.navigate("ServicesOffered", {
+                })}
+              />
+             <Button
+                title="Client History page"
+                onPress={() => navigation.navigate("ClientHistory")}
+            />
+            <Button  
+                title = "AboutMe page"
+                onPress={() => navigation.navigate("AboutMe", {
                     hairStyleData: "",
                     dataDate: ""
                 })}  
