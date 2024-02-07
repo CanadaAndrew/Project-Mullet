@@ -1,11 +1,61 @@
 import { StyleSheet, Text, View, Pressable, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'expo-router';
 import { SelectList } from 'react-native-dropdown-select-list';
 import axios from 'axios'; //used to get data from the backend nodejs
 import moment from 'moment-timezone';
+        
 export default function ClientHistory() {
+
+    interface Appointment {
+        name: string;
+        service: string;
+        date: string;
+        stylist: string;
+        realDate: Date;
+    }
+    /*I have genuinely no idea why this function is needed*/
+    const handleDatesSelected = (selectedDates: string[]) => { };
+
+
+    //new list that makes it work better with filtering and acts more like actual data from the database
+    let clientAppointments: Appointment[] = [
+        {
+            name: "Will Smith",
+            service: "Men's Haircut",
+            date: "10/27/23, Fri, 1:00pm",
+            stylist: 'Melissa Wright',
+            realDate: new Date("2023-10-27")
+        },
+        {
+            name: "Bob Smith",
+            service: "Men's Haircut",
+            date: "11/27/23, Mon, 2:00pm",
+            stylist: 'Melissa Wright',
+            realDate: (new Date("2023-11-27"))
+        },
+        {
+            name: "Jane Doe",
+            service: "Women's Haircut",
+            date: "11/18/23, Fri, 3:00pm",
+            stylist: 'Melissa Wright',
+            realDate: new Date("2023-11-18")
+        },
+        {
+            name: "Melinda Jackson",
+            service: "Hair Extensions",
+            date: "11/15/23, Sat, 2:00pm",
+            stylist: 'Melissa Wright',
+            realDate: new Date("2023-11-15")
+        }
+    ]
+    //setting the times like i did in the dummy data makes it a UTC date which will always be 1 day behind PST so i add one to the day
+    //possibly need to get rid of this when the data base gets added
+    clientAppointments.forEach(val => val.realDate.setDate(val.realDate.getDate() + 1));
+
+    //filteredAps is used as an global array to hold the filtered appointments if there is any that need to be filtered by date
+    let filteredAps: Appointment[] = [];
 
     const database = axios.create({
         baseURL: 'http://192.168.1.150:3000', //Chris pc local
@@ -281,6 +331,7 @@ export default function ClientHistory() {
                             </View>
                         )}
                     />
+                  
                 </View>
             </LinearGradient>
         </>
@@ -375,3 +426,4 @@ const styles = StyleSheet.create({
         padding: 5,
     }
 });
+
