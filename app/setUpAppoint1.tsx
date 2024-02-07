@@ -64,24 +64,6 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
               style = {styles.logo}
               source={require('./images/Hair_Done_Wright_LOGO.png')}
             >
-
-                {/*back button takes you back to index.tsx*/}
-                <View style = {styles.backButton}>
-                    <Pressable
-                        style = {({pressed}) => [{
-                            backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
-                        },
-                        styles.backButtonText
-                    ]}>
-                        {({pressed}) => (
-                            <Link href = "/" asChild>
-                                <Text style = {styles.backButtonText}>Back</Text>
-                            </Link>
-                        )}
-                    </Pressable>
-
-
-                </View>
             </ImageBackground>
 
 

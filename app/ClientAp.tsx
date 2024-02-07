@@ -6,6 +6,7 @@ import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
 import { SelectList } from 'react-native-dropdown-select-list';
 import MyCalendar from './MyCalendar';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 export default function ClientAp(){ 
@@ -154,33 +155,15 @@ export default function ClientAp(){
     }
 
     return(
-      <>
+      <ScrollView>
         <LinearGradient 
         locations = {[0.7, 1]}
         colors = {['#EB73C9','white']}
         style = {styles.container}>
             <View style = {styles.container}>
-                <View style = {styles.header}>
-                     <Text style = {styles.headerTitle}>Client Appointments</Text> 
-                </View>
-                <View style = {styles.backButton}>     
-                    
-                    <Pressable
-                            style={({ pressed }) => [{
-                                backgroundColor: pressed ? '#D8BFD8' : '#C154C1'
-                            },
-                            styles.backButtonText
-                            ]}>
-                            {({ pressed }) => (
-                                <Link href = "/" asChild>
-                                <Text style={styles.backButtonText}>Back</Text>
-                                </Link>
-                            )}
-                        </Pressable>
-                    
-                </View>
+                <View style = {styles.backButton}></View>
             </View>
-
+            
             <View>
 
                 <SafeAreaView style={styles.calendar}>
@@ -234,8 +217,11 @@ export default function ClientAp(){
                 </View>
                 )}
             />
+            <View style = {styles.container}>
+                <View style = {styles.bottomBackGround}></View>
+            </View>
         </LinearGradient>
-      </> 
+      </ScrollView> 
     );
 }
 
@@ -269,7 +255,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         //alignItems: 'center',
         paddingVertical: 15,
-        paddingHorizontal: 3
+        paddingHorizontal: 3,
 
     },
     // appointment text information 
@@ -314,6 +300,10 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.5,
         shadowRadius: 3
+    },
+    // fix grey space under dropdown menu
+    bottomBackGround: {
+        height: 350
     },
     backButtonText: {
         color: 'white',
