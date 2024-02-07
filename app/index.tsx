@@ -9,6 +9,8 @@ import setUpAppoint1 from './setUpAppoint1';
 import ModifyAv from './ModifyAv';
 import NavigateHome from './NavigateHome';
 import SetupAppointment2 from './setupAppointment2';
+import HomeScreen from './HomeScreen';
+import appointmentsClientView from './appointmentsClientView';
 import ClientHistory from './ClientHistory';
 import AboutMe from './AboutMe';
 
@@ -17,8 +19,48 @@ const Stack = createNativeStackNavigator()
 export default function index() {
   return (
    <NavigationContainer independent={true}>
-     <Stack.Navigator>
+    {/*streamline custom header*/}
+     <Stack.Navigator
+       screenOptions={{
+        headerTintColor:'white',
+        headerBackTitle: 'Back',
+        headerStyle: {
+          backgroundColor: '#942989'
+        }
+       }}
+     >
          <Stack.Screen name = "NaviagateHome" component={NavigateHome}/>
+         <Stack.Screen name = "setUpAppoint1" component={setUpAppoint1}
+           options = {{
+            title: "Set Appointment"
+           }}
+         />
+         <Stack.Screen name = "setupAppointment2" component={SetupAppointment2}
+           options = {{
+            title: "Set Appointment"
+           }}
+         />
+         <Stack.Screen name = "ClientAp" component={ClientAp}
+           options = {{
+            title: "Client Appointments"
+           }}
+         />
+         <Stack.Screen name = "ModifyAv" component={ModifyAv}
+           options = {{
+            title: "Modify Availability"
+
+           }}
+         />
+         <Stack.Screen name = "HomeScreen" component={HomeScreen}
+           options = {{
+            title: "Home"
+           }}
+         />
+         <Stack.Screen name = "appointmentsClientView" component={appointmentsClientView}
+           options = {{
+            title: "Your Appointments"
+           }}
+         />
          <Stack.Screen name = "setUpAppoint1" component={setUpAppoint1}/>
          <Stack.Screen name = "setupAppointment2" component={SetupAppointment2}/>
          <Stack.Screen name = "ClientAp" component={ClientAp}/>

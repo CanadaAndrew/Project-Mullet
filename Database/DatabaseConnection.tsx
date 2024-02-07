@@ -619,8 +619,6 @@ app.get('/findAvailableTimesGivenDate', (req, res) => {
     customQuery(query)
     .then((ret) => res.send(ret))
     .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
 })
 
 app.get('/queryUpcomingAppointmentsByUserIDAndDate', (req, res) =>{
@@ -630,8 +628,6 @@ app.get('/queryUpcomingAppointmentsByUserIDAndDate', (req, res) =>{
     customQuery(query)
     .then((ret) => res.send(ret))
     .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
 })
 
 app.get('/queryPastAppointmentsByUserIDAndDate', (req, res) =>{
@@ -641,8 +637,6 @@ app.get('/queryPastAppointmentsByUserIDAndDate', (req, res) =>{
     customQuery(query)
     .then((ret) => res.send(ret))
     .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
 })
 
 app.get('/queryAllAppointmentsByUserID', (req, res) =>{

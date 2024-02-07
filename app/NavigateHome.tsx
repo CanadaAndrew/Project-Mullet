@@ -18,8 +18,16 @@ export default function NavigateHome(){
                 onPress={() => navigation.navigate("ModifyAv")} 
             />
             <Button  
-                title = "Client Appointment page"
+                title = "Client Appointment page admin View"
                 onPress={() => navigation.navigate("ClientAp")} 
+            />
+            <Button
+                title = "Home Screen page"
+                onPress={() => navigation.navigate("HomeScreen")}
+            />
+            <Button
+                title = "Client Appointment page Client View"
+                onPress={() => navigation.navigate("appointmentsClientView")}
             />
             <Button  
                 title = "setupAppointment2 page"
