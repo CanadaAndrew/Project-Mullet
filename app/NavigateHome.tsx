@@ -37,6 +37,11 @@ export default function NavigateHome(){
                 })}  
             />
             <Button
+                title="Services Offered page"
+                onPress={() => navigation.navigate("ServicesOffered", {
+                })}
+              />
+             <Button
                 title="Client History page"
                 onPress={() => navigation.navigate("ClientHistory")}
             />
