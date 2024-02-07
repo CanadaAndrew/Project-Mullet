@@ -241,7 +241,8 @@ async function customQuery(queryString){
 async function updateAppointment(date, time, userID){
     try {
         var poolConnection = await connect();
-        await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, PhoneNumberEmail = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
+        //await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, PhoneNumberEmail = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
+        await poolConnection.request().query('SELECT * FROM Appointments');
         poolConnection.close();
     } catch (err) {
         console.error(err.message);
@@ -249,11 +250,11 @@ async function updateAppointment(date, time, userID){
     
 }
 
-async function addAvailability(addDateTimeString, booked) {
+async function addAvailability(addDateTimeString, notBooked) {
     try {
         const poolConnection = await connect();
         poolConnection.setMaxListeners(24);
-        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${booked});`;
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${notBooked});`;
         await poolConnection.request()
             .query(query);
         poolConnection.close();
@@ -285,6 +286,67 @@ async function appointmentPost(queryString, values){
             .input('AppointmentDate', sql.DateTime2, values.AppointmentDate)
             .input('VacancyStatus', sql.Int, values.VacancyStatus)
             .query(queryString);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so that frontend can catch it
+    }
+}
+
+/*async function pastAppointmentsQuery(){
+    try {
+        const poolConnection = await connect();
+        const query = 'SELECT * FROM Appointments';
+        const resultSet = await poolConnection
+            .request()
+            .query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so that frontend can catch it
+    }
+}*/
+
+//async function upcomingAppointmentsQuery(startDate, endDate){   
+async function clientHistoryAppointmentsQuery(startDate, endDate){
+    try {
+        const poolConnection = await connect();
+        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate BETWEEN \'' + startDate + '\' AND \'' + endDate + '\'';
+        const resultSet = await poolConnection
+            .request()
+            .query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so that frontend can catch it
+    }
+}
+
+async function allPastAppointmentsQuery(todaysDate){
+    try {
+        const poolConnection = await connect();
+        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate < \'' + todaysDate + '\'';
+        const resultSet = await poolConnection
+            .request()
+            .query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so that frontend can catch it
+    }
+}
+
+async function allUpcomingAppointmentsQuery(todaysDate){
+    try {
+        const poolConnection = await connect();
+        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate >= \'' + todaysDate + '\'';
+        const resultSet = await poolConnection
+            .request()
+            .query(query);
         poolConnection.close();
         return sortingResults(resultSet);
     } catch (err) {
@@ -345,16 +407,75 @@ app.get('/customQuery', (req, res) => {
     .catch(res.send("error"));
 })
 
+app.get('/clientHistoryAppointmentsQuery', async (req, res) => {
+    try {
+        const startDate = req.query.startDate;
+        const endDate = req.query.endDate;
+        if (!startDate) {
+            throw new Error('Invalid request. Missing "startDate"');
+        }
+        if (!endDate) {
+            throw new Error('Invalid request. Missing "endDate"');
+        }
+    //const result = await someAppointmentsQuery(startDate, endDate)
+    const result = await clientHistoryAppointmentsQuery(startDate, endDate);
+    res.send(result);   
+    } catch {
+        res.status(400).send('Bad Request');
+    }
+});
+
+app.get('/allPastAppointmentsQuery', async (req, res) => {
+    try {
+        const todaysDate = req.query.todaysDate;
+        if (!todaysDate) {
+            throw new Error('Invalid request. Missing "todaysDate"');
+        }
+        const result = await allPastAppointmentsQuery(todaysDate);
+        res.send(result);
+    } catch {
+        res.status(400).send('Bad Request');
+    }
+});
+
+app.get('/allUpcomingAppointmentsQuery', async (req, res) => {
+    try {
+        const todaysDate = req.query.todaysDate;
+        if (!todaysDate) {
+            throw new Error('Invalid request. Missing "todaysDate"');
+        }
+        const result = await allUpcomingAppointmentsQuery(todaysDate);
+        res.send(result);
+    } catch {
+        res.status(400).send('Bad Request');
+    }
+});
+
+app.post('/appointmentPost', async (req, res) => {
+    console.log('received request body: ');
+    try {
+        const { queryString, values } = req.body;
+        if (!queryString || !values) {
+            throw new Error('Invalid request body. Missing "queryString" or "values".');
+        }
+        const result = await appointmentPost(queryString, values);
+        res.send(result);
+    } catch (error) {
+        console.error(error.response.data);
+        res.status(400).send('Bad Request');
+    }
+});
+
 app.post('/addAvailability', async (req, res) => {
     try {
-        const { addDateTimeString, booked } = req.body;
+        const { addDateTimeString, notBooked } = req.body;
         if (!addDateTimeString) {
             throw new Error('Invalid request body. Missing "addDateTimeString".');
         }
-        if (booked === undefined || booked === null) {
+        if (notBooked === undefined || notBooked === null) {
             throw new Error('Invalid request body. Missing "booked".');
         }
-        await addAvailability(addDateTimeString, booked);
+        await addAvailability(addDateTimeString, notBooked);
         res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
@@ -498,8 +619,6 @@ app.get('/findAvailableTimesGivenDate', (req, res) => {
     customQuery(query)
     .then((ret) => res.send(ret))
     .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
 })
 
 app.get('/queryUpcomingAppointmentsByUserIDAndDate', (req, res) =>{
@@ -509,8 +628,6 @@ app.get('/queryUpcomingAppointmentsByUserIDAndDate', (req, res) =>{
     customQuery(query)
     .then((ret) => res.send(ret))
     .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
 })
 
 app.get('/queryPastAppointmentsByUserIDAndDate', (req, res) =>{
@@ -520,8 +637,6 @@ app.get('/queryPastAppointmentsByUserIDAndDate', (req, res) =>{
     customQuery(query)
     .then((ret) => res.send(ret))
     .catch(() => errorHandle(customQuery, query))
-    .then((ret) => res.send(ret))
-    .catch(res.send("error"));
 })
 
 app.get('/queryAllAppointmentsByUserID', (req, res) =>{
