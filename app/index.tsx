@@ -62,10 +62,6 @@ export default function index() {
             title: "Your Appointments"
            }}
          />
-         <Stack.Screen name = "setUpAppoint1" component={setUpAppoint1}/>
-         <Stack.Screen name = "setupAppointment2" component={SetupAppointment2}/>
-         <Stack.Screen name = "ClientAp" component={ClientAp}/>
-         <Stack.Screen name = "ModifyAv" component={ModifyAv}/>
          <Stack.Screen name = "ServicesOffered" component={ServicesOffered} />
          <Stack.Screen name = "ClientHistory" component={ClientHistory} />
          <Stack.Screen name = "AboutMe" component={AboutMe}/>
