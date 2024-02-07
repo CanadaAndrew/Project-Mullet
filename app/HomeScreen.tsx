@@ -126,7 +126,7 @@ export default function HomeScreen({navigation}){
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("Services Offered", {userData})}
+                      onPress = {() => navigation.navigate("ServicesOffered", {userData})}
                     >
                     <Text style = {styles.homeButtonText}>Services Offered</Text>
                     </TouchableOpacity>
@@ -137,7 +137,7 @@ export default function HomeScreen({navigation}){
                   <View>
                     <TouchableOpacity
                       style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("About Me", {userData})}
+                      onPress = {() => navigation.navigate("AboutMe", {userData})}
                     >
                     <Text style = {styles.homeButtonText}>About Me</Text>
                     </TouchableOpacity>
