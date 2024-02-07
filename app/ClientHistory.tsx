@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Pressable, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useEffect, useState, } from 'react';
 import { Link } from 'expo-router';
 import { SelectList } from 'react-native-dropdown-select-list';
 import axios from 'axios'; //used to get data from the backend nodejs
