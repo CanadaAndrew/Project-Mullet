@@ -10,8 +10,11 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
-export default function setUpAppoint1({navigation}) { // add navigation to default function for data transfer between pages
+// If navigate or another param is already there dont do this {x}, {y}, do this {x, y}
+export default function setUpAppoint1({navigation, route}) { // add navigation to default function for data transfer between pages
 
+    const { userData } = route.params;
+    //{ route }, { navigation }
     //useState for drop down menu
     const [selected, setSelected] = React.useState("");
 
@@ -122,10 +125,10 @@ export default function setUpAppoint1({navigation}) { // add navigation to defau
                 <View>
                     <TouchableOpacity
                       style = {styles.appointmentButton}
-                      onPress = {() => navigation.navigate("setupAppointment2", { 
+                      onPress = {() => navigation.navigate("setupAppointment2",  { 
                         hairStyleData: hairStyleSelected, 
-                        dateData: "11-30-2023"
-                      })}>
+                        dateData: "11-30-2023", 
+                      }, {userData})}>
                         <Text style = {styles.appointButtonText}>Schedule Appointment</Text>
                     </TouchableOpacity>
                 </View>

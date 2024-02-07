@@ -17,7 +17,16 @@ import moment from 'moment'; //used to format dates and times
 import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
 
-export default function ModifyAv() {
+//add route as a param to the function of every page that requires data from the const established in HomeScreen
+//You can also make another const here and transfer data as well here up to you
+export default function ModifyAv({ route }) {
+    //make a local const this way using route.params
+    const { userData } = route.params;
+
+    //Tester lines for console
+   // console.log("Test");
+   // console.log('UserData in ModifyAv: ', userData);
+
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]); //holds selected appointment times
     const [displayedDate, setDisplayedDate] = useState(null);
@@ -346,7 +355,14 @@ export default function ModifyAv() {
                             )}
                             </Pressable>
                         </View>
-                    </View>                  
+                    </View>
+                    {/* 
+                        Tester text that shows the userData Const from HomeScreen to see if it works. 
+                    */}
+                    {/* <Text>
+                        UserId: {userData.UserId}, AdminPriv: {userData.AdminPriv.toString()}, NewClient: {userData.NewClient.toString()}
+                    </Text> */}
+                    
                     <Modal visible={modalVisible} //popup that displays the two times to input
                      animationType="fade"
                      transparent = {true}
