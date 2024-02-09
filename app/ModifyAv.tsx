@@ -8,6 +8,7 @@ import {
     View,
     Pressable,
     FlatList,
+    ScrollView,
     Modal,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
@@ -16,6 +17,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment'; //used to format dates and times
 import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
+import { displayHours } from './Enums/Enums';
 
 //add route as a param to the function of every page that requires data from the const established in HomeScreen
 //You can also make another const here and transfer data as well here up to you
@@ -30,11 +32,12 @@ export default function ModifyAv({ route }) {
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]); //holds selected appointment times
     const [displayedDate, setDisplayedDate] = useState(null);
-    const listOfTimesDefault = [ //used initially and if row is empty for selected date
-        '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00',
-        '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00',
-        '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00',
-      ];
+  
+    const listOfTimesDefault = [
+        "12:00AM", "01:00AM", "02:00AM", "03:00AM", "04:00AM", "05:00AM", "06:00AM", "07:00AM", "08:00AM", "09:00AM",
+        "10:00AM", "11:00AM", "12:00PM", "01:00PM","02:00PM","03:00PM","04:00PM","05:00PM","06:00PM","07:00PM","08:00PM",
+        "09:00PM","10:00PM","11:00PM"
+    ]; //used initially and if row is empty for selected date
     const [listOfTimes, setListOfTimes] = useState(listOfTimesDefault); //holds available appointment times
     const [modalVisible, setModalVisible] = useState(false); //popup for set schedule
     const [databaseTimes, setDatabaseTimes] = useState([]); //holds database times -> should make a separate file that pulls today's UTC date and converts to PST
@@ -42,8 +45,9 @@ export default function ModifyAv({ route }) {
     //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
     //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
     const database = axios.create({
-        //baseURL: 'http://10.0.0.192:3000',
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        //baseURL: 'http://10.0.0.192:3000', //Andrew pc local
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://10.0.0.14:3000'
     })
 
     //function that is called by onDayPress built in function that in turn calls the setSelctedDate function
@@ -80,6 +84,44 @@ export default function ModifyAv({ route }) {
             console.error(error);  //if there's an error, do not update state and keep current listOfTimes          
         } finally {
             setLoading(false);
+        }
+
+        //Makes an iterable and Times array when the calendar is pressed
+        let iterable;
+        let Times = [];
+        try 
+        {
+            //formats the day passed into this function to include the information needed to query it
+            const beginDay = day.dateString + 'T00:00:00.000Z';
+            const endDay = day.dateString + 'T23:59:59.000Z';
+            //Queries the database with the beginning and end of the day selected 
+            const responseToQ = await database.get('/customQuery', {
+                params: {
+                    query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${beginDay}' AND AppointmentDate <= '${endDay}' AND VacancyStatus = 0;`
+                },
+            });
+            //appointmentData then gets the data from the responding query
+            let appointmentData = responseToQ.data;
+
+            //For each that loops through the appointmentData dates and slices it up to get just the time slot
+            //converts time using the Enums and pushes it to the Times array
+            for(iterable in appointmentData)
+            {
+                let apptTime = appointmentData[iterable].AppointmentDate.slice(11,19)
+                let formattedTime = displayHours[apptTime];
+                Times.push(formattedTime)
+                
+
+            }
+            //sets the list of times to the times array so it is updated to reflect that in the app.
+            setListOfTimes(Times);
+
+        } 
+        catch(error)
+        {
+            console.error(error);
+        }
+
         }*/
         return null;
     };
@@ -503,7 +545,7 @@ const styles = StyleSheet.create({
     timeCell: {
         //width: 80,
         paddingRight: 10,
-        width: '25%',             //Adjust width to 20% for five buttons per row
+        width: '30%',             //Adjust width to 20% for five buttons per row
         justifyContent: 'center', //center content vertically
         alignItems: 'center',     //center content horizontally
         marginBottom: 10,         //add marginBottom for spacing
