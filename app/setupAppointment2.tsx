@@ -28,7 +28,8 @@ export default function SetupAppointment2({route}) { // added route for page nav
     
 
     const database = axios.create({
-        baseURL: 'http://10.0.0.199:3000',
+        baseURL: 'http://10.0.0.192:3000'
+        //baseURL: 'http://10.0.0.199:3000',
         //baseURL: 'http://10.0.0.14:3000' Cameron's IP address for testing
     })
 
@@ -93,10 +94,10 @@ export default function SetupAppointment2({route}) { // added route for page nav
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
 
-    const services = ['Women\'s Haircut'];
+    const services = [];
 
-    const dates = ['24th'];
-    const dummyDates = ['Monday, December 4th 2023'];
+    const dates = [];
+    const dummyDates = dateData.split(', ')
 
     const legendWords = ['Available:', 'Selected:'];
 
@@ -151,14 +152,14 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                     data={services}
                                     renderItem={({ item }) => (
                                         <Text style={styles.appointmentText}>
-                                            {item}{', '}
+                                            {item}
                                         </Text>
                                     )}
                                     horizontal={true}
                                 />
                             </View>
                             <View style={styles.appointmentDateChosen}>
-                                <Text style={styles.appointmentText}>Date Chosen:</Text>
+                                <Text style={styles.appointmentText}>Dates Chosen:</Text>
                                 <Text style={styles.appointmentText}>{dateData}</Text>
                                 <FlatList
                                     data={dates}

@@ -30,10 +30,7 @@ const MyCalendar = React.forwardRef(({ pageName, disabled = false }: MyCalendarP
   
   // Use ref to assign the markedDates prop
   React.useImperativeHandle(ref, () => ({
-    markedDates: selectedDates.reduce((obj, date) => {
-      obj[date] = { selected: true, selectedColor: '#C154C1' };
-      return obj;
-    }, {}),
+    markedDates: selectedDates
   }), [selectedDates]);
 
   /* Getter to allow other pages to grab dates from calendar

@@ -69,7 +69,8 @@ export default function ClientAp(){
     */
 
     //filteredAps is used as an global array to hold the filtered appointments if there is any that need to be filtered by date
-    let filteredAps: Appointment[] = [];
+    let filteredApsDef: Appointment[] = [];
+    const [filteredAps, setFilteredAps] = React.useState(filteredApsDef);
 
     const [clientAppointments, setClientAppointments] = React.useState(clientAppointmentsDefault);
 
@@ -131,13 +132,15 @@ export default function ClientAp(){
                 realDate: new Date(newDate)
             }
             appointmentList[i] = newAppointment;
+            i++;
         }
         )
         setClientAppointments(appointmentList);
         const prevSelect = selected;
-        handleSelection(selected);
         setSelected("Adding new Info");
+        handleSelection(selected);
         setSelected(prevSelect);
+        handleSelection(selected);
     }
 
     //Work on another sprint. Query for name instead of having userID as name.
@@ -153,11 +156,12 @@ export default function ClientAp(){
     //it then decides which filtering option to use on the data based upon the key that it is passed in this function
     //it modifies the filteredAps global array and passes it back to the flatlist down below and the flatlist displays what was filtered
     function handleSelection(selected) {
+        let temp: Appointment[] = [];
         if(selected == 'All')
         {
             //this just grabs all appointments available in the database
-            clientAppointments.forEach(val => filteredAps.push(Object.assign({}, val)));
-
+            clientAppointments.forEach(val => temp.push(Object.assign({}, val)));
+            setFilteredAps(temp);
             //alert(filteredAps[0].realDate.toLocaleDateString());
             //const curDay = new Date();
             //alert(curDay.toLocaleDateString())
@@ -171,10 +175,10 @@ export default function ClientAp(){
 
             //filters the appointments by adding the appointments that have the date in the date string, to the filteredAps array
             //with a temp array as a mediator because javascript is stupid and won't let me copy directly over between the two
-            let temp: Appointment[] = [];
             //this line converts both dates to strings(mm/dd/yyy) and compares them storing the ones that are the same in temp
             temp = clientAppointments.filter((item) => item.realDate.toLocaleDateString() === curDay.toLocaleDateString());
-            temp.forEach(val => filteredAps.push(Object.assign({}, val)));
+            //temp.forEach(val => filteredAps.push(Object.assign({}, val)));
+            setFilteredAps(temp);
 
         }
         else if(selected == 'This Week')
@@ -188,7 +192,7 @@ export default function ClientAp(){
             lastDayOfWeek.setDate(today.getDate() + (6 - today.getDay()));
 
             //making another temp array
-            let temp: Appointment[] = [];
+            
             
             //this filters the client appointments using the Date Objects instead of strings similar to what was done for 
             //filter by today
@@ -197,8 +201,8 @@ export default function ClientAp(){
             })
 
             //copies each value of temp into the global filteredAps array
-            temp.forEach(val => filteredAps.push(Object.assign({}, val)));
-            
+            //temp.forEach(val => filteredAps.push(Object.assign({}, val)));
+            setFilteredAps(temp);
         }
         else if(selected == "This Month")
         {
