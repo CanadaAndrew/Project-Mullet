@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Pressable, Image, ImageBackground, ScrollView, Button, Touchable} from 'react-native';
+import { StyleSheet, Text, View, Pressable, Image, ImageBackground, FlatList,} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -7,22 +7,203 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 // overlap. comments have been added above each button for clarification.
 
 export default function HomeScreen({navigation}){
-
+  //create each button in here by doing what i did down there for each one. Push it to the array and then display the array in a
+  //flatlist 
   /*
     Creates a const of data to be sent to the other pages in the app
     You can add other consts or just add another variable to the existing userData const
   */
-
   const userData = {
 
     UserId: '1',
     AdminPriv: true,
     NewClient: false
-
+  
   };
+
+  //The buttons array that stores all individual buttons on a page load/reload
+  let buttons = [];
+
+  /*
+  This might be a little confusing. I did these if statements like they are because it will only load the correct buttons that
+  need to be viewed by the user depending on their role. It won't load any other buttons beside the ones that they are supposed to be 
+  shown. If you need to delete a button you need to wipe it from any of the if/elseif blocks that it appears in. Similarly if you
+  need to add a button, you add it to the corresponding if/elsif block that I have labeled as "Admin" "Old Client" or "New Client"
+  depending on who is supposed to see the button.
+  */
+ 
+  //This block constructs buttons that the Admin can see
+  if(userData.AdminPriv == true)
+  {
+    //Modifies Calendar Availability
+    var modifyAvButton = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("ModifyAv", {userData})}
+      >  
+      <Text style = {styles.homeButtonText}>Modify Calendar</Text>
+    </TouchableOpacity>
+
+    //Views Existing Client Appointments
+    var clientApButton = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("ClientAp", {userData})}
+      >  
+      <Text style = {styles.homeButtonText}>Existing Appointments</Text>
+    </TouchableOpacity>
+
+    //Views Client Info !WIP! no functionality
+    var clientInfoButton = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("Client info", {userData})}
+      >  
+      <Text style = {styles.homeButtonText}>modify Client Info</Text>
+    </TouchableOpacity>
+
+    //Views Client History !WIP! no functionality
+    var clientHistoryButton = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("Client history", {userData})}
+      >  
+      <Text style = {styles.homeButtonText}>Client History</Text>
+    </TouchableOpacity>
+
+    //Takes you to the New Client Approval page !WIP! no functionality
+    var newClientApprovalButton = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("New Client approval", {userData})}
+      >  
+      <Text style = {styles.homeButtonText}>New Client approval</Text>
+    </TouchableOpacity>
+
+    //Takes you to the Set Up Appiontment Page
+    var scheduleAppointmentButton = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("setUpAppoint1", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>Schedule Appointments</Text>
+    </TouchableOpacity>
+
+    //takes you to the Services Offered Page
+    var servicesOfferedButton = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("ServicesOffered", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>Services Offered</Text>
+    </TouchableOpacity>
+
+    //Takes you to the About Me Page
+    var aboutMeButton = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("AboutMe", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>About Me</Text>
+    </TouchableOpacity>
+
+    //Takes you to the FAQ page !WIP! no functionality
+    var FAQButton = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("FAQ", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>FAQ</Text>
+    </TouchableOpacity>
+
+    buttons.push(modifyAvButton);
+    buttons.push(clientApButton);
+    buttons.push(clientInfoButton);
+    buttons.push(clientHistoryButton);
+    buttons.push(newClientApprovalButton);
+    buttons.push(scheduleAppointmentButton);
+    buttons.push(servicesOfferedButton);
+    buttons.push(aboutMeButton);
+    buttons.push(FAQButton);
+  }
+  //This block constructs buttons that only old clients can see
+  else if(userData.NewClient == false)
+  {
+    //Takes you to the Set Up Appointment Page !WIP! no functionality
+    var scheduleAppointmentButton2 = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("setUpAppoint1", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>Schedule Appointments</Text>
+    </TouchableOpacity>
+
+    //Takes you to the Your Appointments page
+    var yourAppointmentsButton = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("Your Appointments", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>Your Appointments</Text>
+    </TouchableOpacity>
+
+    //Takes you to the Services offered page
+    var servicesOfferedButton2 = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("ServicesOffered", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>Services Offered</Text>
+    </TouchableOpacity>
+
+    //Takes you to the About Me page
+    var aboutMeButton2 = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("AboutMe", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>About Me</Text>
+    </TouchableOpacity>
+
+    //takes you to the FAQ page !WIP! no functionality
+    var FAQButton2 = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("FAQ", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>FAQ</Text>
+    </TouchableOpacity>
+
+    buttons.push(scheduleAppointmentButton2);
+    buttons.push(yourAppointmentsButton);
+    buttons.push(servicesOfferedButton2);
+    buttons.push(aboutMeButton2);
+    buttons.push(FAQButton2);
+  }
+  //This block constructs buttons that the new clients can see
+  else if(userData.NewClient == true)
+  {
+    //Takes you to the services offerd page
+    var servicesOfferedButton3 = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("ServicesOffered", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>Services Offered</Text>
+    </TouchableOpacity>
+
+    //Takes you to the About Me page
+    var aboutMeButton3 = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("AboutMe", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>About Me</Text>
+    </TouchableOpacity>
+
+    //Takes you to the FAQ page !WIP! no functionality
+    var FAQButton3 = <TouchableOpacity
+      style = {styles.homeButton}
+      onPress = {() => navigation.navigate("FAQ", {userData})}
+      >
+      <Text style = {styles.homeButtonText}>FAQ</Text>
+    </TouchableOpacity>
+
+    buttons.push(servicesOfferedButton3);
+    buttons.push(aboutMeButton3);
+    buttons.push(FAQButton3);
+  }
+
+
+
+
         
-    return(
-        <ScrollView>
+  return(
+        
             <View style = {styles.container}>
 
             {/*added logo image*/}
@@ -37,129 +218,35 @@ export default function HomeScreen({navigation}){
               colors = {['#EB73C9', 'white']}
               style = {styles.background}
              >
-                <View style = {styles.background}>
+              
+              <View style = {styles.background}>
 
                 {/*add title for homepage*/}
                 <Text style = {styles.objectTitle}> Home </Text>
 
-                {/*button to modify calendar availability*/}
-                {/*Viewable by Admin only*/}
-                <View>
-                    <TouchableOpacity
-                      style = {styles.homeButton}
-                      //Pass the userData const into the navigate function. This has to be done for every page you are using navigate to pass
-                      //data into
-                      onPress = {() => navigation.navigate("ModifyAv", {userData})}
-                    >  
-                    <Text style = {styles.homeButtonText}>Modify Calendar</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                {/*button to navigate to viewing existing client appointments*/}
-                {/*Viewable by Admin only*/}
-                <View>
-                    <TouchableOpacity
-                      style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("ClientAp", {userData})}
-                    >  
-                    <Text style = {styles.homeButtonText}>Existing Appointments</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                {/*button to edit client info page is WIP so no button functionality yet*/}
-                {/*Viewable by Admin only*/}
-                <View>
-                    <TouchableOpacity
-                      style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("Client info", {userData})}
-                    >  
-                    <Text style = {styles.homeButtonText}>modify Client Info</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                {/*button to view client history page is WIP so no button functionality yet*/}
-                {/*Viewable by Admin only*/}
-                <View>
-                    <TouchableOpacity
-                      style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("Client history", {userData})}
-                    >  
-                    <Text style = {styles.homeButtonText}>Client History</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                {/*button to view approval/denial of new clients page is WIP so no button functionality yet*/}
-                {/*Viewable by Admin only*/}
-                <View>
-                    <TouchableOpacity
-                      style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("New Client approval", {userData})}
-                    >  
-                    <Text style = {styles.homeButtonText}>New Client approval</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {/*button to navigate to scheduling appointments*/}
-                  {/*Viewable by Old Clients and Admin*/}
-                  <View>
-                    <TouchableOpacity
-                      style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("setUpAppoint1", {userData})}
-                    >
-                    <Text style = {styles.homeButtonText}>Schedule Appointments</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {/*button to view all personal appointments page is WIP so no button functionality yet*/}
-                  {/*Viewable by Old Clients only*/}
-                  <View>
-                    <TouchableOpacity
-                      style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("Your Appointments", {userData})}
-                    >
-                    <Text style = {styles.homeButtonText}>Your Appointments</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {/*button to navigate to services offered page is WIP so no button functionality yet*/}
-                  {/*Viewable by New Clients, Old Clients, and Admin*/}
-                  <View>
-                    <TouchableOpacity
-                      style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("ServicesOffered", {userData})}
-                    >
-                    <Text style = {styles.homeButtonText}>Services Offered</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {/*button to navigate to about me page is WIP so no button functionality yet*/}
-                  {/*Viewable by New Clients, Old Clients, and Admin*/}
-                  <View>
-                    <TouchableOpacity
-                      style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("AboutMe", {userData})}
-                    >
-                    <Text style = {styles.homeButtonText}>About Me</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {/*button to navigate to FAQ page is WIP so no button functionality yet*/}
-                  {/*Viewable by New Clients, Old Clients, and Admin*/}
-                  <View>
-                    <TouchableOpacity
-                      style = {styles.homeButton}
-                      onPress = {() => navigation.navigate("FAQ", {userData})}
-                    >
-                    <Text style = {styles.homeButtonText}>FAQ</Text>
-                    </TouchableOpacity>
-                  </View>
-
-
+                {/*
+                This flatlist displays each of the buttons when the page is loaded depending on the role of the user
+                as determined above.
+                */}
+                <View style = {styles.listView}>
+                <FlatList
+                  data = {buttons}
+                  renderItem={({item}) => (
+                    <View>
+                      {item}
+                    </View>
+                  )}
+                  
+                  contentContainerStyle = {{flexGrow: 1}}
+                />
                 </View>
+
+
+              </View>
              </LinearGradient>
 
             </View>
-        </ScrollView>
+        
 
 
 
@@ -169,6 +256,9 @@ export default function HomeScreen({navigation}){
 const styles = StyleSheet.create({
     container:{
         borderRadius: 90
+    },
+    listView:{
+        height: 375
     },
     // title styling 
     objectTitle: {
@@ -230,7 +320,7 @@ const styles = StyleSheet.create({
     },
     // home button style
     homeButton: {
-        width: 350, //
+        width: 300, //
         height: 50, //
         paddingTop: 15,
         margin: 25,
