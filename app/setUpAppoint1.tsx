@@ -24,7 +24,7 @@ const renderSelectedDates = () => {
     }
 }
 
-export default function setUpAppoint1({navigation}) { // add navigation to default function for data transfer between pages
+export default function setUpAppoint1({navigation, route}) { // add navigation to default function for data transfer between pages
 
     const { userData } = route.params;
     //{ route }, { navigation }
