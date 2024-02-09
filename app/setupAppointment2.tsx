@@ -17,28 +17,88 @@ export default function SetupAppointment2({route}) { // added route for page nav
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]); //list of selected times to push to db upon confirmation
     const [selectedTime, setSelectedTime] = useState(null);       //updates the selected time state
+    const [alteredListOfTimes, setAlteredTimes] = useState([]);
 
     // for data transfer between appointment pages
     const {hairStyleData} = route.params;
     const {dateData} = route.params;
     const { userData } = route.params;
 
+    //using this dummy data because the dateData variable isn't working currently ^^^ keeps spitting out Monday, December 4th, 2023
+    let dateChosen = 'Mon, 04 December 2023';
+    
+
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000',
+        baseURL: 'http://10.0.0.192:3000'
+        //baseURL: 'http://10.0.0.199:3000',
+        //baseURL: 'http://10.0.0.14:3000' Cameron's IP address for testing
     })
 
-    const listOfTimes = [ //dummy data for testing purposes -> get data from db either from query in setupAppointment1 or this screen on initialization with date from setupAppointment1
-        '7:00am', '8:00am', '9:00am', '10:00am', '11:00am', '12:00pm', '1:00pm', '2:00pm'
-    ];
+
+    function updateTimeList(appointmentData){
+        //creates a new date object based on the dateChosen variable. getter/setter isn't working properly for it yet so it is still
+        //using dummy data
+        var appointmentDateChosen = new Date(dateChosen).toISOString().slice(0, 10);
+
+        let appointment;
+        let Times = [];
+        /*
+        for loop that searches the appointments in the database. If it matches the appointments that are of the same date chosen
+        and the vacancy status is 0 meaning that there is no appointment scheduled for that time slot then it formats the time from
+        the database and puts it into the Times array
+        */
+        for(appointment in appointmentData)
+        {
+            let databaseDate = appointmentData[appointment].AppointmentDate.slice(0, 10);
+
+            if(databaseDate == appointmentDateChosen && appointmentData[appointment].VacancyStatus == 0)
+            {
+                //lots of formatting to be done
+                let aptdate = new Date(appointmentData[appointment].AppointmentDate);
+                const hours = aptdate.getUTCHours().toString().padStart(2, '0');
+                const minutes = aptdate.getUTCMinutes().toString().padStart(2, '0');
+                const seconds = aptdate.getUTCSeconds().toString().padStart(2, '0');
+                const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+                const[hours1, minutes1] = formattedTime.split(':');
+                let period = 'am';
+                let hours12 = parseInt(hours, 10);
+                if(hours12 >= 12)
+                {
+                    period = 'pm';
+                    if(hours12 > 12)
+                    {
+                        hours12 -= 12;
+                    }
+                }
+
+                const formatted12HourTime = `${hours12.toString()}:${minutes}${period}`;
+                //at the end it pushes the formatted time to the Times array
+                Times.push(formatted12HourTime);
+
+
+            }
+        }
+        //useState that keeps track of the alteredListOfTimes array. Setting the alteredListOfTimes array to the correctly
+        //formatted and ordered Times array so it can be used outside of this function.
+        setAlteredTimes(Times);
+    }
+
+    //This is the call to get the appointments from the database. It calls updateTimeList with the data that the call recieves
+    let appointmentData;
+    database.get('/queryAppointments').then((ret) => appointmentData = ret.data).then(() => updateTimeList(appointmentData)).catch(() => {alert("error");});
+
+    //this sets the original listOfTimes to the altered list of times based on the vacancy status in the database.
+    const listOfTimes = alteredListOfTimes;
 
     const month = [
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
 
-    const services = ['Women\'s Haircut'];
+    const services = [];
 
-    const dates = ['24th'];
-    const dummyDates = ['Tuesday, October 24th 2023', 'Wednesday, November 22th 2023'];
+    const dates = [];
+    const dummyDates = dateData.split(', ')
 
     const legendWords = ['Available:', 'Selected:'];
 
@@ -85,14 +145,14 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                     data={services}
                                     renderItem={({ item }) => (
                                         <Text style={styles.appointmentText}>
-                                            {item}{', '}
+                                            {item}
                                         </Text>
                                     )}
                                     horizontal={true}
                                 />
                             </View>
                             <View style={styles.appointmentDateChosen}>
-                                <Text style={styles.appointmentText}>Date Chosen:</Text>
+                                <Text style={styles.appointmentText}>Dates Chosen:</Text>
                                 <Text style={styles.appointmentText}>{dateData}</Text>
                                 <FlatList
                                     data={dates}

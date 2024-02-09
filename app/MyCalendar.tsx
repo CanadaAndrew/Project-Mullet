@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { handleDatesSelected } from './calendarUtils';
 
 interface MyCalendarProps {
-    pageName: string;
-    onDatesSelected: (selectedDates: string[]) => void;
-    disabled?: boolean;
+  pageName: string;
+  onDatesSelected: (selectedDates: string[]) => void;
+  disabled?: boolean;
 }
 
-const MyCalendar: React.FC<MyCalendarProps> = ({ pageName, disabled = false }) => {
-    const [selectedDates, setSelectedDates] = useState<string[]>([]);
+
+const MyCalendar = React.forwardRef(({ pageName, disabled = false }: MyCalendarProps, ref) => {
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
 
   const handleDayPress = (day: any) => {
     if (disabled) {
@@ -26,6 +27,17 @@ const MyCalendar: React.FC<MyCalendarProps> = ({ pageName, disabled = false }) =
     setSelectedDates(newSelectedDates);
     handleDatesSelected(newSelectedDates, pageName);
   };
+  
+  // Use ref to assign the markedDates prop
+  React.useImperativeHandle(ref, () => ({
+    markedDates: selectedDates
+  }), [selectedDates]);
+
+  /* Getter to allow other pages to grab dates from calendar
+  Example: const selectedDates = calendarContainerRef.current.getSelectedDates();*/
+  const getSelectedDates = () => {
+    return selectedDates;
+  };
 
   return (
     <View style={styles.container}>
@@ -38,7 +50,7 @@ const MyCalendar: React.FC<MyCalendarProps> = ({ pageName, disabled = false }) =
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

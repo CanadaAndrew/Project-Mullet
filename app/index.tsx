@@ -18,6 +18,7 @@ import AboutMe from './AboutMe';
 const Stack = createNativeStackNavigator()
 
 export default function index() {
+
   return (
    <NavigationContainer independent={true}>
     {/*streamline custom header*/}

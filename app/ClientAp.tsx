@@ -6,12 +6,20 @@ import { Calendar } from 'react-native-calendars';
 import { Link } from 'expo-router';
 import { SelectList } from 'react-native-dropdown-select-list';
 import MyCalendar from './MyCalendar';
+import axios from 'axios';  //Used to get data from the backend nodejs
 import { ScrollView } from 'react-native-gesture-handler';
 
 
 export default function ClientAp({ route }){ 
 
     const { userData } = route.params;
+
+    //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
+    //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
+    const database = axios.create({
+        baseURL: 'http://10.0.0.192:3000', //Andrew pc local
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+    })
 
     interface Appointment {
         name: string;
@@ -23,9 +31,8 @@ export default function ClientAp({ route }){
     /*I have genuinely no idea why this function is needed*/
     const handleDatesSelected = (selectedDates: string[]) => {};
 
-
     //new list that makes it work better with filtering and acts more like actual data from the database
-    let clientAppointments: Appointment[] = [
+    let clientAppointmentsDefault: Appointment[] = [
         {
             name: "Will Smith",
             service: "Mens Haircut",
@@ -55,16 +62,23 @@ export default function ClientAp({ route }){
             realDate: new Date("2023-11-15")
         }
     ]
+
+    //updateAppointments("2023-12-01")
+
+    /*
     //setting the times like i did in the dummy data makes it a UTC date which will always be 1 day behind PST so i add one to the day
     //possibly need to get rid of this when the data base gets added
     clientAppointments.forEach(val => val.realDate.setDate(val.realDate.getDate() + 1));
+    */
 
     //filteredAps is used as an global array to hold the filtered appointments if there is any that need to be filtered by date
-    let filteredAps: Appointment[] = [];
+    let filteredApsDef: Appointment[] = [];
+    const [filteredAps, setFilteredAps] = React.useState(filteredApsDef);
 
+    const [clientAppointments, setClientAppointments] = React.useState(clientAppointmentsDefault);
 
     //for the drop down list below
-    const [selected, setSelected] = React.useState("");
+    const [selected, setSelected] = React.useState("All");
 
     const filter = [
         {key: 'All', value: 'All'},
@@ -82,15 +96,75 @@ export default function ClientAp({ route }){
         return `${mm}/${dd}/${yy}`;
     }
 
+
+    const [first, setFirst] = React.useState(0);
+    firstUpdate();
+    function firstUpdate(){
+        if(first === 0 ){
+            setFirst(1);
+            let date = new Date;
+            let dateString = date.toISOString(); //NOTE THAT THE DATE IS CURRENTLY OFF, NEED TO FIX IN ANOTHER SPRINT
+            updateAppointments(dateString.split("T")[0]);
+        }
+    }
+    //Updates the upcoming appointments given a date.
+    function updateAppointments(date){
+        let data;
+        database.get('/queryUpcomingAppointments', {
+            params: {
+                queryDate : date 
+            }
+        })
+        .then((ret) => data = ret.data)
+        .then(() => {updateAppointmentsDisplay(data)})
+        .catch(() => {alert("error");});
+    }
+
+    async function updateAppointmentsDisplay(data){
+        let appointmentList : Appointment[] = [];
+        let i = 0;
+        data.forEach(async (appointment) => {
+            let dateTimeArray = appointment.AppointmentDate.split("T");
+            let newDate = dateTimeArray[0];
+            let newTime = dateTimeArray[1].split("Z")[0];
+            let newAppointment : Appointment = {
+                name: appointment.UserID,
+                service: appointment.TypeOfAppointment,
+                date: newDate + ", " + newTime,
+                stylist: 'Melissa Wright',
+                realDate: new Date(newDate)
+            }
+            appointmentList[i] = newAppointment;
+            i++;
+        }
+        )
+        setClientAppointments(appointmentList);
+        const prevSelect = selected;
+        setSelected("Adding new Info");
+        handleSelection(selected);
+        setSelected(prevSelect);
+        handleSelection(selected);
+    }
+
+    //Work on another sprint. Query for name instead of having userID as name.
+    function getName(userID){
+        database.get('/findCurrentClientFullNameByID', {
+            params: {
+                queryId : userID 
+            }
+        })
+        .then()
+    }
     //handleSelection is called whenever a change is made in the drop down menu. It is passed the key value from the filter array above
     //it then decides which filtering option to use on the data based upon the key that it is passed in this function
     //it modifies the filteredAps global array and passes it back to the flatlist down below and the flatlist displays what was filtered
     function handleSelection(selected) {
+        let temp: Appointment[] = [];
         if(selected == 'All')
         {
             //this just grabs all appointments available in the database
-            clientAppointments.forEach(val => filteredAps.push(Object.assign({}, val)));
-
+            clientAppointments.forEach(val => temp.push(Object.assign({}, val)));
+            setFilteredAps(temp);
             //alert(filteredAps[0].realDate.toLocaleDateString());
             //const curDay = new Date();
             //alert(curDay.toLocaleDateString())
@@ -104,10 +178,10 @@ export default function ClientAp({ route }){
 
             //filters the appointments by adding the appointments that have the date in the date string, to the filteredAps array
             //with a temp array as a mediator because javascript is stupid and won't let me copy directly over between the two
-            let temp: Appointment[] = [];
             //this line converts both dates to strings(mm/dd/yyy) and compares them storing the ones that are the same in temp
             temp = clientAppointments.filter((item) => item.realDate.toLocaleDateString() === curDay.toLocaleDateString());
-            temp.forEach(val => filteredAps.push(Object.assign({}, val)));
+            //temp.forEach(val => filteredAps.push(Object.assign({}, val)));
+            setFilteredAps(temp);
 
         }
         else if(selected == 'This Week')
@@ -121,7 +195,7 @@ export default function ClientAp({ route }){
             lastDayOfWeek.setDate(today.getDate() + (6 - today.getDay()));
 
             //making another temp array
-            let temp: Appointment[] = [];
+            
             
             //this filters the client appointments using the Date Objects instead of strings similar to what was done for 
             //filter by today
@@ -130,8 +204,8 @@ export default function ClientAp({ route }){
             })
 
             //copies each value of temp into the global filteredAps array
-            temp.forEach(val => filteredAps.push(Object.assign({}, val)));
-            
+            //temp.forEach(val => filteredAps.push(Object.assign({}, val)));
+            setFilteredAps(temp);
         }
         else if(selected == "This Month")
         {
@@ -169,9 +243,9 @@ export default function ClientAp({ route }){
             <View>
 
                 <SafeAreaView style={styles.calendar}>
-                                    
-                <MyCalendar pageName='ClientAp' onDatesSelected={handleDatesSelected} disabled={true}/>
 
+                <MyCalendar pageName='ClientAp' onDatesSelected={handleDatesSelected} disabled={true}/>
+                
                 </SafeAreaView>
 
             </View>
@@ -195,7 +269,6 @@ export default function ClientAp({ route }){
             {/* flat list is replacing the hard coded list from before as this can work with database data and print out the entire
             list at once */}
             <FlatList
-
                 data = {filteredAps}
                 horizontal = {true}
                 renderItem = {({item}) => (
