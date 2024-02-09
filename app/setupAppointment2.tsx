@@ -35,10 +35,10 @@ export default function SetupAppointment2({route}) { // added route for page nav
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
 
-    const services = ['Women\'s Haircut'];
+    const services = [];
 
-    const dates = ['24th'];
-    const dummyDates = ['Tuesday, October 24th 2023', 'Wednesday, November 22th 2023'];
+    const dates = [];
+    const dummyDates = [];
 
     const legendWords = ['Available:', 'Selected:'];
 
