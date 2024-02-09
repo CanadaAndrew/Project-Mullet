@@ -2,6 +2,9 @@ const sql = require('mssql')
 const express = require('express')
 const cors = require('cors');
 const app = express();
+app.use(cors());
+app.use(express.json()); //middleware to parse JSON request bodies
+
 //Wanted to have these through exports, but exports do not seem to be working, will fix later.
 const monthsNum = {
     January: '01',
@@ -238,12 +241,41 @@ async function customQuery(queryString){
 async function updateAppointment(date, time, userID){
     try {
         var poolConnection = await connect();
-        await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, PhoneNumberEmail = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
+        //await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, PhoneNumberEmail = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
+        await poolConnection.request().query('SELECT * FROM Appointments');
         poolConnection.close();
     } catch (err) {
         console.error(err.message);
     }
     
+}
+
+async function addAvailability(addDateTimeString, notBooked) {
+    try {
+        const poolConnection = await connect();
+        poolConnection.setMaxListeners(24);
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${notBooked});`;
+        await poolConnection.request()
+            .query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+        throw err; // rethrow error so it can be caught in calling code
+    }
+}
+
+async function removeAvailability(removeDateTimeString){
+    try {
+        const poolConnection = await connect();
+        poolConnection.setMaxListeners(24);
+        const query = `DELETE FROM Appointments WHERE AppointmentDate='${removeDateTimeString}';`;
+        await poolConnection.request()
+            .query(query);
+        poolConnection.close();   
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so it can be caught in calling code
+    } 
 }
 
 async function appointmentPost(queryString, values){
@@ -254,6 +286,67 @@ async function appointmentPost(queryString, values){
             .input('AppointmentDate', sql.DateTime2, values.AppointmentDate)
             .input('VacancyStatus', sql.Int, values.VacancyStatus)
             .query(queryString);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so that frontend can catch it
+    }
+}
+
+/*async function pastAppointmentsQuery(){
+    try {
+        const poolConnection = await connect();
+        const query = 'SELECT * FROM Appointments';
+        const resultSet = await poolConnection
+            .request()
+            .query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so that frontend can catch it
+    }
+}*/
+
+//async function upcomingAppointmentsQuery(startDate, endDate){   
+async function clientHistoryAppointmentsQuery(startDate, endDate){
+    try {
+        const poolConnection = await connect();
+        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate BETWEEN \'' + startDate + '\' AND \'' + endDate + '\'';
+        const resultSet = await poolConnection
+            .request()
+            .query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so that frontend can catch it
+    }
+}
+
+async function allPastAppointmentsQuery(todaysDate){
+    try {
+        const poolConnection = await connect();
+        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate < \'' + todaysDate + '\'';
+        const resultSet = await poolConnection
+            .request()
+            .query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err; //rethrow error so that frontend can catch it
+    }
+}
+
+async function allUpcomingAppointmentsQuery(todaysDate){
+    try {
+        const poolConnection = await connect();
+        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate >= \'' + todaysDate + '\'';
+        const resultSet = await poolConnection
+            .request()
+            .query(query);
         poolConnection.close();
         return sortingResults(resultSet);
     } catch (err) {
@@ -299,7 +392,7 @@ async function errorHandle(currentFunction, arguement, res){
     }
     res.send(ret);
 }
-app.use(cors());
+
 //For each query/function, a REST API needs to be created, a way for the frontend of our program to call methods to our backend.
 //app.get means the front end will GET stuff from the backend
 //app.post means the front end will POST stuff to the backend(read up on the Axion api for more information.)
@@ -336,6 +429,50 @@ app.get('/queryUpcomingAppointments', (req, res) => {
 })
 
 
+app.get('/clientHistoryAppointmentsQuery', async (req, res) => {
+    try {
+        const startDate = req.query.startDate;
+        const endDate = req.query.endDate;
+        if (!startDate) {
+            throw new Error('Invalid request. Missing "startDate"');
+        }
+        if (!endDate) {
+            throw new Error('Invalid request. Missing "endDate"');
+        }
+    //const result = await someAppointmentsQuery(startDate, endDate)
+    const result = await clientHistoryAppointmentsQuery(startDate, endDate);
+    res.send(result);   
+    } catch {
+        res.status(400).send('Bad Request');
+    }
+});
+
+app.get('/allPastAppointmentsQuery', async (req, res) => {
+    try {
+        const todaysDate = req.query.todaysDate;
+        if (!todaysDate) {
+            throw new Error('Invalid request. Missing "todaysDate"');
+        }
+        const result = await allPastAppointmentsQuery(todaysDate);
+        res.send(result);
+    } catch {
+        res.status(400).send('Bad Request');
+    }
+});
+
+app.get('/allUpcomingAppointmentsQuery', async (req, res) => {
+    try {
+        const todaysDate = req.query.todaysDate;
+        if (!todaysDate) {
+            throw new Error('Invalid request. Missing "todaysDate"');
+        }
+        const result = await allUpcomingAppointmentsQuery(todaysDate);
+        res.send(result);
+    } catch {
+        res.status(400).send('Bad Request');
+    }
+});
+
 app.post('/appointmentPost', async (req, res) => {
     console.log('received request body: ');
     try {
@@ -351,7 +488,38 @@ app.post('/appointmentPost', async (req, res) => {
     }
 });
 
-app.delete('/customDelete', async (req, res) => {
+app.post('/addAvailability', async (req, res) => {
+    try {
+        const { addDateTimeString, notBooked } = req.body;
+        if (!addDateTimeString) {
+            throw new Error('Invalid request body. Missing "addDateTimeString".');
+        }
+        if (notBooked === undefined || notBooked === null) {
+            throw new Error('Invalid request body. Missing "booked".');
+        }
+        await addAvailability(addDateTimeString, notBooked);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
+app.delete('/removeAvailability', async (req, res) => {
+    try {
+        const { removeDateTimeString } = req.body;
+        if (!removeDateTimeString) {
+            throw new Error('Invalid request body. Missing "removeDateTimeString".');
+        }
+        await removeAvailability(removeDateTimeString);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
+app.delete('/customDelete', async (req, res) => { // Provide explicit types for the 'req' and 'res' parameters
     try {
         const { queryString } = req.body;
         if (!queryString) {
@@ -501,5 +669,18 @@ app.get('/queryAllAppointmentsByUserID', (req, res) =>{
 })
 
 
+app.get('/queryAdminPermissionsByUserID', (req, res) =>{
+    const userID = req.query.userID;
+    const query = "SELECT AdminPriv FROM Users WHERE UserID = " + userID +";";
+    customQuery(query)
+    .then((ret) => res.send(ret))
+    .catch(() => errorHandle(customQuery, query))
+    .then((ret) => res.send(ret))
+    .catch(res.send("error"));
+})
+
 //This opens the server, printing to console 'up' when it is up.
-app.listen(3000, () => console.log('up'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is up and listening on port ${PORT}`);
+});
