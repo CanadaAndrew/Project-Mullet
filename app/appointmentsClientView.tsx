@@ -19,23 +19,24 @@ export default function appointmentsClientView(){
     const [pastClientAppointments, setPastClientAppointments] = React.useState(defaultAppointment);
 
     const database = axios.create({
-        //baseURL: 'http://10.0.0.192:3000',
+        baseURL: 'http://10.0.0.192:3000',
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
 
     const [first, setFirst] = React.useState(0);
     firstUpdate();
-    function firstUpdate(){
+    async function firstUpdate(){
         if(first === 0 ){
             setFirst(1);
             let date = new Date;
             let dateString = date.toISOString(); //NOTE THAT THE DATE IS CURRENTLY OFF, NEED TO FIX IN ANOTHER SPRINT
-            updateUpcomingAppointments(dateString.split("T")[0], 1); //Note that currently using ID 1 until the use of UserID transfer comes in
-            updatePastAppointments(dateString.split("T")[0], 1);
+            let name = await getName(1);
+            updateUpcomingAppointments(dateString.split("T")[0], 1, name); //Note that currently using ID 1 until the use of UserID transfer comes in
+            updatePastAppointments(dateString.split("T")[0], 1, name);
         }
     }
     //Updates the upcoming appointments given a date.
-    function updateUpcomingAppointments(date, userID){
+    function updateUpcomingAppointments(date, userID, name){
         let data;
         database.get('/queryUpcomingAppointmentsByUserIDAndDate', {
             params: {
@@ -44,11 +45,11 @@ export default function appointmentsClientView(){
             }
         })
         .then((ret) => data = ret.data)
-        .then(() => {updateUpcomingAppointmentsDisplay(data)})
+        .then(() => {updateUpcomingAppointmentsDisplay(data, name)})
         .catch(() => {alert("error");});
     }
 
-    function updatePastAppointments(date, userID){
+    function updatePastAppointments(date, userID, name){
         let data;
         database.get('/queryPastAppointmentsByUserIDAndDate', {
             params: {
@@ -57,11 +58,11 @@ export default function appointmentsClientView(){
             }
         })
         .then((ret) => data = ret.data)
-        .then(() => {updatePastAppointmentsDisplay(data)})
+        .then(() => {updatePastAppointmentsDisplay(data, name)})
         .catch(() => {alert("error");});
     }
 
-    function updateUpcomingAppointmentsDisplay(data){
+    function updateUpcomingAppointmentsDisplay(data, name){
         //alert(JSON.stringify(data));
         //alert(JSON.stringify(data[0]));
         let appointmentList : Appointment[] = [];
@@ -71,7 +72,7 @@ export default function appointmentsClientView(){
             let newDate = dateTimeArray[0];
             let newTime = dateTimeArray[1].split("Z")[0];
             let newAppointment : Appointment = {
-                name: appointment.UserID,
+                name: name,
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
@@ -82,10 +83,10 @@ export default function appointmentsClientView(){
         }
         )
         setUpcomingClientAppointments(appointmentList);
-        alert("Upcoming List: " + JSON.stringify(appointmentList));
+        //alert("Upcoming List: " + JSON.stringify(appointmentList));
     }
 
-    function updatePastAppointmentsDisplay(data){
+    function updatePastAppointmentsDisplay(data, name){
         let appointmentList : Appointment[] = [];
         let i = 0;
         data.forEach((appointment) => {
@@ -93,7 +94,7 @@ export default function appointmentsClientView(){
             let newDate = dateTimeArray[0];
             let newTime = dateTimeArray[1].split("Z")[0];
             let newAppointment : Appointment = {
-                name: appointment.UserID,
+                name: name,
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
@@ -105,6 +106,18 @@ export default function appointmentsClientView(){
         )
         setPastClientAppointments(appointmentList);
         //Test: alert("Past list: " + JSON.stringify(appointmentList));
+    }
+    async function getName(userID){
+        let name = await database.get('/findCurrentClientFullNameByID', {
+            params: {
+                queryId : userID 
+            }
+        })
+        if(name.data[0].MiddleName == null){
+            return name.data[0].FirstName + " " + name.data[0].LastName;
+        }else{
+            return name.data[0].FirstName + " " + name.data[0].MiddleName + " " + name.data[0].LastName
+        }
     }
 
     return(

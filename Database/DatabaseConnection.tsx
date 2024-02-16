@@ -610,7 +610,7 @@ app.get('/findCurrentClientByID', (req, res) =>{
 })
 
 app.get('/findCurrentClientFullNameByID', (req, res) =>{
-    const queryId = req.query.Id;
+    const queryId = req.query.queryId;
     const query = "SELECT FirstName, MiddleName, LastName FROM CurrentClientView WHERE UserID = " + queryId + ";";
     console.log(query);
     customQuery(query)
@@ -674,7 +674,7 @@ app.get('/queryAdminPermissionsByUserID', (req, res) =>{
     const query = "SELECT AdminPriv FROM Users WHERE UserID = " + userID +";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
+    .catch(() => errorHandle(customQuery, query, res))
     .then((ret) => res.send(ret))
     .catch(res.send("error"));
 })
