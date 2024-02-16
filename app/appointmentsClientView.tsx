@@ -1,9 +1,11 @@
-import { StyleSheet, Text, View, ScrollView} from 'react-native';
+import { StyleSheet, Text, View, ScrollView, FlatList, Dimensions, useWindowDimensions} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import axios from 'axios';
 
 export default function appointmentsClientView(){
+
+    const windowDimensions = Dimensions.get('window')
     interface Appointment {
         name: string;
         service: string;
@@ -105,79 +107,102 @@ export default function appointmentsClientView(){
         //Test: alert("Past list: " + JSON.stringify(appointmentList));
     }
 
+
+    let clientAppointmentsDefault: Appointment[] = [
+        {
+            name: "Will Smith",
+            service: "Mens Haircut",
+            date: "10/27/23, Fri, 1:00pm",
+            stylist: 'Melissa Wright',
+            realDate: new Date("2023-10-27")
+        },
+        {
+            name: "Bob Smith",
+            service: "Mens Haircut",
+            date: "11/27/23, Mon, 2:00pm",
+            stylist: 'Melissa Wright',
+            realDate: (new Date("2023-11-27"))
+        },
+        {
+            name: "Jane Doe",
+            service: "Womens Haircut",
+            date: "11/18/23, Fri, 3:00pm",
+            stylist: 'Melissa Wright',
+            realDate: new Date("2023-11-18")
+        },
+        {
+            name: "Melinda Jackson",
+            service: "Hair Extensions",
+            date: "11/15/23, Sat, 2:00pm",
+            stylist: 'Melissa Wright',
+            realDate: new Date("2023-11-15")
+        }
+    ]
+
     return(
         <ScrollView>
             <View style = {styles.container}>
                 <LinearGradient
                   locations = {[0.7, 1]}
                   colors = {['#EB73C9', 'white']}
-                  
+                  style = {{width: windowDimensions.width, height: windowDimensions.height - 85}}
                 >
                     <View style = {styles.background}>
                         {/*Upcoming Appointments List*/}
                         <Text style = {styles.objectTitle}>Upcoming Appointments:</Text>
 
-                        {/*temporary data*/}
-                        <View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Customer:</Text>
-                            <Text style = {styles.appointText}>Bob</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Service:</Text>
-                            <Text style = {styles.appointText}>Men's Haircut</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Date:</Text>
-                            <Text style = {styles.appointText}>1/27/24, Sat, 2:00pm</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Stylist:</Text>
-                            <Text style = {styles.appointText}>Melissa Wright</Text>
-                        </View>
-                        </View>
+                        <FlatList
+                            data={clientAppointmentsDefault}
+                            horizontal={true}
+                            renderItem={({ item }) => (
+                                <View style={[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Customer:</Text>
+                                        <Text style={styles.appointText}> {item.name}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Service:</Text>
+                                        <Text style={styles.appointText}>{item.service}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Date:</Text>
+                                        <Text style={styles.appointText}>{item.date}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Stylist:</Text>
+                                        <Text style={styles.appointText}>{item.stylist}</Text>
+                                    </View>
+                                </View>
+                            )}
+                        />
 
                         {/*Past Appointments List*/}
                         <Text style = {styles.objectTitle}>Past Appointments:</Text>
                         {/*temporary data*/}
-                        <View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Customer:</Text>
-                            <Text style = {styles.appointText}>Bob</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Service:</Text>
-                            <Text style = {styles.appointText}>Men's Haircut</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Date:</Text>
-                            <Text style = {styles.appointText}>10/23/23, Mon, 1:00pm</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Stylist:</Text>
-                            <Text style = {styles.appointText}>Melissa Wright</Text>
-                        </View>
-                        </View>
-
-                        <View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Customer:</Text>
-                            <Text style = {styles.appointText}>Bob</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Service:</Text>
-                            <Text style = {styles.appointText}>Hair Extensions</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Date:</Text>
-                            <Text style = {styles.appointText}>8/10/23, Thur, 4:00pm</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Stylist:</Text>
-                            <Text style = {styles.appointText}>Melissa Wright</Text>
-                        </View>
-                        </View>
-
+                        <FlatList
+                            data={clientAppointmentsDefault}
+                            horizontal={true}
+                            renderItem={({ item }) => (
+                                <View style={[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Customer:</Text>
+                                        <Text style={styles.appointText}> {item.name}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Service:</Text>
+                                        <Text style={styles.appointText}>{item.service}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Date:</Text>
+                                        <Text style={styles.appointText}>{item.date}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Stylist:</Text>
+                                        <Text style={styles.appointText}>{item.stylist}</Text>
+                                    </View>
+                                </View>
+                            )}
+                        />
                     </View>
 
                 </LinearGradient>
@@ -203,7 +228,7 @@ const styles = StyleSheet.create({
     // background
     background: {
         //paddingTop: 20,
-        paddingBottom: 775,
+        //paddingBottom: 775,
         alignItems: 'center',
         borderRadius: 30
     },
