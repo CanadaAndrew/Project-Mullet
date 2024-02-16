@@ -19,7 +19,7 @@ export default function appointmentsClientView(){
     const [pastClientAppointments, setPastClientAppointments] = React.useState(defaultAppointment);
 
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000',
+        //baseURL: 'http://10.0.0.192:3000',
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
 
@@ -107,38 +107,6 @@ export default function appointmentsClientView(){
         //Test: alert("Past list: " + JSON.stringify(appointmentList));
     }
 
-
-    let clientAppointmentsDefault: Appointment[] = [
-        {
-            name: "Will Smith",
-            service: "Mens Haircut",
-            date: "10/27/23, Fri, 1:00pm",
-            stylist: 'Melissa Wright',
-            realDate: new Date("2023-10-27")
-        },
-        {
-            name: "Bob Smith",
-            service: "Mens Haircut",
-            date: "11/27/23, Mon, 2:00pm",
-            stylist: 'Melissa Wright',
-            realDate: (new Date("2023-11-27"))
-        },
-        {
-            name: "Jane Doe",
-            service: "Womens Haircut",
-            date: "11/18/23, Fri, 3:00pm",
-            stylist: 'Melissa Wright',
-            realDate: new Date("2023-11-18")
-        },
-        {
-            name: "Melinda Jackson",
-            service: "Hair Extensions",
-            date: "11/15/23, Sat, 2:00pm",
-            stylist: 'Melissa Wright',
-            realDate: new Date("2023-11-15")
-        }
-    ]
-
     return(
         <ScrollView>
             <View style = {styles.container}>
@@ -150,9 +118,8 @@ export default function appointmentsClientView(){
                     <View style = {styles.background}>
                         {/*Upcoming Appointments List*/}
                         <Text style = {styles.objectTitle}>Upcoming Appointments:</Text>
-
                         <FlatList
-                            data={clientAppointmentsDefault}
+                            data={upcomingClientAppointments}
                             horizontal={true}
                             renderItem={({ item }) => (
                                 <View style={[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
@@ -178,9 +145,8 @@ export default function appointmentsClientView(){
 
                         {/*Past Appointments List*/}
                         <Text style = {styles.objectTitle}>Past Appointments:</Text>
-                        {/*temporary data*/}
                         <FlatList
-                            data={clientAppointmentsDefault}
+                            data={pastClientAppointments}
                             horizontal={true}
                             renderItem={({ item }) => (
                                 <View style={[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
@@ -204,7 +170,6 @@ export default function appointmentsClientView(){
                             )}
                         />
                     </View>
-
                 </LinearGradient>
 
             </View>
@@ -219,17 +184,18 @@ const styles = StyleSheet.create({
     },
     // title styling 
     objectTitle: {
-        fontSize: 25,
+        fontSize: 23,
         fontWeight: 'bold',
         color: 'white',
-        paddingTop: 30,
-        paddingBottom: 30
+        paddingTop: 20,
+        paddingLeft: 20
+        //paddingBottom: 30
     },
     // background
     background: {
         //paddingTop: 20,
         //paddingBottom: 775,
-        alignItems: 'center',
+        //alignItems: 'center',
         borderRadius: 30
     },
     // shadow for objects IOS
