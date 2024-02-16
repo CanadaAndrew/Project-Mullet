@@ -67,6 +67,8 @@ npm install express
 npm install cors
 npm install moment-timezone
 npm install @react-native-community/datetimepicker --save
+npm install @expo/vector-icons
+npm i react-native-vector-icons
 ```
     
 ### Running the Program
