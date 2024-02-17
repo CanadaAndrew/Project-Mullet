@@ -250,11 +250,25 @@ async function updateAppointment(date, time, userID){
     
 }
 
-async function addAvailability(addDateTimeString, notBooked) {
+async function appointmentQuery(startDate, endDate, vacancyStatus){
+    try {
+        const poolConnection = await connect();
+        const query = `SELECT * FROM Appointments WHERE AppointmentDate>='${startDate}' AND AppointmentDate<='${endDate}' AND VacancyStatus=${vacancyStatus};`;
+        const resultSet = await poolConnection.request()
+            .query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err; // rethrow error so it can be caught in calling code
+    }
+}
+
+async function addAvailability(addDateTimeString, vacancyStatus) {
     try {
         const poolConnection = await connect();
         poolConnection.setMaxListeners(24);
-        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${notBooked});`;
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${vacancyStatus});`;
         await poolConnection.request()
             .query(query);
         poolConnection.close();
@@ -488,16 +502,35 @@ app.post('/appointmentPost', async (req, res) => {
     }
 });
 
+app.get('/appointmentQuery', async (req, res) => {
+    try {
+        const { startDate, endDate, vacancyStatus } = req.query;
+        if (!startDate) {
+            throw new Error('Invalid request. Missing "startTime"');
+        }
+        if (!endDate) {
+            throw new Error('Invalid request. Missing "endTime"');
+        }
+        if (!vacancyStatus) {
+            throw new Error('Invalid request. Missing "vacancyStatus"');
+        }
+        const result = await appointmentQuery(startDate, endDate, vacancyStatus);
+        res.send(result);
+    } catch {
+        res.status(400).send('Bad Request');
+    }
+});
+
 app.post('/addAvailability', async (req, res) => {
     try {
-        const { addDateTimeString, notBooked } = req.body;
+        const { addDateTimeString, vacancyStatus } = req.body;
         if (!addDateTimeString) {
             throw new Error('Invalid request body. Missing "addDateTimeString".');
         }
-        if (notBooked === undefined || notBooked === null) {
-            throw new Error('Invalid request body. Missing "booked".');
+        if (vacancyStatus === undefined || vacancyStatus === null) {
+            throw new Error('Invalid request body. Missing "vacancyStatus".');
         }
-        await addAvailability(addDateTimeString, notBooked);
+        await addAvailability(addDateTimeString, vacancyStatus);
         res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
@@ -669,7 +702,7 @@ app.get('/queryAllAppointmentsByUserID', (req, res) =>{
 })
 
 
-app.get('/queryAdminPermissionsByUserID', (req, res) =>{
+/*app.get('/queryAdminPermissionsByUserID', (req, res) =>{
     const userID = req.query.userID;
     const query = "SELECT AdminPriv FROM Users WHERE UserID = " + userID +";";
     customQuery(query)
@@ -677,7 +710,7 @@ app.get('/queryAdminPermissionsByUserID', (req, res) =>{
     .catch(() => errorHandle(customQuery, query, res))
     .then((ret) => res.send(ret))
     .catch(res.send("error"));
-})
+})*/
 
 //This opens the server, printing to console 'up' when it is up.
 const PORT = process.env.PORT || 3000;
