@@ -28,6 +28,25 @@ const monthsWritten = {
     December: 'December'
 }
 
+const SERVICES = {
+    KIDS_HAIRCUT: {service: "Kid's Haircut", time: 1},
+    MENS_HAIRCUT: {service: "Men's Haircut", time: 1},
+    WOMANS_HAIRCUT: {service: "Woman's Haircut", time: 1},
+    PARTIAL_HIGHLIGHT: {service: "Partial Highlight", time: 3},
+    FULL_HIGHLIGHT: {service: "Full Highlight", time: 3},
+    ROOT_TOUCH_UP: {service: "Root touch up", time: 2},
+    FULL_COLOR: {service: "Full Color", time: 2},
+    EXTENSION_CONSULTATION: {service: "Extension Consultation", time: 1},
+    EXTENSION_INSTALLATION: {service: "Extension Installation", time: 3},
+    EXTENSION_MOVE_UP: {service: "Extension Move-up", time: 3},
+    MAKEUP: {service: "Makeup", time: 1},
+    SPECIAL_OCCASION_HAIRSTYLE: {service: "Special Occasion Hairstyle", time: 1},
+    PERM: {service: "Perm", time: 2},
+    DEEP_CONDITIONING_TREATMENT: {service: "Deep Conditioning Treatment", time: 1},
+    BLOW_DRY_AND_STYLE: {service: "Blow dry and style", time: 1},
+    WAXING: {service: "Waxing", time: 1},
+}
+
 const militaryHours = {};
 militaryHours['12:00AM'] = '00:00:00';
 militaryHours['01:00AM'] = '01:00:00';
@@ -80,4 +99,4 @@ displayHours['21:00:00'] = '09:00PM';
 displayHours['22:00:00'] = '10:00PM';
 displayHours['23:00:00'] = '11:00PM';
 
-export{monthsNum, monthsWritten, militaryHours, displayHours};
+export{monthsNum, monthsWritten, militaryHours, displayHours, SERVICES};
