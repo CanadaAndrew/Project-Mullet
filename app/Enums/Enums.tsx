@@ -80,4 +80,31 @@ displayHours['21:00:00'] = '09:00PM';
 displayHours['22:00:00'] = '10:00PM';
 displayHours['23:00:00'] = '11:00PM';
 
-export{monthsNum, monthsWritten, militaryHours, displayHours};
+const UTCtoPST = {};
+UTCtoPST['12:00AM'] = '04:00AM';
+UTCtoPST['01:00AM'] = '05:00AM';
+UTCtoPST['02:00AM'] = '06:00AM';
+UTCtoPST['03:00AM'] = '07:00AM';
+UTCtoPST['04:00AM'] = '08:00AM';
+UTCtoPST['05:00AM'] = '09:00AM';
+UTCtoPST['06:00AM'] = '10:00AM';
+UTCtoPST['07:00AM'] = '11:00AM';
+UTCtoPST['08:00AM'] = '12:00PM';
+UTCtoPST['09:00AM'] = '01:00PM';
+UTCtoPST['10:00AM'] = '02:00PM';
+UTCtoPST['11:00AM'] = '03:00PM';
+UTCtoPST['12:00PM'] = '04:00PM';
+UTCtoPST['01:00PM'] = '05:00PM';
+UTCtoPST['02:00PM'] = '06:00PM';
+UTCtoPST['03:00PM'] = '07:00PM';
+UTCtoPST['04:00PM'] = '08:00PM';
+UTCtoPST['05:00PM'] = '09:00PM';
+UTCtoPST['06:00PM'] = '10:00PM';
+UTCtoPST['07:00PM'] = '11:00PM';
+UTCtoPST['08:00PM'] = '12:00AM';
+UTCtoPST['09:00PM'] = '01:00AM';
+UTCtoPST['10:00PM'] = '02:00AM';
+UTCtoPST['11:00PM'] = '03:00AM';
+
+
+export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST};
