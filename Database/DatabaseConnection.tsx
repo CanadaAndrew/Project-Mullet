@@ -238,11 +238,13 @@ async function customQuery(queryString){
     }
 }
 //Takes the formatted date, time, and userID and updates the appointment so it is taken.
-async function updateAppointment(date, time, userID){
+async function updateAppointment(date, time, userID, type){
     try {
         var poolConnection = await connect();
-        //await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, PhoneNumberEmail = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
-        await poolConnection.request().query('SELECT * FROM Appointments');
+        let query = 'UPDATE Appointments SET VacancyStatus = 1, UserID = \''+ userID + '\', TypeOfAppointment = \''+ type + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'';
+        await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, UserID = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
+        console.log(query);
+        //await poolConnection.request().query('SELECT * FROM Appointments');
         poolConnection.close();
     } catch (err) {
         console.error(err.message);
@@ -573,6 +575,8 @@ app.put('/confirmAppointment', (req, res) => {
     let date = req.query.date;
     let time = req.query.time;
     let userID = req.query.userID;
+    let type = req.query.type
+    /*
     if(date && time){
         //Deals with am/pm, turning it into military time. Want to do this with Enums if can get export working.
         if(time.includes('pm')){
@@ -615,7 +619,10 @@ app.put('/confirmAppointment', (req, res) => {
         console.log('date:' + date);
         console.log('time:' + time);
     }
-    res.send("ok");
+    */
+    updateAppointment(date, time, userID, type)
+    .then(res.send("ok"))
+    .catch((err) => console.log(err));
 })
 
 app.get('/findUserByID', (req, res) =>{
