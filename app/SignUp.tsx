@@ -44,6 +44,62 @@ export default function SignUp({ route }) { // added route for page navigation
     const [password, newPassword] = React.useState('');
     const [confirmPassword, newConfirmPassword] = React.useState('');
 
+    //set length and character checks for text input fields
+    const [count, setCount] = useState(0);
+
+    
+    const [firstNameValid, setfirstNameValid] =  React.useState(false);
+    const [lastNameValid, setlastNameValid] =  React.useState(false);
+    const [emailValid, setemailValid] =  React.useState(false);
+    const [phoneNumberValid, setphoneNumberValid] =  React.useState(false);
+    const [passwordValid, setpasswordValid] =  React.useState(false);
+    const [confirmPasswordValid, setconfirmPasswordValid] =  React.useState(false);
+
+    //is everything filled out? if so, unlock the sign up button
+    const formComplete =  !(firstNameValid && lastNameValid && emailValid && phoneNumberValid && passwordValid && confirmPasswordValid && selected.length != 0); 
+
+    //check() functions set the letter/number/length requirement of each text field
+    //TODO: determine each requirement for each field 
+    function checkfirstNameValid()
+    {
+        setfirstNameValid(firstName.length>0 ? true : false);
+    }
+
+    function checklastNameValid()
+    {
+        setlastNameValid(lastName.length>0 ? true : false);
+    }
+
+    function checkemailValid()
+    {
+        //reg expression checks for ---@---.--- format
+        setemailValid(/\S+@\S+\.\S+/.test(email)); 
+    }
+
+    function checkphoneNumberValid()
+    {
+        //add dashes to maintain ###-###-#### format
+        if(phoneNumber.length == 3 || phoneNumber.length == 7) 
+        {
+            newPhoneNumber(phoneNumber + '-');
+        }
+
+        //13 to account for international phones
+        setphoneNumberValid(phoneNumber.length == 12 || phoneNumber.length == 13 ? true : false);
+       
+    }
+    function checkpasswordValid()
+    {
+        //if the password contains numbers and letters and is 8 chars or more in length...
+        if(password.match(/^[A-Za-z0-9]*$/))
+            setpasswordValid(password.length > 7 ? true : false);
+    }
+    function checkconfirmPasswordValid()
+    {
+        setconfirmPasswordValid(password == confirmPassword ? true : false)
+    }
+      
+    
     //options for drop down menu
     const hairOptions = [
         { key: ' Mens Haircut', value: ' Mens Haircut' },
@@ -86,38 +142,46 @@ export default function SignUp({ route }) { // added route for page navigation
                                 style={styles.textField}
                                 value={firstName}
                                 onChangeText={newFirstName}
+                                onTextInput={() => checkfirstNameValid()}
                                 placeholder="First Name"
                             />
                             <TextInput
                                 style={styles.textField}
                                 value={lastName}
                                 onChangeText={newLastName}
+                                onTextInput={() => checklastNameValid()}
                                 placeholder="Last Name"
                             />
                             <TextInput
                                 style={styles.textField}
                                 value={email}
                                 onChangeText={newEmail}
+                                onTextInput={() => checkemailValid()}
                                 placeholder="Email"
                             />
                             <TextInput
                                 style={styles.textField}
                                 value={phoneNumber}
                                 onChangeText={newPhoneNumber}
+                                onTextInput={() => checkphoneNumberValid()}
                                 placeholder="Phone Number"
                                 keyboardType="numeric"
-                                maxLength={11}  // putting 11 for now if international number
+                                maxLength={14}  // putting 14 for now if international number + added dashes , originally 11
                             />
                             <TextInput
                                 style={styles.textField}
+                                secureTextEntry={true}
                                 value={password}
                                 onChangeText={newPassword}
+                                onTextInput={() => {checkpasswordValid(); checkconfirmPasswordValid()}} /*extra measure if user changes password*/
                                 placeholder="Password"
                             />
                             <TextInput
                                 style={styles.textField}
+                                secureTextEntry={true}
                                 value={confirmPassword}
                                 onChangeText={newConfirmPassword}
+                                onTextInput={() => checkconfirmPasswordValid()}
                                 placeholder="Confirm Password"
                             />
                         </View>
@@ -144,8 +208,11 @@ export default function SignUp({ route }) { // added route for page navigation
                                 onSelect={() => handleHairSelection(selected)}
                             />
                         </View>
+                        
                         <View style={styles.signUpContainer}>
-                            <TouchableOpacity style={styles.signUpButton}>
+                            <TouchableOpacity 
+                            disabled={formComplete} 
+                             style={styles.signUpButton}>
                                 <Text style={styles.signUpText}>Sign Up</Text>
                             </TouchableOpacity>
                         </View>
@@ -155,6 +222,19 @@ export default function SignUp({ route }) { // added route for page navigation
         </>
     );
 }
+
+//a bunch of checks to see if the text fields are being filled correctly.
+
+//{ firstNameValid && <Text> firstName is valid</Text> /*debugging*/ } 
+//{ lastNameValid && <Text> lastName is valid</Text> /*debugging*/ } 
+//{ emailValid && <Text> email is valid</Text> /*debugging*/ } 
+//{ phoneNumberValid && <Text> phone is valid</Text> /*debugging*/ } 
+//{ passwordValid && <Text> password is valid</Text> /*debugging*/ } 
+//{confirmPasswordValid && <Text>confirm password is valid</Text> /*debugging*/ }
+//{phoneNumber.length != 0 && <Text> phoneNumber length is: {phoneNumber.length} </Text>}
+//{selected.length != 0 && <Text> service/services selected </Text>}
+
+
 
 const styles = StyleSheet.create({
     container: {
