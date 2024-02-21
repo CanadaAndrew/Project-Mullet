@@ -383,6 +383,7 @@ export default function ModifyAv({ route }) {
                     <View style={styles.dateContainer}>
                         <Text style={styles.dateText}>{displayedDate}</Text>
                     </View>
+                    <View style = {styles.listView}>
                     <FlatList
                         data={listOfTimes}
                         keyExtractor={(item, index) => index.toString()}
@@ -401,6 +402,7 @@ export default function ModifyAv({ route }) {
                         numColumns={3}
                         contentContainerStyle={styles.timeContainer}
                     />
+                    </View>
                     <View style={styles.bottomButtonContainer}>
                         <View style={styles.bottomButton}>
                             <Pressable
@@ -459,11 +461,11 @@ export default function ModifyAv({ route }) {
                             <View style={{ flexDirection:"row", flex: .23, columnGap: 30}}>
                                 <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, 
                                     styles.backButtonText, styles.shadow ]} onPress={showTimePicker1}  >
-                                    <Text style={styles.backButtonText}>{"  Change Opening  "}</Text>
+                                    <Text style={styles.backButtonText}>{" Change Opening  "}</Text>
                                 </Pressable>
                                 <Pressable  style={({ pressed }) => [{ backgroundColor: pressed ? '#D8BFD8' : '#C154C1' }, 
                                     styles.backButtonText, styles.shadow ]} onPress={showTimePicker2}  >
-                                    <Text style={styles.backButtonText}>{"   Change Closing   "}</Text>
+                                    <Text style={styles.backButtonText}>{" Change Closing   "}</Text>
                                 </Pressable>
                             </View>                     
                             {show1 && (
@@ -489,7 +491,7 @@ export default function ModifyAv({ route }) {
                                 setListOfTimes(filteredTimes); //update available times
                                 setFilteredTimes([]); //clear filtered times
                             }}>
-                                <Text  style={styles.backButtonText} >    Close    </Text>
+                                <Text  style={styles.backButtonText} > Close    </Text>
                             </Pressable>
                         </View>                                
                     </Modal>
@@ -564,13 +566,7 @@ const styles = StyleSheet.create({
     },
     // for the time slots
     timeContainer: {
-        flex: 5,
-        height: 100,
-        paddingTop: 10,
-        paddingBottom: 20,
-        paddingLeft: 10,
-        //marginTop: 30,
-        //backgroundColor: 'grey'
+        flexGrow: 1,
     },
     timeRow: {
         flexDirection: 'row',
@@ -590,13 +586,19 @@ const styles = StyleSheet.create({
     bottomButtonContainer: {
         //backgroundColor: 'lightgreen',
         height: 50,
-        flex: .2,
         paddingTop: 10,
         alignItems: 'center',
         justifyContent: 'space-evenly'
     },
     bottomButton: {
-        width: 250
+        width: 250,
+        shadowColor: 'black',
+        shadowOffset: {
+            width: 4,
+            height: 4,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 3,
     },
     bottomButtonText: {
         fontSize: 17,
@@ -637,5 +639,11 @@ const styles = StyleSheet.create({
     },
     shadow: {   
         elevation: 15, 
+    },
+    listView: {
+        height: 250,
+        paddingTop: 10,
+        paddingBottom: 20,
+        paddingLeft: 10,
     }
 });
