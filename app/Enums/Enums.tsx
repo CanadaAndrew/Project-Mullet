@@ -47,7 +47,7 @@ const SERVICES = {
     PERM: {service: "Perm", time: 2},
     DEEP_CONDITIONING_TREATMENT: {service: "Deep Conditioning Treatment", time: 1},
     BLOW_DRY_AND_STYLE: {service: "Blow dry and style", time: 1},
-    WAXING: {service: "Waxing", time: 1},
+    WAXING: {service: "Waxing", time: 1}
 }
 
 const militaryHours = {};
