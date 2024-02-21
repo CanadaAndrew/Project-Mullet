@@ -1,3 +1,6 @@
+import moment from 'moment-timezone';
+
+
 const monthsNum = {
     January: '01',
     February: '02',
@@ -99,4 +102,16 @@ displayHours['21:00:00'] = '09:00PM';
 displayHours['22:00:00'] = '10:00PM';
 displayHours['23:00:00'] = '11:00PM';
 
-export{monthsNum, monthsWritten, militaryHours, displayHours, SERVICES};
+function UTCtoPST(today: Date)
+{
+    //get today's date and convert it to PST
+   
+    const pstDateString =  moment(today).tz('America/Los_Angeles').format('YYYY-MM-DDTHH:mm:ss.SSS');
+    const todaysDate = pstDateString.slice(11, 16); //cuts off the date section
+    //console.log('todaysDate: ', todaysDate); //for debugging
+
+    return todaysDate; //returns time as a string in HH:MM format
+   
+}
+
+export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST};
