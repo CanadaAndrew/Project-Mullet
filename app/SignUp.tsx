@@ -136,7 +136,7 @@ export default function SignUp({ route }) { // added route for page navigation
     const middle_name = 'Sh';
     const last_name = 'Moe';
     const preferred_way_of_contact = 'email';
-    const approval_status = 0; //not approved yet
+    const approval_status = 1; //not sure what 1 represents - Chris
 
     //posts new user to the database --> will need to set up format validation later  email, phoneNumber, pass, adminPrive
     const postNewUser = async () => {
