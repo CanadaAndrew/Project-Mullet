@@ -217,15 +217,22 @@ export default function ClientHistory() {
 
     const handleNameSearch = async () => {
 
+        console.log(pastClientAppointments);
+        console.log(searchName);
+
         try {
 
-            const filteredAppointments = clientAppointments.filter(appointment => {
+            const filteredAppointments = pastClientAppointments.filter(appointment => {
                 const clientName = '${appointment.FirstName} ${appointment.LastName}'.toLowerCase();
+                //console.log("Client Name");
+                //console.log(clientName);
                 return clientName.includes(searchName.toLowerCase());
             });
 
             setPastClientAppointments(filteredAppointments);
             console.log("Filtered Appointments");
+            console.log(pastClientAppointments);
+            console.log(filteredAppointments);
 
         } catch (error) {
             console.error("Error filtering past appointments by name", error);
