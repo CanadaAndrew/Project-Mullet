@@ -120,10 +120,66 @@ export default function SignUp({ route }) { // added route for page navigation
     ];
 
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000'
+        //baseURL: 'http://10.0.0.192:3000'
         //baseURL: 'http://10.0.0.199:3000',
-        //baseURL: 'http://10.0.0.14:3000' Cameron's IP address for testing
+        //baseURL: 'http://10.0.0.14:3000' Cameron's IP address for testing,
+        baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
+
+    //dummy data for postNewUser function until Firebase authentication is set up
+    const verified = true; //demo data signifying the user is verified
+    const e_mail = 'joeshmoe@anywhere.com';
+    const phone_number = '5555555555';
+    const pass_word = 'JoesPassword';
+    const admin_priv = 0; //no admin privileges
+    const first_name = 'Joe';
+    const middle_name = 'Sh';
+    const last_name = 'Moe';
+    const preferred_way_of_contact = 'email';
+    const approval_status = 0; //not approved yet
+
+    //posts new user to the database --> will need to set up format validation later  email, phoneNumber, pass, adminPrive
+    const postNewUser = async () => {
+        try {
+            if (verified) {
+                
+                //post data for new user
+                const userResponse = await database.post('/newUserPost', {
+                    email: e_mail,
+                    phoneNumber: phone_number,
+                    pass: pass_word,
+                    adminPrive: admin_priv
+                });
+                
+                //get the userID from response
+                const userID = userResponse.data.userID;
+                //console.log('userID', userID); //for testing
+
+                //post to Clients -> must post to Clients before NewClients because of foreign key constraint
+                await database.post('/newClientPost', {
+                    userID: userID,
+                    firstName: first_name,
+                    middleName: middle_name,
+                    lastName: last_name,
+                    preferredWayOfContact: preferred_way_of_contact,
+                });
+                
+                //post to NewClients
+                await database.post('/new_newClientPost', {
+                    userID: userID,
+                    approvalStatus: approval_status
+                });
+                
+                console.log('New user and related data posted successfully.');
+                alert('new account created successfully');
+            } else {
+                console.log('Verification failed. Cannot post new user data.');
+            }
+        } catch (error) {
+            console.error('Error posting new user data:', error);
+            alert('problem with creating new account');
+        }
+    };
 
     return (
         <>
@@ -211,8 +267,9 @@ export default function SignUp({ route }) { // added route for page navigation
                         
                         <View style={styles.signUpContainer}>
                             <TouchableOpacity 
-                            disabled={formComplete} 
-                             style={styles.signUpButton}>
+                                //disabled={formComplete} //not sure why it was disabled -> enabled again to demo postNewUser function -Chris
+                                style={styles.signUpButton}
+                                onPress={postNewUser}>
                                 <Text style={styles.signUpText}>Sign Up</Text>
                             </TouchableOpacity>
                         </View>
