@@ -60,8 +60,8 @@ export default function ClientHistory() {
     let filteredAps: Appointment[] = [];
 
     const database = axios.create({
-        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
-        baseURL: 'http://10.0.0.133:3000', //Adrian's local pc
+        baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        //baseURL: 'http://10.0.0.133:3000', //Adrian's local pc
     });
     const [upcomingClientAppointments, setUpcomingClientAppointments] = useState([]);
     const [pastClientAppointments, setPastClientAppointments] = useState([]);
@@ -223,9 +223,10 @@ export default function ClientHistory() {
         try {
 
             const filteredAppointments = pastClientAppointments.filter(appointment => {
-                const clientName = '${appointment.FirstName} ${appointment.LastName}'.toLowerCase();
+                const clientName = `${appointment.FirstName} ${appointment.LastName}`.toLowerCase();
                 //console.log("Client Name");
                 //console.log(clientName);
+                //console.log('clientname: ', clientName);
                 return clientName.includes(searchName.toLowerCase());
             });
 
@@ -248,8 +249,8 @@ export default function ClientHistory() {
     };
 
     useEffect(() => {
-        //console.log('pastClientAppointments: ', pastClientAppointments); //for debugging
-        //console.log('upcomingClientAppointments: ', upcomingClientAppointments); //for debugging
+        console.log('pastClientAppointments: ', pastClientAppointments); //for debugging
+        console.log('upcomingClientAppointments: ', upcomingClientAppointments); //for debugging
     }, [pastClientAppointments, upcomingClientAppointments]);
 
     return (
