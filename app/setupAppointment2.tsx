@@ -449,8 +449,8 @@ const styles = StyleSheet.create({
     },
     // Available Times styling
     availableContainer: {
-        paddingTop: 5,
-        paddingBottom: 5
+       //paddingTop: 5,
+        //paddingBottom: 5
     },
     availableTimesHeader: {
     },
@@ -468,13 +468,15 @@ const styles = StyleSheet.create({
     },
     availableTimeContainer: {
         alignItems: 'center',
+        paddingLeft: 5,
+        paddingRight: 5,
     },
     availableTimeCell: {
-        width: '25%',             //Adjust width to 25% for four buttons per row
+        width: 80,             //Adjust width to 25% for four buttons per row
         justifyContent: 'center', //center content vertically
         alignItems: 'center',     //center content horizontally
         paddingTop: 5,
-        paddingBottom: 5
+        paddingBottom: 5,
     },
     availableTimeCellButton: {
         padding: 5,
