@@ -679,6 +679,15 @@ app.get('/queryAdminPermissionsByUserID', (req, res) =>{
     .catch(res.send("error"));
 })
 
+app.get('/queryAppointmentByDaySelectedAndVacancy', (req, res) =>{
+    const beginDay = req.query.beginDay;
+    const endDay = req.query.endDay;
+    const query = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + beginDay + "' AND AppointmentDate <= '" + endDay + "' AND VacancyStatus = 0;";
+    customQuery(query)
+    .then((ret) => res.send(ret))
+    .catch(() => errorHandle(customQuery, query, res));
+})
+
 //This opens the server, printing to console 'up' when it is up.
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
