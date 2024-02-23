@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
         borderRadius: 90
     },
     listView:{
-        height: 375
+        height: 475
     },
     // title styling 
     objectTitle: {

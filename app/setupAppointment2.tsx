@@ -14,6 +14,7 @@ import {
 import { displayHours } from './Enums/Enums';
 import { Link } from 'expo-router';
 import axios from 'axios';
+import { SERVICES, militaryHours, displayHours} from './Enums/Enums';
 
 export default function SetupAppointment2({route}) { // added route for page navigation
     const [selectedDate, setSelectedDate] = useState(null);
@@ -141,12 +142,11 @@ export default function SetupAppointment2({route}) { // added route for page nav
     }
     
 
-
     const month = [
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
 
-    const services = [];
+    const [services, setServices] = React.useState('');
 
     const dates = [];
     const dummyDates = dateData.split(', ')
@@ -156,6 +156,41 @@ export default function SetupAppointment2({route}) { // added route for page nav
     useEffect(() => {
         displayDateTimes();
     }, []);
+
+    const [hours, setHours] = React.useState(0);
+    const [firstLoad, setFirstLoad] = React.useState(0);
+
+    if(firstLoad == 0){
+        setFirstLoad(1);
+        calculateHours();
+        formatServices()
+    }
+    function calculateHours(){
+            let hairStyleArray = hairStyleData.split(', ');
+            let totalHours = 0;
+            hairStyleArray.forEach((hairStyle) => {
+                //alert(JSON.stringify(SERVICES[hairStyle]));
+                try{
+                    totalHours += SERVICES[hairStyle]['time'];
+                }catch(e){
+                    totalHours += 0;
+                }
+            })
+            alert(totalHours);
+            setHours(totalHours);
+    }
+    function formatServices(){
+        let hairStyleArray = hairStyleData.split(', ');
+        let services = [];
+        hairStyleArray.forEach((hairStyle) => {
+            try{
+                services.push(SERVICES[hairStyle]['service']);
+            }catch(e){
+
+            }
+        })
+        setServices(services.join(', '));
+    }
 
     const handleAppointmentPress = (time, date) => {
         setSelectedDate((prevDate) => {
@@ -170,13 +205,13 @@ export default function SetupAppointment2({route}) { // added route for page nav
         });
     };
 
+
     return (
         <>
             <StatusBar backgroundColor={'black'} />
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={styles.backButton}>
-                        
                     </View>
                     <View style={styles.logoContainer}>
                         <Image source={require('./images/logo.png')} style={styles.logo} />
@@ -191,7 +226,6 @@ export default function SetupAppointment2({route}) { // added route for page nav
                             </View>
                             <View style={styles.appointmentServicesSelected}>
                                 <Text style={styles.appointmentText}>Services Selected:</Text>
-                                <Text style={styles.appointmentText}>{hairStyleData}</Text> 
                                 <FlatList
                                     data={services}
                                     renderItem={({ item }) => (
@@ -272,17 +306,45 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                 },
                                 styles.confirmButton
                                 ]}
-                                onPress = {() => database.put('/confirmAppointment', null, {
-                                    params:{
-                                        date:selectedDate,
-                                        time:selectedTime,
-                                        userID: '321-422-4215'
+                                onPress = {() => {
+                                    let startingTimeNum
+                                    try{
+                                        startingTimeNum = militaryHours[selectedTime].split(':')[0];
+                                    }catch(e){
+                                        alert("Error: Invalid time/Date");
+                                        return;
                                     }
-                                }).then(()=>{alert('success')}).catch(() => alert('error'))}
+                                    for(let i = 1; i < hours; i++){
+                                        let newTime;
+                                        newTime = parseInt(startingTimeNum) + i;
+                                        if(newTime < 10){
+                                            newTime = '0' + newTime;
+                                        }
+                                        if(!appointmentTimes.includes(displayHours[newTime + ":00:00"]) || parseInt(startingTimeNum) + i > 23){
+                                            alert("Error, not enough available time");
+                                            return;
+                                        }
+                                    }
+                                    for(let j = 0; j < hours; j++){
+                                        let newTime;
+                                        newTime = parseInt(startingTimeNum) + j;
+                                        if(newTime < 10){
+                                            newTime = '0' + newTime;
+                                        }
+                                        database.put('/confirmAppointment', null, {
+                                            params:{
+                                                date:selectedDate,
+                                                time:(newTime + ':00:00'),
+                                                userID: userData.UserId,
+                                                type: services.split('\'').join('')
+                                            }
+                                        }).then(()=>{alert('success')}).catch(() => alert('error'));
+                                    }
+                                    }
+                                }
                                 >
                                 {({ pressed }) => (
                                     <Text style={styles.confirmButtonText}>Confirm Appointment</Text>
-                                    
                                 )}
                             </Pressable>
                         </View>
