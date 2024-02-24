@@ -15,12 +15,19 @@ import {
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { Link } from 'expo-router';
 import axios from 'axios';
+import {initializeApp} from 'firebase/app';
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
-export default function SignUp({ route }) { // added route for page navigation
+export default function SignUp({ navigation, route }) { // added route for page navigation
 
+    const firebaseConfig = {
+
+    };
+
+    const app = initializeApp(firebaseConfig);
+    
     //useState for drop down menu
     const [selected, setSelected] = React.useState("");
 
@@ -181,6 +188,55 @@ export default function SignUp({ route }) { // added route for page navigation
         }
     };
 
+    function newUserSignUp()
+    {
+        interface clientInformation
+        {
+            firstName: string
+            lastName: string
+            email: string
+            phoneNumber: string
+            password: string
+        }
+        let client: clientInformation;
+        //password conditionals if these are both false move onto setting the 
+        if(password != confirmPassword)
+        {
+            alert("Passwords did not match. Please try again.")
+        }
+        else if(password == "" || confirmPassword == "")
+        {
+            alert("No password was entered. Please enter in a password.")
+        }
+        else
+        {
+            client.firstName = firstName;
+            client.lastName = lastName;
+            client.email = email;
+            client.phoneNumber = phoneNumber;
+            client.password = password;
+            //check to see if user was successfully created in Entra ID if so send user back to the log in screen.
+        }
+
+    
+        //on press send client sign up information to Entra ID
+        //on press if the sign up was successful send the user back to the log in screen which we don't have in this branch.
+        return 0;
+    }
+
+    function handleSignUpPress()
+    {
+        let verify = newUserSignUp();
+
+        if(verify = 0)
+        {
+            postNewUser();
+            //return user to log in page is not available right now. There is no log in screen in this branch. Will have to test later
+            //navigation.navigate("Login")
+        }
+    }
+
+
     return (
         <>
             <StatusBar backgroundColor={'black'} />
@@ -269,7 +325,7 @@ export default function SignUp({ route }) { // added route for page navigation
                             <TouchableOpacity 
                                 //disabled={formComplete} //not sure why it was disabled -> enabled again to demo postNewUser function -Chris
                                 style={styles.signUpButton}
-                                onPress={postNewUser}>
+                                onPress={handleSignUpPress}>
                                 <Text style={styles.signUpText}>Sign Up</Text>
                             </TouchableOpacity>
                         </View>

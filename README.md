@@ -67,6 +67,7 @@ npm install express
 npm install cors
 npm install moment-timezone
 npm install @react-native-community/datetimepicker --save
+npm install firebase
 ```
     
 ### Running the Program
