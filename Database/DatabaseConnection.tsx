@@ -409,6 +409,23 @@ async function errorHandle(currentFunction, arguement, res){
     res.send(ret);
 }
 
+async function QueryAppointmentByDaySelectedAndVacancy(beginDay, endDay)
+{
+    try
+    {
+        const poolConnection = await connect();
+        const query = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + beginDay + "' AND AppointmentDate <= '" + endDay + "' AND VacancyStatus = 0;";
+        const resultSet = await poolConnection.request().query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    }
+    catch(err)
+    {
+        console.error(err.message);
+        throw err;
+    }
+}
+
 //For each query/function, a REST API needs to be created, a way for the frontend of our program to call methods to our backend.
 //app.get means the front end will GET stuff from the backend
 //app.post means the front end will POST stuff to the backend(read up on the Axion api for more information.)
@@ -719,14 +736,27 @@ app.get('/queryAllAppointmentsByUserID', (req, res) =>{
     .catch(res.send("error"));
 })*/
 
-app.get('/queryAppointmentByDaySelectedAndVacancy', (req, res) =>{
-    const beginDay = req.query.beginDay;
-    const endDay = req.query.endDay;
-    const query = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + beginDay + "' AND AppointmentDate <= '" + endDay + "' AND VacancyStatus = 0;";
-    customQuery(query)
-    .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res));
-})
+app.get('/queryAppointmentByDaySelectedAndVacancy', async (req, res) =>{
+    try
+    {
+        const beginDay = req.query.beginDay;
+        const endDay = req.query.endDay;
+        if(!beginDay)
+        {
+            throw new Error("Invalid request. Missin 'beginDay'")
+        }
+        if(!endDay)
+        {
+            throw new Error("Invalid request. Missing 'endDay'")
+        }
+        const result = await QueryAppointmentByDaySelectedAndVacancy(beginDay, endDay);
+        res.send(result);
+    }
+    catch
+    {
+        res.status(400).send('Bad Request');
+    }
+});
 
 //This opens the server, printing to console 'up' when it is up.
 const PORT = process.env.PORT || 3000;

@@ -104,22 +104,14 @@ export default function SetupAppointment2({route}) { // added route for page nav
             const endDay = dateDataQ[date] + 'T23:59:59.000Z';
 
             let appointmentData;
-            //Queries the database for appointments with the beginning and end of the day selected 
-            /*database.get('/queryAppointmentByDaySelectedAndVacancy', {
+            //Queries the database for appointments with the beginning and end of the day selected and a vacant time
+            let response = await database.get('/queryAppointmentByDaySelectedAndVacancy', {
                 params: {
                     beginDay: beginDay,
                     endDay: endDay
                 }
-            })
-            .then((ret) => appointmentData = ret.data)
-            .catch(() => {alert("error")});
-            alert(appointmentData);*/
-            const response = await database.get('/customQuery', {
-                params: {
-                    query: `SELECT * FROM Appointments WHERE AppointmentDate >= '${beginDay}' AND AppointmentDate <= '${endDay}' AND VacancyStatus = 0;`
-                },
             });
-            appointmentData = response.data
+            appointmentData = response.data;
             //appointmentData then gets the data from the responding query
             let apptData;
             var temptimelist: string[] = [];
