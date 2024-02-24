@@ -60,8 +60,8 @@ export default function ClientHistory() {
     let filteredAps: Appointment[] = [];
 
     const database = axios.create({
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
-        //baseURL: 'http://10.0.0.133:3000', //Adrian's local pc
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://10.0.0.133:3000', //Adrian's local pc
     });
     const [upcomingClientAppointments, setUpcomingClientAppointments] = useState([]);
     const [pastClientAppointments, setPastClientAppointments] = useState([]);
@@ -343,26 +343,28 @@ export default function ClientHistory() {
                             onSelect={() => handleSelection(selected)}
                         />
                     </View>
+                    <View style = {styles.appointBox}>
+                        <View style = {styles.textAlignment}>
 
-                    <View>
+                                <TextInput
+                                    value={searchName}
+                                    onChangeText={text => setSearchName(text)}
+                                    placeholder="Enter Name"
+                                    style = {styles.textInput}
+                                />
+                                <Button
+                                    title = "Search"
+                                    onPress={handleNameSearch}
+                                    color = "#942989"
+                                />
 
-                            <TextInput
-                                value={searchName}
-                                onChangeText={text => setSearchName(text)}
-                                placeholder="Enter Name"
-                            />
-                            <Button
-                                title = "Search"
-                                onPress={handleNameSearch}
-                            />
-
+                        </View>
                     </View>
-
                     <View>
                         <Text>Filtered Past Appointments:</Text>
                     </View>
 
-                    <FlatList
+                    {/*<FlatList
                         data = {pastClientAppointments}
                         renderItem = {({ item }) => (
                             <View>
@@ -373,7 +375,7 @@ export default function ClientHistory() {
                             </View>
                         )}
                         keyExtractor={(item, index) => index.toString()}
-                    />
+                    /> */}
                     {/* flat list is replacing the hard coded list from before as this can work with database data and print out the entire list at once */}
                     <FlatList
                         data={pastClientAppointments}
@@ -474,6 +476,13 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.5,
         shadowRadius: 3
+    },
+    textInput: {
+        flex: 1,
+        paddingHorizontal: 10,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 10,
+        marginRight: 10,
     },
     backButtonText: {
         color: 'white',
