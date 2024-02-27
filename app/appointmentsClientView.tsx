@@ -1,9 +1,11 @@
-import { StyleSheet, Text, View, ScrollView} from 'react-native';
+import { StyleSheet, Text, View, ScrollView, FlatList, Dimensions, useWindowDimensions} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import axios from 'axios';
 
 export default function appointmentsClientView(){
+
+    const windowDimensions = Dimensions.get('window')
     interface Appointment {
         name: string;
         service: string;
@@ -23,17 +25,18 @@ export default function appointmentsClientView(){
 
     const [first, setFirst] = React.useState(0);
     firstUpdate();
-    function firstUpdate(){
+    async function firstUpdate(){
         if(first === 0 ){
             setFirst(1);
             let date = new Date;
             let dateString = date.toISOString(); //NOTE THAT THE DATE IS CURRENTLY OFF, NEED TO FIX IN ANOTHER SPRINT
-            updateUpcomingAppointments(dateString.split("T")[0], 1); //Note that currently using ID 1 until the use of UserID transfer comes in
-            updatePastAppointments(dateString.split("T")[0], 1);
+            let name = await getName(1);
+            updateUpcomingAppointments(dateString.split("T")[0], 1, name); //Note that currently using ID 1 until the use of UserID transfer comes in
+            updatePastAppointments(dateString.split("T")[0], 1, name);
         }
     }
     //Updates the upcoming appointments given a date.
-    function updateUpcomingAppointments(date, userID){
+    function updateUpcomingAppointments(date, userID, name){
         let data;
         database.get('/queryUpcomingAppointmentsByUserIDAndDate', {
             params: {
@@ -42,11 +45,11 @@ export default function appointmentsClientView(){
             }
         })
         .then((ret) => data = ret.data)
-        .then(() => {updateUpcomingAppointmentsDisplay(data)})
+        .then(() => {updateUpcomingAppointmentsDisplay(data, name)})
         .catch(() => {alert("error");});
     }
 
-    function updatePastAppointments(date, userID){
+    function updatePastAppointments(date, userID, name){
         let data;
         database.get('/queryPastAppointmentsByUserIDAndDate', {
             params: {
@@ -55,11 +58,11 @@ export default function appointmentsClientView(){
             }
         })
         .then((ret) => data = ret.data)
-        .then(() => {updatePastAppointmentsDisplay(data)})
+        .then(() => {updatePastAppointmentsDisplay(data, name)})
         .catch(() => {alert("error");});
     }
 
-    function updateUpcomingAppointmentsDisplay(data){
+    function updateUpcomingAppointmentsDisplay(data, name){
         //alert(JSON.stringify(data));
         //alert(JSON.stringify(data[0]));
         let appointmentList : Appointment[] = [];
@@ -69,7 +72,7 @@ export default function appointmentsClientView(){
             let newDate = dateTimeArray[0];
             let newTime = dateTimeArray[1].split("Z")[0];
             let newAppointment : Appointment = {
-                name: appointment.UserID,
+                name: name,
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
@@ -80,10 +83,10 @@ export default function appointmentsClientView(){
         }
         )
         setUpcomingClientAppointments(appointmentList);
-        alert("Upcoming List: " + JSON.stringify(appointmentList));
+        //alert("Upcoming List: " + JSON.stringify(appointmentList));
     }
 
-    function updatePastAppointmentsDisplay(data){
+    function updatePastAppointmentsDisplay(data, name){
         let appointmentList : Appointment[] = [];
         let i = 0;
         data.forEach((appointment) => {
@@ -91,7 +94,7 @@ export default function appointmentsClientView(){
             let newDate = dateTimeArray[0];
             let newTime = dateTimeArray[1].split("Z")[0];
             let newAppointment : Appointment = {
-                name: appointment.UserID,
+                name: name,
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
@@ -104,6 +107,18 @@ export default function appointmentsClientView(){
         setPastClientAppointments(appointmentList);
         //Test: alert("Past list: " + JSON.stringify(appointmentList));
     }
+    async function getName(userID){
+        let name = await database.get('/findCurrentClientFullNameByID', {
+            params: {
+                queryId : userID 
+            }
+        })
+        if(name.data[0].MiddleName == null){
+            return name.data[0].FirstName + " " + name.data[0].LastName;
+        }else{
+            return name.data[0].FirstName + " " + name.data[0].MiddleName + " " + name.data[0].LastName
+        }
+    }
 
     return(
         <ScrollView>
@@ -111,75 +126,63 @@ export default function appointmentsClientView(){
                 <LinearGradient
                   locations = {[0.7, 1]}
                   colors = {['#EB73C9', 'white']}
-                  
+                  style = {{width: windowDimensions.width, height: windowDimensions.height - 85}}
                 >
                     <View style = {styles.background}>
                         {/*Upcoming Appointments List*/}
                         <Text style = {styles.objectTitle}>Upcoming Appointments:</Text>
-
-                        {/*temporary data*/}
-                        <View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Customer:</Text>
-                            <Text style = {styles.appointText}>Bob</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Service:</Text>
-                            <Text style = {styles.appointText}>Men's Haircut</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Date:</Text>
-                            <Text style = {styles.appointText}>1/27/24, Sat, 2:00pm</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Stylist:</Text>
-                            <Text style = {styles.appointText}>Melissa Wright</Text>
-                        </View>
-                        </View>
+                        <FlatList
+                            data={upcomingClientAppointments}
+                            horizontal={true}
+                            renderItem={({ item }) => (
+                                <View style={[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Customer:</Text>
+                                        <Text style={styles.appointText}> {item.name}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Service:</Text>
+                                        <Text style={styles.appointText}>{item.service}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Date:</Text>
+                                        <Text style={styles.appointText}>{item.date}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Stylist:</Text>
+                                        <Text style={styles.appointText}>{item.stylist}</Text>
+                                    </View>
+                                </View>
+                            )}
+                        />
 
                         {/*Past Appointments List*/}
                         <Text style = {styles.objectTitle}>Past Appointments:</Text>
-                        {/*temporary data*/}
-                        <View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Customer:</Text>
-                            <Text style = {styles.appointText}>Bob</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Service:</Text>
-                            <Text style = {styles.appointText}>Men's Haircut</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Date:</Text>
-                            <Text style = {styles.appointText}>10/23/23, Mon, 1:00pm</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Stylist:</Text>
-                            <Text style = {styles.appointText}>Melissa Wright</Text>
-                        </View>
-                        </View>
-
-                        <View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Customer:</Text>
-                            <Text style = {styles.appointText}>Bob</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Service:</Text>
-                            <Text style = {styles.appointText}>Hair Extensions</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Date:</Text>
-                            <Text style = {styles.appointText}>8/10/23, Thur, 4:00pm</Text>
-                        </View>
-                        <View style = {styles.textAlignment}>
-                            <Text style = {styles.appointText}>Stylist:</Text>
-                            <Text style = {styles.appointText}>Melissa Wright</Text>
-                        </View>
-                        </View>
-
+                        <FlatList
+                            data={pastClientAppointments}
+                            horizontal={true}
+                            renderItem={({ item }) => (
+                                <View style={[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Customer:</Text>
+                                        <Text style={styles.appointText}> {item.name}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Service:</Text>
+                                        <Text style={styles.appointText}>{item.service}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Date:</Text>
+                                        <Text style={styles.appointText}>{item.date}</Text>
+                                    </View>
+                                    <View style={styles.textAlignment}>
+                                        <Text style={styles.appointText}>Stylist:</Text>
+                                        <Text style={styles.appointText}>{item.stylist}</Text>
+                                    </View>
+                                </View>
+                            )}
+                        />
                     </View>
-
                 </LinearGradient>
 
             </View>
@@ -194,17 +197,18 @@ const styles = StyleSheet.create({
     },
     // title styling 
     objectTitle: {
-        fontSize: 25,
+        fontSize: 23,
         fontWeight: 'bold',
         color: 'white',
-        paddingTop: 30,
-        paddingBottom: 30
+        paddingTop: 20,
+        paddingLeft: 20
+        //paddingBottom: 30
     },
     // background
     background: {
         //paddingTop: 20,
-        paddingBottom: 775,
-        alignItems: 'center',
+        //paddingBottom: 775,
+        //alignItems: 'center',
         borderRadius: 30
     },
     // shadow for objects IOS

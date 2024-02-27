@@ -238,17 +238,28 @@ async function customQuery(queryString){
     }
 }
 //Takes the formatted date, time, and userID and updates the appointment so it is taken.
-async function updateAppointment(date, time, userID){
+async function updateAppointment(date, time, userID, type){
     try {
         var poolConnection = await connect();
-        //await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, PhoneNumberEmail = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
-        await poolConnection.request().query('SELECT * FROM Appointments');
+        let query = 'UPDATE Appointments SET VacancyStatus = 1, UserID = \''+ userID + '\', TypeOfAppointment = \''+ type + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'';
+        await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, UserID = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
+        console.log(query);
+        //await poolConnection.request().query('SELECT * FROM Appointments');
         poolConnection.close();
     } catch (err) {
         console.error(err.message);
     }
     
 }
+
+async function appointmentQuery(startDate, endDate, vacancyStatus){
+    try {
+        const poolConnection = await connect();
+        const query = `SELECT * FROM Appointments WHERE AppointmentDate>='${startDate}' AND AppointmentDate<='${endDate}' AND VacancyStatus=${vacancyStatus};`;
+        const resultSet = await poolConnection.request()
+            .query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
 
 //adds new user to database
 async function newUserPost(email, phoneNumber, pass, adminPrive) {
@@ -294,6 +305,7 @@ async function new_newClientPost(userID, approvalStatus) {
             VALUES (${userID}, ${approvalStatus});`;
         await poolConnection.request().query(query);
         poolConnection.close();
+
     } catch (err) {
         console.error(err.message);
         throw err; // rethrow error so it can be caught in calling code
@@ -301,11 +313,11 @@ async function new_newClientPost(userID, approvalStatus) {
 }
 
 //adds an admin availability date/time to the database
-async function addAvailability(addDateTimeString, notBooked) {
+async function addAvailability(addDateTimeString, vacancyStatus) {
     try {
         const poolConnection = await connect();
         poolConnection.setMaxListeners(24);
-        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${notBooked});`;
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${vacancyStatus});`;
         await poolConnection.request()
             .query(query);
         poolConnection.close();
@@ -445,6 +457,23 @@ async function errorHandle(currentFunction, arguement, res){
     res.send(ret);
 }
 
+async function QueryAppointmentByDaySelectedAndVacancy(beginDay, endDay)
+{
+    try
+    {
+        const poolConnection = await connect();
+        const query = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + beginDay + "' AND AppointmentDate <= '" + endDay + "' AND VacancyStatus = 0;";
+        const resultSet = await poolConnection.request().query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    }
+    catch(err)
+    {
+        console.error(err.message);
+        throw err;
+    }
+}
+
 //For each query/function, a REST API needs to be created, a way for the frontend of our program to call methods to our backend.
 //app.get means the front end will GET stuff from the backend
 //app.post means the front end will POST stuff to the backend(read up on the Axion api for more information.)
@@ -540,16 +569,35 @@ app.post('/appointmentPost', async (req, res) => {
     }
 });
 
+app.get('/appointmentQuery', async (req, res) => {
+    try {
+        const { startDate, endDate, vacancyStatus } = req.query;
+        if (!startDate) {
+            throw new Error('Invalid request. Missing "startTime"');
+        }
+        if (!endDate) {
+            throw new Error('Invalid request. Missing "endTime"');
+        }
+        if (!vacancyStatus) {
+            throw new Error('Invalid request. Missing "vacancyStatus"');
+        }
+        const result = await appointmentQuery(startDate, endDate, vacancyStatus);
+        res.send(result);
+    } catch {
+        res.status(400).send('Bad Request');
+    }
+});
+
 app.post('/addAvailability', async (req, res) => {
     try {
-        const { addDateTimeString, notBooked } = req.body;
+        const { addDateTimeString, vacancyStatus } = req.body;
         if (!addDateTimeString) {
             throw new Error('Invalid request body. Missing "addDateTimeString".');
         }
-        if (notBooked === undefined || notBooked === null) {
-            throw new Error('Invalid request body. Missing "booked".');
+        if (vacancyStatus === undefined || vacancyStatus === null) {
+            throw new Error('Invalid request body. Missing "vacancyStatus".');
         }
-        await addAvailability(addDateTimeString, notBooked);
+        await addAvailability(addDateTimeString, vacancyStatus);
         res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
@@ -638,6 +686,8 @@ app.put('/confirmAppointment', (req, res) => {
     let date = req.query.date;
     let time = req.query.time;
     let userID = req.query.userID;
+    let type = req.query.type
+    /*
     if(date && time){
         //Deals with am/pm, turning it into military time. Want to do this with Enums if can get export working.
         if(time.includes('pm')){
@@ -680,7 +730,10 @@ app.put('/confirmAppointment', (req, res) => {
         console.log('date:' + date);
         console.log('time:' + time);
     }
-    res.send("ok");
+    */
+    updateAppointment(date, time, userID, type)
+    .then(res.send("ok"))
+    .catch((err) => console.log(err));
 })
 
 app.get('/findUserByID', (req, res) =>{
@@ -708,7 +761,7 @@ app.get('/findCurrentClientByID', (req, res) =>{
 })
 
 app.get('/findCurrentClientFullNameByID', (req, res) =>{
-    const queryId = req.query.Id;
+    const queryId = req.query.queryId;
     const query = "SELECT FirstName, MiddleName, LastName FROM CurrentClientView WHERE UserID = " + queryId + ";";
     console.log(query);
     customQuery(query)
@@ -767,15 +820,37 @@ app.get('/queryAllAppointmentsByUserID', (req, res) =>{
 })
 
 
-app.get('/queryAdminPermissionsByUserID', (req, res) =>{
+/*app.get('/queryAdminPermissionsByUserID', (req, res) =>{
     const userID = req.query.userID;
     const query = "SELECT AdminPriv FROM Users WHERE UserID = " + userID +";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
+    .catch(() => errorHandle(customQuery, query, res))
     .then((ret) => res.send(ret))
     .catch(res.send("error"));
-})
+})*/
+
+app.get('/queryAppointmentByDaySelectedAndVacancy', async (req, res) =>{
+    try
+    {
+        const beginDay = req.query.beginDay;
+        const endDay = req.query.endDay;
+        if(!beginDay)
+        {
+            throw new Error("Invalid request. Missin 'beginDay'")
+        }
+        if(!endDay)
+        {
+            throw new Error("Invalid request. Missing 'endDay'")
+        }
+        const result = await QueryAppointmentByDaySelectedAndVacancy(beginDay, endDay);
+        res.send(result);
+    }
+    catch
+    {
+        res.status(400).send('Bad Request');
+    }
+});
 
 //This opens the server, printing to console 'up' when it is up.
 const PORT = process.env.PORT || 3000;

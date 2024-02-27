@@ -20,6 +20,8 @@ import {initializeApp} from 'firebase/app';
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
+//this is from DT-154 -> navigation, route or just route?
+//export default function SignUp({ route }) { // added route for page navigation
 export default function SignUp({ navigation, route }) { // added route for page navigation
 
     const firebaseConfig = {
@@ -106,7 +108,6 @@ export default function SignUp({ navigation, route }) { // added route for page 
         setconfirmPasswordValid(password == confirmPassword ? true : false)
     }
       
-    
     //options for drop down menu
     const hairOptions = [
         { key: ' Mens Haircut', value: ' Mens Haircut' },
@@ -236,7 +237,6 @@ export default function SignUp({ navigation, route }) { // added route for page 
         }
     }
 
-
     return (
         <>
             <StatusBar backgroundColor={'black'} />
@@ -320,7 +320,6 @@ export default function SignUp({ navigation, route }) { // added route for page 
                                 onSelect={() => handleHairSelection(selected)}
                             />
                         </View>
-                        
                         <View style={styles.signUpContainer}>
                             <TouchableOpacity 
                                 //disabled={formComplete} //not sure why it was disabled -> enabled again to demo postNewUser function -Chris
@@ -346,8 +345,6 @@ export default function SignUp({ navigation, route }) { // added route for page 
 //{confirmPasswordValid && <Text>confirm password is valid</Text> /*debugging*/ }
 //{phoneNumber.length != 0 && <Text> phoneNumber length is: {phoneNumber.length} </Text>}
 //{selected.length != 0 && <Text> service/services selected </Text>}
-
-
 
 const styles = StyleSheet.create({
     container: {
