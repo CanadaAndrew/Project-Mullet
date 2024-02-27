@@ -15,6 +15,7 @@ import appointmentsClientView from './appointmentsClientView';
 import ClientHistory from './ClientHistory';
 import AboutMe from './AboutMe';
 import SignUp from './SignUp';
+import Login from './Login';
 
 const Stack = createNativeStackNavigator()
 
@@ -67,11 +68,12 @@ export default function index() {
          <Stack.Screen name = "ServicesOffered" component={ServicesOffered} />
          <Stack.Screen name = "ClientHistory" component={ClientHistory} />
          <Stack.Screen name = "AboutMe" component={AboutMe}/>
-        <Stack.Screen name="SignUp" component={SignUp}
+         <Stack.Screen name="SignUp" component={SignUp}
             options={{
                 title: "Sign Up"
             }}
-        />
+         />
+         <Stack.Screen name = "Login" component={Login}/>
       </Stack.Navigator>
    </NavigationContainer>
   
