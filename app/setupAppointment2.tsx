@@ -31,7 +31,8 @@ export default function SetupAppointment2({route}) { // added route for page nav
     const database = axios.create({
         //baseURL: 'http://10.0.0.192:3000'
         //baseURL: 'http://10.0.0.199:3000',
-        baseURL: 'http://10.0.0.14:3000' 
+        //baseURL: 'http://10.0.0.14:3000',
+        baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
 
     //Doesn't work anymore, this is getting replaced by the function directly below this one.

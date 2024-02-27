@@ -114,4 +114,4 @@ function UTCtoPST(today: Date)
    
 }
 
-export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST};
+export{monthsNum, monthsWritten, militaryHours, displayHours, SERVICES, UTCtoPST};

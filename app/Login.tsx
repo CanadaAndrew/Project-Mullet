@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 //import { MaterialCommunityIcons as Icon} from "@expo/vector-icons";
 import React, {useState} from 'react';
-import firebase from './Firebase.js'  // import firebase
+//import firebase from './Firebase.js'  // import firebase
 
 //Declaring Window as a global variable to be accessed
 declare global {
@@ -14,12 +14,12 @@ declare global {
 
 /*To use an invisible reCAPTCHA, create a RecaptchaVerifier object with the size parameter set to invisible,
 specifying the ID of the button that submits your sign-in form.*/
-window.RecaptchaVerifier = new firebase.RecaptchaVerifier(firebase.auth, 'loginButton', {
+/*window.RecaptchaVerifier = new firebase.RecaptchaVerifier(firebase.auth, 'loginButton', {
     'size': 'invisible',
     'callback': (response) => {
     // reCAPTCHA solved, allow signInWithPhoneNumber.
     }
-});
+});*/
   
 export default function Login(){
 

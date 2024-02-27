@@ -260,6 +260,10 @@ async function appointmentQuery(startDate, endDate, vacancyStatus){
             .query(query);
         poolConnection.close();
         return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
 
 //adds new user to database
 async function newUserPost(email, phoneNumber, pass, adminPrive) {

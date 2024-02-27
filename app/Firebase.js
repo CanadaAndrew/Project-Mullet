@@ -1,5 +1,5 @@
 //It was necessary to name this as a JS file due to TS having an error reading captchas
-import firebase from "firebase/app";
+/*import firebase from "firebase/app";
 import { getAuth, RecaptchaVerifier } from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -24,4 +24,4 @@ const auth = getAuth();
 auth.languageCode = 'it';
 
 export {auth};
-export default firebase;
+export default firebase;*/
