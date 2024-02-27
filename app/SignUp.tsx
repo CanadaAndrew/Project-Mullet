@@ -15,12 +15,21 @@ import {
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { Link } from 'expo-router';
 import axios from 'axios';
+import {initializeApp} from 'firebase/app';
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
-export default function SignUp({ route }) { // added route for page navigation
+//this is from DT-154 -> navigation, route or just route?
+//export default function SignUp({ route }) { // added route for page navigation
+export default function SignUp({ navigation, route }) { // added route for page navigation
 
+    const firebaseConfig = {
+
+    };
+
+    const app = initializeApp(firebaseConfig);
+    
     //useState for drop down menu
     const [selected, setSelected] = React.useState("");
 
@@ -44,6 +53,61 @@ export default function SignUp({ route }) { // added route for page navigation
     const [password, newPassword] = React.useState('');
     const [confirmPassword, newConfirmPassword] = React.useState('');
 
+    //set length and character checks for text input fields
+    const [count, setCount] = useState(0);
+
+    
+    const [firstNameValid, setfirstNameValid] =  React.useState(false);
+    const [lastNameValid, setlastNameValid] =  React.useState(false);
+    const [emailValid, setemailValid] =  React.useState(false);
+    const [phoneNumberValid, setphoneNumberValid] =  React.useState(false);
+    const [passwordValid, setpasswordValid] =  React.useState(false);
+    const [confirmPasswordValid, setconfirmPasswordValid] =  React.useState(false);
+
+    //is everything filled out? if so, unlock the sign up button
+    const formComplete =  !(firstNameValid && lastNameValid && emailValid && phoneNumberValid && passwordValid && confirmPasswordValid && selected.length != 0); 
+
+    //check() functions set the letter/number/length requirement of each text field
+    //TODO: determine each requirement for each field 
+    function checkfirstNameValid()
+    {
+        setfirstNameValid(firstName.length>0 ? true : false);
+    }
+
+    function checklastNameValid()
+    {
+        setlastNameValid(lastName.length>0 ? true : false);
+    }
+
+    function checkemailValid()
+    {
+        //reg expression checks for ---@---.--- format
+        setemailValid(/\S+@\S+\.\S+/.test(email)); 
+    }
+
+    function checkphoneNumberValid()
+    {
+        //add dashes to maintain ###-###-#### format
+        if(phoneNumber.length == 3 || phoneNumber.length == 7) 
+        {
+            newPhoneNumber(phoneNumber + '-');
+        }
+
+        //13 to account for international phones
+        setphoneNumberValid(phoneNumber.length == 12 || phoneNumber.length == 13 ? true : false);
+       
+    }
+    function checkpasswordValid()
+    {
+        //if the password contains numbers and letters and is 8 chars or more in length...
+        if(password.match(/^[A-Za-z0-9]*$/))
+            setpasswordValid(password.length > 7 ? true : false);
+    }
+    function checkconfirmPasswordValid()
+    {
+        setconfirmPasswordValid(password == confirmPassword ? true : false)
+    }
+      
     //options for drop down menu
     const hairOptions = [
         { key: ' Mens Haircut', value: ' Mens Haircut' },
@@ -64,10 +128,114 @@ export default function SignUp({ route }) { // added route for page navigation
     ];
 
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000'
+        //baseURL: 'http://10.0.0.192:3000'
         //baseURL: 'http://10.0.0.199:3000',
-        //baseURL: 'http://10.0.0.14:3000' Cameron's IP address for testing
+        //baseURL: 'http://10.0.0.14:3000' Cameron's IP address for testing,
+        baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
+
+    //dummy data for postNewUser function until Firebase authentication is set up
+    const verified = true; //demo data signifying the user is verified
+    const e_mail = 'joeshmoe@anywhere.com';
+    const phone_number = '5555555555';
+    const pass_word = 'JoesPassword';
+    const admin_priv = 0; //no admin privileges
+    const first_name = 'Joe';
+    const middle_name = 'Sh';
+    const last_name = 'Moe';
+    const preferred_way_of_contact = 'email';
+    const approval_status = 1; //not sure what 1 represents - Chris
+
+    //posts new user to the database --> will need to set up format validation later  email, phoneNumber, pass, adminPrive
+    const postNewUser = async () => {
+        try {
+            if (verified) {
+                
+                //post data for new user
+                const userResponse = await database.post('/newUserPost', {
+                    email: e_mail,
+                    phoneNumber: phone_number,
+                    pass: pass_word,
+                    adminPrive: admin_priv
+                });
+                
+                //get the userID from response
+                const userID = userResponse.data.userID;
+                //console.log('userID', userID); //for testing
+
+                //post to Clients -> must post to Clients before NewClients because of foreign key constraint
+                await database.post('/newClientPost', {
+                    userID: userID,
+                    firstName: first_name,
+                    middleName: middle_name,
+                    lastName: last_name,
+                    preferredWayOfContact: preferred_way_of_contact,
+                });
+                
+                //post to NewClients
+                await database.post('/new_newClientPost', {
+                    userID: userID,
+                    approvalStatus: approval_status
+                });
+                
+                console.log('New user and related data posted successfully.');
+                alert('new account created successfully');
+            } else {
+                console.log('Verification failed. Cannot post new user data.');
+            }
+        } catch (error) {
+            console.error('Error posting new user data:', error);
+            alert('problem with creating new account');
+        }
+    };
+
+    function newUserSignUp()
+    {
+        interface clientInformation
+        {
+            firstName: string
+            lastName: string
+            email: string
+            phoneNumber: string
+            password: string
+        }
+        let client: clientInformation;
+        //password conditionals if these are both false move onto setting the 
+        if(password != confirmPassword)
+        {
+            alert("Passwords did not match. Please try again.")
+        }
+        else if(password == "" || confirmPassword == "")
+        {
+            alert("No password was entered. Please enter in a password.")
+        }
+        else
+        {
+            client.firstName = firstName;
+            client.lastName = lastName;
+            client.email = email;
+            client.phoneNumber = phoneNumber;
+            client.password = password;
+            //check to see if user was successfully created in Entra ID if so send user back to the log in screen.
+        }
+
+    
+        //on press send client sign up information to Entra ID
+        //on press if the sign up was successful send the user back to the log in screen which we don't have in this branch.
+        return 0;
+    }
+
+    function handleSignUpPress()
+    {
+        let verify = newUserSignUp();
+
+        if(verify = 0)
+        {
+            postNewUser();
+            //return user to log in page is not available right now. There is no log in screen in this branch. Will have to test later
+            //navigation.navigate("Login")
+        }
+    }
 
     return (
         <>
@@ -78,58 +246,66 @@ export default function SignUp({ route }) { // added route for page navigation
                 </View>
                 <LinearGradient locations={[0.8, 1]} colors={['#DDA0DD', 'white']} style={styles.linearGradientStyle}>
                     <View style={styles.body}>
-                        <View style = {styles.createAccountContainer}>
+                        <View style={styles.createAccountContainer}>
                             <Text style={styles.createAccountText}>Create an Account</Text>
                         </View>
-                        <View style = {styles.textFieldContainer}>
+                        <View style={styles.textFieldContainer}>
                             <TextInput
                                 style={styles.textField}
                                 value={firstName}
                                 onChangeText={newFirstName}
-                                placeholder = "First Name"
+                                onTextInput={() => checkfirstNameValid()}
+                                placeholder="First Name"
                             />
                             <TextInput
                                 style={styles.textField}
                                 value={lastName}
                                 onChangeText={newLastName}
-                                placeholder = "Last Name"
+                                onTextInput={() => checklastNameValid()}
+                                placeholder="Last Name"
                             />
                             <TextInput
                                 style={styles.textField}
                                 value={email}
                                 onChangeText={newEmail}
-                                placeholder = "Email"
+                                onTextInput={() => checkemailValid()}
+                                placeholder="Email"
                             />
                             <TextInput
                                 style={styles.textField}
                                 value={phoneNumber}
-                                onChangeText = {newPhoneNumber}
-                                placeholder = "Phone Number"
-                                keyboardType = "numeric"
-                                maxLength={11}  // putting 11 for now if international number
+                                onChangeText={newPhoneNumber}
+                                onTextInput={() => checkphoneNumberValid()}
+                                placeholder="Phone Number"
+                                keyboardType="numeric"
+                                maxLength={14}  // putting 14 for now if international number + added dashes , originally 11
                             />
                             <TextInput
                                 style={styles.textField}
+                                secureTextEntry={true}
                                 value={password}
-                                onChangeText = {newPassword}
-                                placeholder = "Password"
+                                onChangeText={newPassword}
+                                onTextInput={() => {checkpasswordValid(); checkconfirmPasswordValid()}} /*extra measure if user changes password*/
+                                placeholder="Password"
                             />
                             <TextInput
                                 style={styles.textField}
+                                secureTextEntry={true}
                                 value={confirmPassword}
-                                onChangeText = {newConfirmPassword}
-                                placeholder = "Confirm Password"
+                                onChangeText={newConfirmPassword}
+                                onTextInput={() => checkconfirmPasswordValid()}
+                                placeholder="Confirm Password"
                             />
                         </View>
-                        <View style = {styles.serviceContainer}>
+                        <View style={styles.serviceContainer}>
                             <MultipleSelectList
                                 setSelected={(val) => setSelected(val)}
                                 data={hairOptions}
 
                                 // styles
                                 boxStyles={styles.dropDown}
-                                inputStyles={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}
-                                labelStyles={{color: 'white', fontWeight: 'bold', textAlign: 'center' }}
+                                inputStyles={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}
+                                labelStyles={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}
                                 dropdownStyles={{
                                     backgroundColor: 'white',
                                     width: '85%'
@@ -144,8 +320,11 @@ export default function SignUp({ route }) { // added route for page navigation
                                 onSelect={() => handleHairSelection(selected)}
                             />
                         </View>
-                        <View style = {styles.signUpContainer}>
-                            <TouchableOpacity style={styles.signUpButton}>
+                        <View style={styles.signUpContainer}>
+                            <TouchableOpacity 
+                                //disabled={formComplete} //not sure why it was disabled -> enabled again to demo postNewUser function -Chris
+                                style={styles.signUpButton}
+                                onPress={handleSignUpPress}>
                                 <Text style={styles.signUpText}>Sign Up</Text>
                             </TouchableOpacity>
                         </View>
@@ -155,6 +334,17 @@ export default function SignUp({ route }) { // added route for page navigation
         </>
     );
 }
+
+//a bunch of checks to see if the text fields are being filled correctly.
+
+//{ firstNameValid && <Text> firstName is valid</Text> /*debugging*/ } 
+//{ lastNameValid && <Text> lastName is valid</Text> /*debugging*/ } 
+//{ emailValid && <Text> email is valid</Text> /*debugging*/ } 
+//{ phoneNumberValid && <Text> phone is valid</Text> /*debugging*/ } 
+//{ passwordValid && <Text> password is valid</Text> /*debugging*/ } 
+//{confirmPasswordValid && <Text>confirm password is valid</Text> /*debugging*/ }
+//{phoneNumber.length != 0 && <Text> phoneNumber length is: {phoneNumber.length} </Text>}
+//{selected.length != 0 && <Text> service/services selected </Text>}
 
 const styles = StyleSheet.create({
     container: {

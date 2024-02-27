@@ -260,12 +260,59 @@ async function appointmentQuery(startDate, endDate, vacancyStatus){
             .query(query);
         poolConnection.close();
         return sortingResults(resultSet);
+
+//adds new user to database
+async function newUserPost(email, phoneNumber, pass, adminPrive) {
+    try {
+        const poolConnection = await connect();
+        const query = 
+            `INSERT INTO Users (Email, PhoneNumber, Pass, AdminPriv)
+            OUTPUT INSERTED.UserID
+            VALUES ('${email}', '${phoneNumber}', '${pass}', ${adminPrive});`;
+        const result = await poolConnection.request().query(query);
+        poolConnection.close();
+
+        //extract new user ID from result
+        const userID = result.recordset[0].UserID;
+        return { userID };
     } catch (err) {
         console.error(err.message);
         throw err; // rethrow error so it can be caught in calling code
     }
 }
 
+//adds client to database
+async function newClientPost(userID, firstName, middleName, lastName, preferredWayOfContact) {
+    try {
+        const poolConnection = await connect();
+        const query = 
+            `INSERT INTO Clients (UserID, FirstName, MiddleName, LastName, PreferredWayOfContact)
+            VALUES (${userID}, '${firstName}', '${middleName}', '${lastName}', '${preferredWayOfContact}');`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+        throw err; // rethrow error so it can be caught in calling code
+    }
+}
+
+//adds new client to database
+async function new_newClientPost(userID, approvalStatus) {
+    try {
+        const poolConnection = await connect();
+        const query = 
+            `INSERT INTO NewClients (UserID, ApprovalStatus)
+            VALUES (${userID}, ${approvalStatus});`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+
+    } catch (err) {
+        console.error(err.message);
+        throw err; // rethrow error so it can be caught in calling code
+    }
+}
+
+//adds an admin availability date/time to the database
 async function addAvailability(addDateTimeString, vacancyStatus) {
     try {
         const poolConnection = await connect();
@@ -280,6 +327,7 @@ async function addAvailability(addDateTimeString, vacancyStatus) {
     }
 }
 
+//removes an admin availability date/time from the database
 async function removeAvailability(removeDateTimeString){
     try {
         const poolConnection = await connect();
@@ -555,7 +603,53 @@ app.post('/addAvailability', async (req, res) => {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
-})
+});
+
+app.post('/newUserPost', async (req, res) => {
+    try {
+        const { email, phoneNumber, pass, adminPrive } = req.body;
+        if (!email || !phoneNumber || !pass || adminPrive === undefined || adminPrive === null) {
+            throw new Error('Invalid request body. Missing "email", "phoneNumber", "pass", or "adminPrive".');
+        }
+
+        //create new user
+        const newUser = await newUserPost(email, phoneNumber, pass, adminPrive);
+
+        //send userID in response
+        res.status(201).json({ userID: newUser.userID, message: 'User created successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post('/newClientPost', async (req, res) => {
+    try {
+        const { userID, firstName, middleName, lastName, preferredWayOfContact } = req.body;
+        if (!userID || !firstName || !middleName || !lastName || !preferredWayOfContact) {
+            throw new Error('Invalid request body. Missing "userID", "firstName", "middleName", "lastName", or "preferredWayOfContact".');
+        }
+        await newClientPost(userID, firstName, middleName, lastName, preferredWayOfContact);
+        res.status(201).send('Client created successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post('/new_newClientPost', async (req, res) => {
+    try {
+        const { userID, approvalStatus } = req.body;
+        if (!userID || approvalStatus === undefined || approvalStatus === null) {
+            throw new Error('Invalid request body. Missing "userID" or "approvalStatus".');
+        }
+        await new_newClientPost(userID, approvalStatus);
+        res.status(201).send('New client created successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 app.delete('/removeAvailability', async (req, res) => {
     try {
