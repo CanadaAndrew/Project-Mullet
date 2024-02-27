@@ -64,6 +64,10 @@ export default function NavigateHome(){
                     dataDate: ""
                 })}  
             />
+            <Button
+                title = "Sign Up page"
+                onPress = {() => navigation.navigate("SignUp", {userData})}
+            />
             
         </View>
     )
