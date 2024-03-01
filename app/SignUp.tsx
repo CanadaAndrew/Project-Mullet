@@ -15,19 +15,18 @@ import {
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { Link } from 'expo-router';
 import axios from 'axios';
-import {initializeApp} from 'firebase/app';
-import firebase from './Firebase.js';
+//firebase imports VVV
 import { getAuth, createUserWithEmailAndPassword  } from "firebase/auth";
+import firebase from './Firebase.js';
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
 export default function SignUp({ navigation, route }) { // added route for page navigation
 
-
-    //initializes Firebase
     //initializes the Authentication and gets a reference to the service
     const auth = getAuth(firebase);
+    //sets the default language to the systems language
     auth.languageCode = 'it';
 
     //useState for drop down menu
@@ -203,7 +202,13 @@ export default function SignUp({ navigation, route }) { // added route for page 
         }
         else
         {
+            /*
+            IMPORTANT
 
+            We are going to talk with Melissa about using emails instead of Phone numbers for authentication
+            For some reason the phone number verification doesn't want to work and we've been trying but have only had
+            success with the email verification. We may implement this at a later date.
+            */
             //if(phoneNumber != "")
             //{
                 //not able to get the phone number verification to work. 
@@ -225,24 +230,26 @@ export default function SignUp({ navigation, route }) { // added route for page 
                     const errorMessage = error.message;
                     console.log(errorCode);
                     console.log(errorMessage);
+                    alert("Something went wrong. Please enter account information and try again.")
                     return 1; //returns 1 on sign up fail so that way it doesn't post this user to the database
                 });
             //}
             return 0;
         }
         //returns 1 if something along the way messed up so it doesn't post the new user to the database
+        alert("Something went wrong. Please enter account information and try again.")
         return 1;
     }
 
     function handleSignUpPress()
     {
+        //registers the user with Firebase first then if the function returns 0 meaning a successful user creation
+        //it will post the user to the database and route them back to the login page
         let verify = newUserSignUp();
 
         if(verify == 0)
         {
-
-            //postNewUser();
-            //return user to log in page is not available right now. There is no log in screen in this branch. Will have to test later
+            postNewUser();
             navigation.navigate("Login")
         }
     }
