@@ -27,6 +27,29 @@ export default function ResetLogin(){
         textH(!textS);
     }
 
+    //user inputs for password and confirm password
+    const [password, newPassword] = React.useState('');
+    const [confirmPassword, newConfirmPassword] = React.useState('');
+
+    //checks if passwords are valid
+    const [passwordValid, setpasswordValid] =  React.useState(false);
+    const [confirmPasswordValid, setconfirmPasswordValid] =  React.useState(false);
+
+    //TODO: discuss password requirements in a sprint
+    function checkpasswordValid() 
+    {
+        //temporary requirement: if the password contains numbers and letters and is 8 chars or more in length...
+            setpasswordValid(password.length > 7 ? true : false);
+    }
+    function checkconfirmPasswordValid()
+    {
+        //if confirmpassword matches with password
+        setconfirmPasswordValid(password == confirmPassword ? true : false)
+    }
+
+    //if the password requirement is met and confirm password matches password, unlock the reset pw button
+    const formComplete =  !(passwordValid && confirmPasswordValid);
+
     return (
         <ScrollView>
         <View style = {styles.container}>
@@ -64,6 +87,9 @@ export default function ResetLogin(){
                       keyboardType = 'default'
                       secureTextEntry = {showPassword}
                       style = {styles.inputBox}
+                      value={password} 
+                      onChangeText={newPassword}
+                      onTextInput={() => {checkpasswordValid(); checkconfirmPasswordValid()}} /*extra measure if user changes password*/
                   />
                  {/*user input for password match partly functional*/}
                   <TextInput 
@@ -72,6 +98,9 @@ export default function ResetLogin(){
                       keyboardType = 'default'
                       secureTextEntry = {showPassword}
                       style = {styles.inputBox}
+                      value={confirmPassword}
+                      onChangeText={newConfirmPassword}
+                      onTextInput={() => checkconfirmPasswordValid()}
                   />
                  
                  {/*button to show and hide password is functional*/}
@@ -90,6 +119,7 @@ export default function ResetLogin(){
                     <TouchableOpacity
                       style = {styles.resetButton}
                       onPress = {onClickLogin}
+                      disabled={formComplete}
                     >
                     <Text style = {styles.resetButtonText}>Reset Password</Text>
                     </TouchableOpacity>
