@@ -60,6 +60,10 @@ export default function NavigateHome(){
                     dataDate: ""
                 })}  
             />
+            <Button
+                title="New Client Approval page"
+                onPress={() => navigation.navigate("NewClientApproval", { userData })}
+            />
             
         </View>
     )
