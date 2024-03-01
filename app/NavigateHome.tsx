@@ -60,6 +60,14 @@ export default function NavigateHome(){
                     dataDate: ""
                 })}  
             />
+            <Button  
+                title = "newClientInfo page"
+                onPress={() => navigation.navigate("newClientInfo", {
+                    userData,
+                    hairStyleData: "",
+                    dataDate: ""
+                })}  
+            />
             
         </View>
     )
