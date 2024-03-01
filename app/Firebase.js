@@ -1,6 +1,6 @@
 //It was necessary to name this as a JS file due to TS having an error reading captchas
-import firebase from "firebase/app";
 import { getAuth, RecaptchaVerifier } from "firebase/auth";
+import {initializeApp} from 'firebase/app';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -19,9 +19,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const firebase = initializeApp(firebaseConfig);
-const auth = getAuth();
 //Sets the default language to the system's default
-auth.languageCode = 'it';
 
-export {auth};
+
 export default firebase;

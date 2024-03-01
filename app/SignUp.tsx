@@ -16,18 +16,20 @@ import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-lis
 import { Link } from 'expo-router';
 import axios from 'axios';
 import {initializeApp} from 'firebase/app';
+import firebase from './Firebase.js';
+import { getAuth, createUserWithEmailAndPassword  } from "firebase/auth";
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
 export default function SignUp({ navigation, route }) { // added route for page navigation
 
-    const firebaseConfig = {
 
-    };
+    //initializes Firebase
+    //initializes the Authentication and gets a reference to the service
+    const auth = getAuth(firebase);
+    auth.languageCode = 'it';
 
-    const app = initializeApp(firebaseConfig);
-    
     //useState for drop down menu
     const [selected, setSelected] = React.useState("");
 
@@ -190,15 +192,6 @@ export default function SignUp({ navigation, route }) { // added route for page 
 
     function newUserSignUp()
     {
-        interface clientInformation
-        {
-            firstName: string
-            lastName: string
-            email: string
-            phoneNumber: string
-            password: string
-        }
-        let client: clientInformation;
         //password conditionals if these are both false move onto setting the 
         if(password != confirmPassword)
         {
@@ -210,29 +203,47 @@ export default function SignUp({ navigation, route }) { // added route for page 
         }
         else
         {
-            client.firstName = firstName;
-            client.lastName = lastName;
-            client.email = email;
-            client.phoneNumber = phoneNumber;
-            client.password = password;
-            //check to see if user was successfully created in Entra ID if so send user back to the log in screen.
-        }
 
-    
-        //on press send client sign up information to Entra ID
-        //on press if the sign up was successful send the user back to the log in screen which we don't have in this branch.
-        return 0;
+            //if(phoneNumber != "")
+            //{
+                //not able to get the phone number verification to work. 
+                /*window.RecaptchaVerifier = new RecaptchaVerifier(auth, 'sign-in-button', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                    // reCAPTCHA solved, allow signInWithPhoneNumber.
+                    }
+                });*/
+            //}
+            //else
+            //{
+                createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.log(errorCode);
+                    console.log(errorMessage);
+                    return 1; //returns 1 on sign up fail so that way it doesn't post this user to the database
+                });
+            //}
+            return 0;
+        }
+        //returns 1 if something along the way messed up so it doesn't post the new user to the database
+        return 1;
     }
 
     function handleSignUpPress()
     {
         let verify = newUserSignUp();
 
-        if(verify = 0)
+        if(verify == 0)
         {
-            postNewUser();
+
+            //postNewUser();
             //return user to log in page is not available right now. There is no log in screen in this branch. Will have to test later
-            //navigation.navigate("Login")
+            navigation.navigate("Login")
         }
     }
 
