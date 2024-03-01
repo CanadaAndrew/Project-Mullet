@@ -14,6 +14,7 @@ import HomeScreen from './HomeScreen';
 import appointmentsClientView from './appointmentsClientView';
 import ClientHistory from './ClientHistory';
 import AboutMe from './AboutMe';
+import ResetLogin from './ResetLogin';
 
 const Stack = createNativeStackNavigator()
 
@@ -61,6 +62,11 @@ export default function index() {
          <Stack.Screen name = "appointmentsClientView" component={appointmentsClientView}
            options = {{
             title: "Your Appointments"
+           }}
+         />
+         <Stack.Screen name = "ResetLogin" component={ResetLogin}
+           options = {{
+            title: "Reset Login"
            }}
          />
          <Stack.Screen name = "ServicesOffered" component={ServicesOffered} />

@@ -17,9 +17,7 @@ export default function AboutMe() {
 
 <LinearGradient locations={[0.7, 1]} colors={['#DDA0DD', 'white']} style={styles.container}>
    
-<View style={styles.header}>
-<Text style={styles.headerText}>About Me</Text>
-</View>
+
 
      {/*  <View style={styles.backButton}> //obsolete?
                         <Pressable
@@ -35,8 +33,8 @@ export default function AboutMe() {
 
                    
                     <Image style = {styles.logo} source={require('./images/Melissa.jpg')} />
-                    <Text style={{textAlign: 'center', color: 'black', fontSize: 18}}>Bio</Text>
-                    <Text style={{color: 'black', fontSize: 16}}>{"\n"}{aboutMeText}</Text>
+                    <Text style={styles.titleText}>Bio</Text>
+                    <Text style={styles.titleText}>{"\n"}{aboutMeText}</Text>
 
 
                     </LinearGradient>
@@ -198,5 +196,13 @@ const styles = StyleSheet.create({
       logo: {
         width: 435,
         height: 250,
-    }
+    },
+    // error text styling 
+    titleText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center',
+        marginTop: 10
+    },
 })

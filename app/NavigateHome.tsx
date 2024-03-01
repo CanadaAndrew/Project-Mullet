@@ -32,6 +32,10 @@ export default function NavigateHome(){
                 onPress={() => navigation.navigate("HomeScreen")}
             />
             <Button
+                title = "Reset Login page"
+                onPress={() => navigation.navigate("ResetLogin")}
+            />
+            <Button
                 title = "Client Appointment page Client View"
                 onPress={() => navigation.navigate("appointmentsClientView", {userData})}
             />
