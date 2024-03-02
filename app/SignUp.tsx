@@ -16,8 +16,8 @@ import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-lis
 import { Link } from 'expo-router';
 import axios from 'axios';
 //firebase imports VVV
+import firebase from './Firebase.js'
 import { getAuth, createUserWithEmailAndPassword  } from "firebase/auth";
-import firebase from './Firebase.js';
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
@@ -230,14 +230,13 @@ export default function SignUp({ navigation, route }) { // added route for page 
                     const errorMessage = error.message;
                     console.log(errorCode);
                     console.log(errorMessage);
-                    alert("Something went wrong. Please enter account information and try again.")
                     return 1; //returns 1 on sign up fail so that way it doesn't post this user to the database
                 });
             //}
             return 0;
         }
         //returns 1 if something along the way messed up so it doesn't post the new user to the database
-        alert("Something went wrong. Please enter account information and try again.")
+        alert("Something went wrong. Please enter account information and try again2.")
         return 1;
     }
 
@@ -249,7 +248,7 @@ export default function SignUp({ navigation, route }) { // added route for page 
 
         if(verify == 0)
         {
-            postNewUser();
+            //postNewUser();
             navigation.navigate("Login")
         }
     }
