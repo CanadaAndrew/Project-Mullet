@@ -7,9 +7,9 @@ export default function NewClientApproval() {
 
     const windowDimensions = Dimensions.get('window')
     const database = axios.create({
-        baseURL: 'http://10.0.0.119:3000',  // Wilson local
+        //baseURL: 'http://10.0.0.119:3000',  // Wilson local
         //baseURL: 'http://10.0.0.192:3000',
-        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
 
     const [first, setFirst] = React.useState(0);
@@ -20,8 +20,25 @@ export default function NewClientApproval() {
         phoneNumber: string;
         service: string;
     }
-    let defaultClient: Client[] = [];
-    const [newClient, setNewClient] = React.useState(defaultClient);
+
+    //dummy data for testing
+    const dummyClients: Client[] = [
+        {
+            name: 'John Doe',
+            email: 'john@doe.com',
+            phoneNumber: '123-456-7890',
+            service: 'Haircut'
+        },
+        {
+            name: 'Jane Doe',
+            email: 'jane@doe.com',
+            phoneNumber: '123-456-7890',
+            service: 'Nails'
+        }
+    ];
+    const [newClient, setNewClient] = React.useState(dummyClients); //set to dummyClients for testing
+    //let defaultClient: Client[] = [];
+    //const [newClient, setNewClient] = React.useState(defaultClient);
     firstUpdate();
 
     async function firstUpdate() {
@@ -69,6 +86,14 @@ export default function NewClientApproval() {
         }
     }
 
+    //result when admin declines a new client
+    const handleDeclineClient = async (client) => {
+        console.log(client.name + " Declined"); //for testing purposes
+        alert(`${client.name} is Declined`);
+        const updatedClients = newClient.filter((person) => person.name !== client.name);  //remove declined client from list
+        setNewClient(updatedClients);
+    }
+
     return (
         <SafeAreaView>
             <ScrollView>
@@ -109,7 +134,8 @@ export default function NewClientApproval() {
                                             <Text style={styles.buttonText}>Accept</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity
-                                            style={styles.buttonStyling}>
+                                            style={styles.buttonStyling}
+                                            onPress={() => handleDeclineClient(item)}>
                                             <Text style={styles.buttonText}>Decline</Text>
                                         </TouchableOpacity>
                                     </View>
