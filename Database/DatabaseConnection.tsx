@@ -252,6 +252,7 @@ async function updateAppointment(date, time, userID, type){
     
 }
 
+//gets appointments between two dates
 async function appointmentQuery(startDate, endDate, vacancyStatus){
     try {
         const poolConnection = await connect();
@@ -266,11 +267,27 @@ async function appointmentQuery(startDate, endDate, vacancyStatus){
     }
 }
 
+//adds client to CurrentClients
+async function currentClientPost(userID, street, city, state, zip) {
+    try {
+        const poolConnection = await connect();
+        const query = `INSERT INTO CurrentClients (UserID, Street, City, StateAbbreviation, Zip)
+            VALUES (${userID}, '${street}', '${city}', '${state}', '${zip}');`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+        throw err; // rethrow error so it can be caught in calling code
+    }
+}
+
+//adds available appointment time to database
 async function addAvailability(addDateTimeString, vacancyStatus) {
     try {
         const poolConnection = await connect();
         poolConnection.setMaxListeners(24);
-        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${vacancyStatus});`;
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) 
+            VALUES ('${addDateTimeString}', ${vacancyStatus});`;
         await poolConnection.request()
             .query(query);
         poolConnection.close();
@@ -280,6 +297,7 @@ async function addAvailability(addDateTimeString, vacancyStatus) {
     }
 }
 
+//removes available appointment time from database
 async function removeAvailability(removeDateTimeString){
     try {
         const poolConnection = await connect();
@@ -329,7 +347,10 @@ async function appointmentPost(queryString, values){
 async function clientHistoryAppointmentsQuery(startDate, endDate){
     try {
         const poolConnection = await connect();
-        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate BETWEEN \'' + startDate + '\' AND \'' + endDate + '\'';
+        const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
+            FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
+            WHERE AppointmentDate BETWEEN \'' + ${startDate} + '\' 
+            AND \'' + ${endDate} + '\'`;
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -344,7 +365,9 @@ async function clientHistoryAppointmentsQuery(startDate, endDate){
 async function allPastAppointmentsQuery(todaysDate){
     try {
         const poolConnection = await connect();
-        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate < \'' + todaysDate + '\'';
+        const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
+            FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
+            WHERE AppointmentDate < \'' + ${todaysDate} + '\'`;
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -359,7 +382,9 @@ async function allPastAppointmentsQuery(todaysDate){
 async function allUpcomingAppointmentsQuery(todaysDate){
     try {
         const poolConnection = await connect();
-        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate >= \'' + todaysDate + '\'';
+        const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
+            FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
+            WHERE AppointmentDate >= \'' + ${todaysDate} + '\'`;
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -414,7 +439,9 @@ async function QueryAppointmentByDaySelectedAndVacancy(beginDay, endDay)
     try
     {
         const poolConnection = await connect();
-        const query = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + beginDay + "' AND AppointmentDate <= '" + endDay + "' AND VacancyStatus = 0;";
+        const query = `SELECT * FROM Appointments 
+            WHERE AppointmentDate >= '" + ${beginDay} + "' 
+            AND AppointmentDate <= '" + ${endDay} + "' AND VacancyStatus = 0;`;
         const resultSet = await poolConnection.request().query(query);
         poolConnection.close();
         return sortingResults(resultSet);
@@ -454,7 +481,9 @@ app.get('/customQuery', (req, res) => {
 app.get('/queryUpcomingAppointments', (req, res) => {
     const date = req.query.queryDate;
     console.log(date);
-    let queryString = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + date + " 00:00:00' AND VacancyStatus = 1";
+    let queryString = `SELECT * FROM Appointments 
+        WHERE AppointmentDate >= '" + date + " 00:00:00' 
+        AND VacancyStatus = 1`;
     console.log(queryString);
     customQuery(queryString)
     .then((ret) => res.send(ret))
@@ -537,6 +566,32 @@ app.get('/appointmentQuery', async (req, res) => {
         res.send(result);
     } catch {
         res.status(400).send('Bad Request');
+    }
+});
+
+app.post('/currentClientPost', async (req, res) => {
+    try {
+        const { userID, street, city, state, zip } = req.body;
+        if (!userID) {
+            throw new Error('Invalid request body. Missing "userID"');
+        }
+        if (!street) {
+            throw new Error('Invalid request body. Missing "street"');
+        }
+        if (!city) {
+            throw new Error('Invalid request body. Missing "city"');
+        }
+        if (!state) {
+            throw new Error('Invalid request body. Missing "state"');
+        }
+        if (!zip) {
+            throw new Error('Invalid request body. Missing "zip"');
+        }
+        await currentClientPost(userID, street, city, state, zip);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
 });
 
