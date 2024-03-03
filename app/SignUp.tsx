@@ -70,6 +70,16 @@ export default function SignUp({ navigation, route }) { // added route for page 
     //is everything filled out? if so, unlock the sign up button
     const formComplete =  !(firstNameValid && lastNameValid && emailValid && phoneNumberValid && passwordValid && confirmPasswordValid && selected.length != 0); 
 
+    /*useEffect(() => { //for testing purposes -> prints to console whenever lists are updated
+        console.log('firstNameValid', firstNameValid); //for testing purposes
+        console.log('lastNameValid', lastNameValid); //for testing purposes
+        console.log('emailValid', emailValid); //for testing purposes
+        console.log('phoneNumberValid', phoneNumberValid); //for testing purposes
+        console.log('passwordValid', passwordValid); //for testing purposes
+        console.log('confirmPasswordValid', confirmPasswordValid); //for testing purposes
+        console.log('selected.length', selected.length); //for testing purposes
+    }, [firstNameValid, lastNameValid, emailValid, phoneNumberValid, passwordValid, confirmPasswordValid, selected.length]);*/
+
     //check() functions set the letter/number/length requirement of each text field
     //TODO: determine each requirement for each field 
     function checkfirstNameValid()
@@ -361,10 +371,9 @@ export default function SignUp({ navigation, route }) { // added route for page 
                         
                         <View style={styles.signUpContainer}>
                             <TouchableOpacity 
-                                //disabled={formComplete} //not sure why it was disabled -> enabled again to demo postNewUser function -Chris
+                                disabled={formComplete}
                                 style={styles.signUpButton}
-                                //onPress={handleSignUpPress}>
-                                onPress={postNewUser}>
+                                onPress={handleSignUpPress}>
                                 <Text style={styles.signUpText}>Sign Up</Text>
                             </TouchableOpacity>
                         </View>
