@@ -300,6 +300,21 @@ async function new_newClientPost(userID, approvalStatus) {
     }
 }
 
+//adds services wanted to database
+async function servicesWantedPost(userID, serviceName) {
+    try {
+        const poolConnection = await connect();
+        const query = 
+            `INSERT INTO ServicesWanted (UserID, ServiceName)
+            VALUES (${userID}, '${serviceName}');`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+        throw err; // rethrow error so it can be caught in calling code
+    }
+}
+
 //adds an admin availability date/time to the database
 async function addAvailability(addDateTimeString, notBooked) {
     try {
@@ -597,6 +612,20 @@ app.post('/new_newClientPost', async (req, res) => {
         }
         await new_newClientPost(userID, approvalStatus);
         res.status(201).send('New client created successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post('/servicesWantedPost', async (req, res) => {
+    try {
+        const { userID, serviceName } = req.body;
+        if (!userID || !serviceName) {
+            throw new Error('Invalid request body. Missing "userID" or "serviceName".');
+        }
+        await servicesWantedPost(userID, serviceName);
+        res.status(201).send('Service wanted created successfully');
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');

@@ -41,6 +41,10 @@ export default function SignUp({ navigation, route }) { // added route for page 
         hairStyleSelected = temparr;
     }
 
+    /*useEffect(() => { //for testing purposes -> prints to console whenever lists are updated
+        console.log('hairStyleSelected', hairStyleSelected); //for testing purposes
+    }, [hairStyleSelected]);*/
+
     //using this dummy data because the dateData variable isn't working currently ^^^ keeps spitting out Monday, December 4th, 2023
     let dateChosen = 'Mon, 04 December 2023';
 
@@ -134,9 +138,8 @@ export default function SignUp({ navigation, route }) { // added route for page 
         baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
 
-    //dummy data for postNewUser function until Firebase authentication is set up
-    const verified = true; //demo data signifying the user is verified
-    const e_mail = 'joeshmoe@anywhere.com';
+    //demo data for postNewUser function until Firebase authentication is set up
+    /*const e_mail = 'joeshmoe@anywhere.com';
     const phone_number = '5555555555';
     const pass_word = 'JoesPassword';
     const admin_priv = 0; //no admin privileges
@@ -144,45 +147,64 @@ export default function SignUp({ navigation, route }) { // added route for page 
     const middle_name = 'Sh';
     const last_name = 'Moe';
     const preferred_way_of_contact = 'email';
-    const approval_status = 1; //not sure what 1 represents - Chris
+    const approval_status = 1; //not sure what 1 represents - Chris*/
 
-    //posts new user to the database --> will need to set up format validation later  email, phoneNumber, pass, adminPrive
+    //posts new user to the database, assumes user is verified by firebase
     const postNewUser = async () => {
         try {
-            if (verified) {
+            //post data for new user
+            const userResponse = await database.post('/newUserPost', {
+                /*email: e_mail, //uses demo data
+                phoneNumber: phone_number,
+                pass: pass_word,
+                adminPrive: admin_priv*/
+                email: email,
+                phoneNumber: phoneNumber,
+                pass: password,
+                adminPrive: 0
+            });
                 
-                //post data for new user
-                const userResponse = await database.post('/newUserPost', {
-                    email: e_mail,
-                    phoneNumber: phone_number,
-                    pass: pass_word,
-                    adminPrive: admin_priv
-                });
-                
-                //get the userID from response
-                const userID = userResponse.data.userID;
-                //console.log('userID', userID); //for testing
+            //get the userID from response
+            const userID = userResponse.data.userID;
+            //console.log('userID', userID); //for testing
 
-                //post to Clients -> must post to Clients before NewClients because of foreign key constraint
-                await database.post('/newClientPost', {
-                    userID: userID,
-                    firstName: first_name,
-                    middleName: middle_name,
-                    lastName: last_name,
-                    preferredWayOfContact: preferred_way_of_contact,
-                });
-                
-                //post to NewClients
-                await database.post('/new_newClientPost', {
-                    userID: userID,
-                    approvalStatus: approval_status
-                });
-                
-                console.log('New user and related data posted successfully.');
-                alert('new account created successfully');
-            } else {
-                console.log('Verification failed. Cannot post new user data.');
-            }
+            //post to Clients -> must post to Clients before NewClients because of foreign key constraint
+            await database.post('/newClientPost', {
+                /*userID: userID, //uses demo data
+                firstName: first_name,
+                middleName: middle_name,
+                lastName: last_name,
+                preferredWayOfContact: preferred_way_of_contact*/
+                userID: userID,
+                firstName: firstName,
+                //middleName: , //form info?
+                lastName: lastName,
+                //preferredWayOfContact:  //form info?
+            });
+            
+            //post to NewClients
+            await database.post('/new_newClientPost', {
+                /*userID: userID, //uses demo data
+                approvalStatus: approval_status*/
+                userID: userID,
+                approvalStatus: 1 //not sure what 1 represents - Chris
+            });
+
+            //post to ServicesWanted
+            const servicePromises = hairStyleSelected.map(async (service)=> {
+                try {
+                    const serviceResponse = await database.post('/servicesWantedPost', {
+                        userID: userID,
+                        serviceName: service
+                    });
+                } catch (error) {
+                    console.error('Error posting services wanted:', error.serviceResponse.data);
+                }
+            });
+            await Promise.all(servicePromises); //wait for all services to be posted
+             
+            console.log('New user and related data posted successfully.');
+            alert('new account created successfully');
         } catch (error) {
             console.error('Error posting new user data:', error);
             alert('problem with creating new account');
@@ -248,11 +270,10 @@ export default function SignUp({ navigation, route }) { // added route for page 
 
         if(verify == 0)
         {
-            //postNewUser();
+            postNewUser();
             navigation.navigate("Login")
         }
     }
-
 
     return (
         <>
@@ -342,7 +363,8 @@ export default function SignUp({ navigation, route }) { // added route for page 
                             <TouchableOpacity 
                                 //disabled={formComplete} //not sure why it was disabled -> enabled again to demo postNewUser function -Chris
                                 style={styles.signUpButton}
-                                onPress={handleSignUpPress}>
+                                //onPress={handleSignUpPress}>
+                                onPress={postNewUser}>
                                 <Text style={styles.signUpText}>Sign Up</Text>
                             </TouchableOpacity>
                         </View>
@@ -363,8 +385,6 @@ export default function SignUp({ navigation, route }) { // added route for page 
 //{confirmPasswordValid && <Text>confirm password is valid</Text> /*debugging*/ }
 //{phoneNumber.length != 0 && <Text> phoneNumber length is: {phoneNumber.length} </Text>}
 //{selected.length != 0 && <Text> service/services selected </Text>}
-
-
 
 const styles = StyleSheet.create({
     container: {
