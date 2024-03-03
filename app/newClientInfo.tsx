@@ -14,135 +14,155 @@ import {
 } from 'react-native';
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { Link } from 'expo-router';
-//import axios from 'axios';
+import axios from 'axios';
 //import {initializeApp} from 'firebase/app';
 import { listOfStates } from './Enums/Enums';
 
+const database = axios.create({
+    //baseURL: 'http://10.0.0.192:3000',
+    baseURL: 'http://192.168.1.150:3000', //Chris pc local
+})
 
 export default function newClientInfo() {
 
-//temp name, need to import the client's name from somewhere else
-const [firstName, newFirstName] = useState('Sam'); 
-const welcomeMessage = 'Congratulations ' + firstName + '! You’ve been approved as a new client. Fill in some additional info to complete your sign up process.';
+    //temp name, need to import the client's name from somewhere else
+    const [firstName, newFirstName] = useState('Sam'); 
+    const welcomeMessage = 'Congratulations ' + firstName + '! You’ve been approved as a new client. Fill in some additional info to complete your sign up process.';
 
-const [StreetAddress, newStreetAddress] = useState(''); 
-const [City, newCity] = useState('');
-const [State, newState] = useState(''); 
-const [ZipCode, newZipCode] = useState(''); 
+    const [StreetAddress, newStreetAddress] = useState(''); 
+    const [City, newCity] = useState('');
+    const [State, newState] = useState(''); 
+    const [ZipCode, newZipCode] = useState(''); 
 
-const [StreetAddressValid, setStreetAddressValid] =  useState(false);
-const [CityValid, setCityValid] = useState(false);
-const [StateValid, setStateValid] = useState(false); 
-const [ZipValid, setZipValid] = useState(false); 
+    const [StreetAddressValid, setStreetAddressValid] =  useState(false);
+    const [CityValid, setCityValid] = useState(false);
+    const [StateValid, setStateValid] = useState(false); 
+    const [ZipValid, setZipValid] = useState(false); 
 
-const formComplete = StreetAddressValid && CityValid && StateValid && ZipValid;
+    const formComplete = StreetAddressValid && CityValid && StateValid && ZipValid;
 
+    //need to add to submit button when HTML is added and test
+    //dummy data for testing purposes
+    const user_ID = 10; //will need to be replaced with actual userID once ok'd from admin (ApprovalStatus in NewClients) -> do we need to check approval status?
+    const strt = "1234 Main St";
+    const cty = "Anytown";
+    const stat = "TX";
+    const zp = "12345";
 
-function checkStreetAddressValid()
-{
-    //Street addresses have lots of variences that regex doesn't cover, so using a address verifier would be preferable.
-    //but for now we're checking if length > 5
-       
-    setStreetAddressValid(StreetAddress.length > 5 ? true : false);
-}
+    //adds current client to database
+    const handleCurrentClientPost = async () => {
+        try {
+            const response = await database.post('/currentClientPost', { //userID, street, city, state, zip
+                userID: user_ID, //for demo -> need to replace with actual imported userID -> can use UserID 9-22 for testing but must increment after each use
+                //street: strt,
+                //city: cty,
+                //state: stat,
+                //zip: zp
+                street: StreetAddress,
+                city: City,
+                state: State,
+                zip: ZipCode
+            });
+            //console.log(response); //for testing purposes
+            alert('Your information has been updated!');
+            //should navigate to home page after successful submission -> need to implement
+        } catch (error) {
+            console.error('Error adding current client:', error.response.data);
+        }
+    };  
 
-function checkCityValid()
-{
-    //checks for regular characters only and that city length isn't 0
-    setCityValid(/^[a-zA-Z ]*$/.test(City) && City.length > 0 ? true : false);
-}
+    function checkStreetAddressValid()
+    {
+        //Street addresses have lots of variences that regex doesn't cover, so using a address verifier would be preferable.
+        //but for now we're checking if length > 5
+        setStreetAddressValid(StreetAddress.length > 5 ? true : false);
+    }
 
-function checkStateValid()
-{
-    //Checks with a list of states in enum.tsx, if State matches with anything on the list, then it's a valid state.
-    //Also accepts state abbreviations like CA and NV.
-    setStateValid(Object.values(listOfStates).includes(State) || listOfStates[State.toUpperCase()] ? true : false);
-    
-}
-function checkZipValid()
-{
-    //zip codes are 5 digits
-   setZipValid(ZipCode.length == 5 ? true : false);
-}
+    function checkCityValid()
+    {
+        //checks for regular characters only and that city length isn't 0
+        setCityValid(/^[a-zA-Z ]*$/.test(City) && City.length > 0 ? true : false);
+    }
 
+    function checkStateValid()
+    {
+        //Checks with a list of states in enum.tsx, if State matches with anything on the list, then it's a valid state.
+        //Also accepts state abbreviations like CA and NV.
+        setStateValid(Object.values(listOfStates).includes(State) || listOfStates[State.toUpperCase()] ? true : false);
+    }
 
-
+    function checkZipValid()
+    {
+        //zip codes are 5 digits
+        setZipValid(ZipCode.length == 5 ? true : false);
+    }
 
     return (
-<>
-<LinearGradient locations={[0.7, 1]} colors={['#DDA0DD', 'white']} style={styles.container}>
-          
-<Text >{'\n'}</Text>
-<View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-    <Text style={styles.appointText}>{welcomeMessage}</Text>
-</View> 
 
-<View style={styles.textFieldContainer}>
-    <Text style= {styles.textFieldHeader} >Street Address</Text>
-   
-<TextInput
-    style={styles.textField}
-    value={StreetAddress}
-    onChangeText={newStreetAddress}
-    onTextInput={() => checkStreetAddressValid()}
-    placeholder="Street Address"
-                            />
- <Text style= {styles.textFieldHeader} >City</Text>
-<TextInput
-    style={styles.textField}
-    value={City}
-    onChangeText={newCity}
-    onTextInput={() => checkCityValid()}
-    placeholder="City"
-                            />
-
-<Text style= {styles.textFieldHeader} >State & Zip Code</Text>
-
-    <View style={[
-        styles.container,
-        {
-          flexDirection: 'row',
-        },
-      ]}>
-
-<TextInput
-    style={styles.textFieldState}
-    value={State}
-    onChangeText={newState}
-    onTextInput={() => checkStateValid()}
-    placeholder="State"
-                            />
-
-<Text> </Text>
-<TextInput
-    style={styles.textFieldZip}
-    value={ZipCode}
-    maxLength={5}
-    keyboardType="number-pad"
-    onChangeText={newZipCode}
-    onTextInput={() => checkZipValid()}
-    placeholder="Zip"
-                            />
-
-      </View>
-
-      <Text >{'\n'}{'\n'}{'\n'}</Text>
-      <TouchableOpacity 
-                                disabled={!formComplete} //until everything is filled out, button is disabled.
-                                style={styles.signUpButton}
-                                //onPress={}
-                                >
-                                <Text style={styles.signUpText}>Save Changes</Text>
-                            </TouchableOpacity>
-                            
-{/*testing stuff if all the fields are valid*/}
-{/*StateValid && <Text >state valid is true</Text>  }
-{/*CityValid && <Text >city valid is true</Text> /**/ }
-{/*StreetAddressValid && <Text > address valid is true</Text> /**/ }
-{/*ZipValid && <Text > zip valid is true</Text> /**/ }
-</View>
-</LinearGradient>
-</>  
+    <>
+        <LinearGradient locations={[0.7, 1]} colors={['#DDA0DD', 'white']} style={styles.container}>  
+            <Text >{'\n'}</Text>
+            <View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>
+                <Text style={styles.appointText}>{welcomeMessage}</Text>
+            </View> 
+            <View style={styles.textFieldContainer}>
+                <Text style= {styles.textFieldHeader} >Street Address</Text>
+                    <TextInput
+                        style={styles.textField}
+                        value={StreetAddress}
+                        onChangeText={newStreetAddress}
+                        onTextInput={() => checkStreetAddressValid()}
+                        placeholder="Street Address"
+                />
+                <Text style= {styles.textFieldHeader} >City</Text>
+                    <TextInput
+                        style={styles.textField}
+                        value={City}
+                        onChangeText={newCity}
+                        onTextInput={() => checkCityValid()}
+                        placeholder="City"
+                />
+                <Text style= {styles.textFieldHeader} >State & Zip Code</Text>
+                    <View style={[
+                        styles.container,
+                        {
+                            flexDirection: 'row',
+                        },
+                    ]}>
+                        <TextInput
+                            style={styles.textFieldState}
+                            value={State}
+                            onChangeText={newState}
+                            onTextInput={() => checkStateValid()}
+                            placeholder="State"
+                        />
+                        <Text> </Text>
+                        <TextInput
+                            style={styles.textFieldZip}
+                            value={ZipCode}
+                            maxLength={5}
+                            keyboardType="number-pad"
+                            onChangeText={newZipCode}
+                            onTextInput={() => checkZipValid()}
+                            placeholder="Zip"
+                        />
+                    </View>
+                <Text >{'\n'}{'\n'}{'\n'}</Text>
+                <TouchableOpacity 
+                    //disabled={!formComplete} //until everything is filled out, button is disabled.
+                    style={styles.signUpButton}
+                    onPress={handleCurrentClientPost}
+                >
+                    <Text style={styles.signUpText}>Save Changes</Text>
+                </TouchableOpacity>                
+            {/*testing stuff if all the fields are valid*/}
+            {/*StateValid && <Text >state valid is true</Text>  }
+            {/*CityValid && <Text >city valid is true</Text> /**/ }
+            {/*StreetAddressValid && <Text > address valid is true</Text> /**/ }
+            {/*ZipValid && <Text > zip valid is true</Text> /**/ }
+            </View>
+        </LinearGradient>
+    </>  
 )}
 
 const styles = StyleSheet.create({
