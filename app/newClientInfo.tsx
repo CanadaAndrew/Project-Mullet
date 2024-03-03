@@ -41,7 +41,6 @@ export default function newClientInfo() {
 
     const formComplete = StreetAddressValid && CityValid && StateValid && ZipValid;
 
-    //need to add to submit button when HTML is added and test
     //dummy data for testing purposes
     const user_ID = 10; //will need to be replaced with actual userID once ok'd from admin (ApprovalStatus in NewClients) -> do we need to check approval status?
     const strt = "1234 Main St";
