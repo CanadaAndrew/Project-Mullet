@@ -16,22 +16,24 @@ import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-lis
 import { Link } from 'expo-router';
 //import axios from 'axios';
 //import {initializeApp} from 'firebase/app';
+import { listOfStates } from './Enums/Enums';
 
 
+export default function newClientInfo() {
 
 //temp name, need to import the client's name from somewhere else
-const [firstName, newFirstName] = React.useState('Sam'); 
+const [firstName, newFirstName] = useState('Sam'); 
 const welcomeMessage = 'Congratulations ' + firstName + '! You’ve been approved as a new client. Fill in some additional info to complete your sign up process.';
 
-const [StreetAddress, newStreetAddress] = React.useState(''); 
-const [City, newCity] = React.useState('');
-const [State, newState] = React.useState(''); 
-const [ZipCode, newZipCode] = React.useState(''); 
+const [StreetAddress, newStreetAddress] = useState(''); 
+const [City, newCity] = useState('');
+const [State, newState] = useState(''); 
+const [ZipCode, newZipCode] = useState(''); 
 
-const [StreetAddressValid, setStreetAddressValid] =  React.useState(false);
-const [CityValid, setCityValid] = React.useState(false);
-const [StateValid, setStateValid] = React.useState(false); 
-const [ZipValid, setZipValid] = React.useState(false); 
+const [StreetAddressValid, setStreetAddressValid] =  useState(false);
+const [CityValid, setCityValid] = useState(false);
+const [StateValid, setStateValid] = useState(false); 
+const [ZipValid, setZipValid] = useState(false); 
 
 const formComplete = StreetAddressValid && CityValid && StateValid && ZipValid;
 
@@ -39,29 +41,33 @@ const formComplete = StreetAddressValid && CityValid && StateValid && ZipValid;
 function checkStreetAddressValid()
 {
     //Street addresses have lots of variences that regex doesn't cover, so using a address verifier would be preferable.
-    //but for now, we're using regex to check for special characters an address won't have
+    //but for now we're checking if length > 5
        
-    //setStreetAddressValid(/A-Za-z0-9'\.\-\s\./.test(StreetAddress) && StreetAddress.length > 5 ? true : false);
+    setStreetAddressValid(StreetAddress.length > 5 ? true : false);
 }
 
 function checkCityValid()
 {
-    //setCityValid(/A-Za-z0-9'\.\-\s\./.test(City) && City.length > 0 ? true : false);
+    //checks for regular characters only and that city length isn't 0
+    setCityValid(/^[a-zA-Z ]*$/.test(City) && City.length > 0 ? true : false);
 }
 
 function checkStateValid()
 {
-    //setStateValid(/A-Za-z0-9'\.\-\s\./.test(State) && State.length > 0 ? true : false);
+    //Checks with a list of states in enum.tsx, if State matches with anything on the list, then it's a valid state.
+    //Also accepts state abbreviations like CA and NV.
+    setStateValid(Object.values(listOfStates).includes(State) || listOfStates[State.toUpperCase()] ? true : false);
+    
 }
 function checkZipValid()
 {
-    //regex checks for numbers only
-   //setZipValid(/^[0-9]+$/.test(ZipCode) && State.length == 5 ? true : false);
+    //zip codes are 5 digits
+   setZipValid(ZipCode.length == 5 ? true : false);
 }
 
 
 
-export default function newClientInfo() {
+
     return (
 <>
 <LinearGradient locations={[0.7, 1]} colors={['#DDA0DD', 'white']} style={styles.container}>
@@ -76,16 +82,16 @@ export default function newClientInfo() {
    
 <TextInput
     style={styles.textField}
-    onChangeText={newStreetAddress}
     value={StreetAddress}
-    //onTextInput={() => checkStreetAddressValid}
+    onChangeText={newStreetAddress}
+    onTextInput={() => checkStreetAddressValid()}
     placeholder="Street Address"
                             />
  <Text style= {styles.textFieldHeader} >City</Text>
 <TextInput
     style={styles.textField}
     value={City}
-    onChangeText={() => newCity}
+    onChangeText={newCity}
     onTextInput={() => checkCityValid()}
     placeholder="City"
                             />
@@ -102,7 +108,7 @@ export default function newClientInfo() {
 <TextInput
     style={styles.textFieldState}
     value={State}
-    onChangeText={() =>newState}
+    onChangeText={newState}
     onTextInput={() => checkStateValid()}
     placeholder="State"
                             />
@@ -111,7 +117,9 @@ export default function newClientInfo() {
 <TextInput
     style={styles.textFieldZip}
     value={ZipCode}
-    onChangeText={() => newZipCode}
+    maxLength={5}
+    keyboardType="number-pad"
+    onChangeText={newZipCode}
     onTextInput={() => checkZipValid()}
     placeholder="Zip"
                             />
@@ -120,13 +128,18 @@ export default function newClientInfo() {
 
       <Text >{'\n'}{'\n'}{'\n'}</Text>
       <TouchableOpacity 
-                                disabled={formComplete} 
+                                disabled={!formComplete} //until everything is filled out, button is disabled.
                                 style={styles.signUpButton}
                                 //onPress={}
                                 >
                                 <Text style={styles.signUpText}>Save Changes</Text>
                             </TouchableOpacity>
-
+                            
+{/*testing stuff if all the fields are valid*/}
+{/*StateValid && <Text >state valid is true</Text>  }
+{/*CityValid && <Text >city valid is true</Text> /**/ }
+{/*StreetAddressValid && <Text > address valid is true</Text> /**/ }
+{/*ZipValid && <Text > zip valid is true</Text> /**/ }
 </View>
 </LinearGradient>
 </>  
