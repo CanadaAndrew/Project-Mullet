@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
     StatusBar,
     StyleSheet,
@@ -10,22 +12,54 @@ import {
     Image,
     TextInput
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Link } from 'expo-router';
-import React from 'react';
-import MyCalendar from './MyCalendar';
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
-import { useNavigation } from '@react-navigation/native';
+import { Link } from 'expo-router';
+//import axios from 'axios';
+//import {initializeApp} from 'firebase/app';
+
 
 
 //temp name, need to import the client's name from somewhere else
 const [firstName, newFirstName] = React.useState('Sam'); 
+const welcomeMessage = 'Congratulations ' + firstName + '! You’ve been approved as a new client. Fill in some additional info to complete your sign up process.';
+
 const [StreetAddress, newStreetAddress] = React.useState(''); 
 const [City, newCity] = React.useState('');
 const [State, newState] = React.useState(''); 
 const [ZipCode, newZipCode] = React.useState(''); 
 
-const welcomeMessage = 'Congratulations ' + firstName + '! You’ve been approved as a new client. Fill in some additional info to complete your sign up process.';
+const [StreetAddressValid, setStreetAddressValid] =  React.useState(false);
+const [CityValid, setCityValid] = React.useState(false);
+const [StateValid, setStateValid] = React.useState(false); 
+const [ZipValid, setZipValid] = React.useState(false); 
+
+const formComplete = StreetAddressValid && CityValid && StateValid && ZipValid;
+
+
+function checkStreetAddressValid()
+{
+    //Street addresses have lots of variences that regex doesn't cover, so using a address verifier would be preferable.
+    //but for now, we're using regex to check for special characters an address won't have
+       
+    //setStreetAddressValid(/A-Za-z0-9'\.\-\s\./.test(StreetAddress) && StreetAddress.length > 5 ? true : false);
+}
+
+function checkCityValid()
+{
+    //setCityValid(/A-Za-z0-9'\.\-\s\./.test(City) && City.length > 0 ? true : false);
+}
+
+function checkStateValid()
+{
+    //setStateValid(/A-Za-z0-9'\.\-\s\./.test(State) && State.length > 0 ? true : false);
+}
+function checkZipValid()
+{
+    //regex checks for numbers only
+   //setZipValid(/^[0-9]+$/.test(ZipCode) && State.length == 5 ? true : false);
+}
+
+
 
 export default function newClientInfo() {
     return (
@@ -42,17 +76,17 @@ export default function newClientInfo() {
    
 <TextInput
     style={styles.textField}
-    value={StreetAddress}
     onChangeText={newStreetAddress}
-    //onTextInput={() => checklastNameValid()}
+    value={StreetAddress}
+    //onTextInput={() => checkStreetAddressValid}
     placeholder="Street Address"
                             />
  <Text style= {styles.textFieldHeader} >City</Text>
 <TextInput
     style={styles.textField}
     value={City}
-    onChangeText={newCity}
-    //onTextInput={() => checklastNameValid()}
+    onChangeText={() => newCity}
+    onTextInput={() => checkCityValid()}
     placeholder="City"
                             />
 
@@ -68,8 +102,8 @@ export default function newClientInfo() {
 <TextInput
     style={styles.textFieldState}
     value={State}
-    onChangeText={newState}
-    //onTextInput={() => checklastNameValid()}
+    onChangeText={() =>newState}
+    onTextInput={() => checkStateValid()}
     placeholder="State"
                             />
 
@@ -77,8 +111,8 @@ export default function newClientInfo() {
 <TextInput
     style={styles.textFieldZip}
     value={ZipCode}
-    onChangeText={newZipCode}
-    //onTextInput={() => checklastNameValid()}
+    onChangeText={() => newZipCode}
+    onTextInput={() => checkZipValid()}
     placeholder="Zip"
                             />
 
@@ -86,7 +120,7 @@ export default function newClientInfo() {
 
       <Text >{'\n'}{'\n'}{'\n'}</Text>
       <TouchableOpacity 
-                                //disabled={formComplete} 
+                                disabled={formComplete} 
                                 style={styles.signUpButton}
                                 //onPress={}
                                 >

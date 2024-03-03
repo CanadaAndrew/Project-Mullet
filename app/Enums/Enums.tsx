@@ -31,6 +31,8 @@ const monthsWritten = {
     December: 'December'
 }
 
+
+
 const SERVICES = {
     KIDS_HAIRCUT: {service: "Kid's Haircut", time: 1},
     MENS_HAIRCUT: {service: "Men's Haircut", time: 1},
