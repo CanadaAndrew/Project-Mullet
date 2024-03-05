@@ -1,6 +1,9 @@
+//I copy and pasted Cameron's code from DT-5 so that I could test
+//The two files should be nearly identical, so hopefully there won't be too many issues merging
+
+
 //It was necessary to name this as a JS file due to TS having an error reading captchas
-import firebase from "firebase/app";
-import { getAuth, RecaptchaVerifier } from "firebase/auth";
+import {initializeApp} from 'firebase/app';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -17,11 +20,9 @@ const firebaseConfig = {
     measurementId: "G-ZSHM08TW82"
 };
 
-// Initialize Firebase
+// Initialize Firebase with the config we copy/pasted from our account
 const firebase = initializeApp(firebaseConfig);
-const auth = getAuth();
-//Sets the default language to the system's default
-auth.languageCode = 'it';
-
-export {auth};
+//this firebase variable is important. Use it to initialize all the Firebase services, such as Authentication
+//by calling the let auth = getAuth(firebase); and passing it this firebase variable.
+//the different services are listed on the Firebase website if we have a need for them.
 export default firebase;
