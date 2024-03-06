@@ -642,6 +642,15 @@ app.put('/confirmAppointment', (req, res) => {
     .catch((err) => console.log(err));
 })
 
+app.get('/findEmailByPhoneNumber', (req, res) =>{
+    const queryPhoneNumber = req.query.PhoneNumber;
+    const query = "SELECT Email FROM Users WHERE PhoneNumber = '" + queryPhoneNumber + "';";
+    console.log(query);
+    customQuery(query)
+    .then((ret) => res.send(ret))
+    .catch(() => res.send("error"));
+})
+
 app.get('/findUserByID', (req, res) =>{
     const queryId = req.query.Id;
     const query = "SELECT * FROM Users WHERE UserID = " + queryId + ";";

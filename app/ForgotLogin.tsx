@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View, TextInput, ImageBackground} from 'react-native';
+import { StyleSheet, Text, View, TextInput, ImageBackground,} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import React, {useState} from 'react';
+import axios from 'axios';
 
 //Declaring Window as a global variable to be accessed
 declare global {
@@ -12,19 +13,48 @@ declare global {
   
 export default function ForgotLogin(){
 
+    const database = axios.create({
+        baseURL: 'http://10.0.0.192:3000', //Andrew pc local
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+    })
+    
+    const [rawNum, setNum] = useState('');
     // error msg if wrong login info is put in
     const [loginError, loginErrorMsg] = useState('');
-    const onClickLogin = () => {
-        loginErrorMsg('Your email or phone number \n do not match any existing accounts \n please try again.');
+    const onClickLogin = async () => {
+        let email = rawNum;
+        if(rawNum.length == 12){
+            alert(rawNum);
+            database.get('/findEmailByPhoneNumber', {
+                params: {
+                    PhoneNumber : rawNum,
+                }
+            })
+            .then((ret) => {
+                email = ret.data[0].Email;
+                loginErrorMsg(email);
+            });
+        }
+        else if(rawNum.includes("@")){
+            email = rawNum;
+            loginErrorMsg(email);
+        }
+        else{
+            loginErrorMsg('Your email or phone number \n do not match any existing accounts \n please try again.');
+            return;
+        }
+        //Send reset email todo here
     }
 
     // put user input into phone number format
-    const [rawNum, setNum] = useState('');
+    
     const formattingPhoneNumber = (input) => {
         if (/^\d*$/.test(input)){
             if (input.length <=10){
-                return input.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+                return input.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
             }
+        }else{
+            return input
         }
     }
     const setPhoneNumFormat = (input) => { 
