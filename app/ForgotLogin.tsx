@@ -13,7 +13,7 @@ declare global {
     }
   }
   
-export default function ForgotLogin(){
+export default function ForgotLogin({ navigation }){
 
     const auth = getAuth(firebase);
     auth.languageCode = 'en';
@@ -45,6 +45,8 @@ export default function ForgotLogin(){
             email = rawNum;
             await sendPasswordResetEmail(auth, email);
             loginErrorMsg('Password reset email send. Please checm your inbox.');
+            // For noe goes to HomeScreen cause LoginPage doesnt exist yet in this branch
+            navigation.navigate('HomeScreen');
         }
         else{
             loginErrorMsg('Your email or phone number \n do not match any existing accounts \n please try again.');
