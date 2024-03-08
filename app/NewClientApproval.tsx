@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, FlatList, TouchableOpacity, Dimensions, SafeAreaView, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, {useEffect} from 'react';
 import axios from 'axios';
 
 export default function NewClientApproval() {
@@ -9,7 +9,8 @@ export default function NewClientApproval() {
     const database = axios.create({
         //baseURL: 'http://10.0.0.119:3000',  // Wilson local
         //baseURL: 'http://10.0.0.192:3000',
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://10.0.0.14:3000', //Cameron Local
     })
 
     const [first, setFirst] = React.useState(0);
@@ -19,10 +20,11 @@ export default function NewClientApproval() {
         email: string;
         phoneNumber: string;
         service: string;
+        ID: string;
     }
 
     //dummy data for testing
-    const dummyClients: Client[] = [
+    /*const dummyClients: Client[] = [
         {
             name: 'John Doe',
             email: 'john@doe.com',
@@ -35,12 +37,15 @@ export default function NewClientApproval() {
             phoneNumber: '123-456-7890',
             service: 'Nails'
         }
-    ];
-    const [newClient, setNewClient] = React.useState(dummyClients); //set to dummyClients for testing
+    ];*/
+    const [newClient, setNewClient] = React.useState([]); //set to dummyClients for testing
     //let defaultClient: Client[] = [];
     //const [newClient, setNewClient] = React.useState(defaultClient);
-    firstUpdate();
-
+    useEffect(() => {
+        updateClient();
+    }, [])
+     //old code replaced with useEffect Hook ^^^
+    /*firstUpdate();
     async function firstUpdate() {
         if (first === 0) {
             setFirst(1);
@@ -48,18 +53,20 @@ export default function NewClientApproval() {
             //updateClient(1, name); //Note that currently using ID 1 until the use of UserID transfer comes in
             updateClient(5);
         }
-    }
-    function updateClient(userID) {
+    }*/
+
+    function updateClient() {
         let data;
         database.get('/customQuery', {
             params: {
-                query: 'SELECT ServicesWanted.ServiceName, NewClientView.FirstName, NewClientView.MiddleName, NewClientView.LastName, NewClientView.Email, NewClientView.PhoneNumber, NewClientView.ApprovalStatus FROM ServicesWanted INNER JOIN NewClientView ON ServicesWanted.UserID = NewClientView.UserID WHERE ApprovalStatus = 1;'
+                query: 'SELECT ServicesWanted.ServiceName, NewClientView.FirstName, NewClientView.MiddleName, NewClientView.LastName, NewClientView.Email, NewClientView.PhoneNumber, NewClientView.ApprovalStatus, NewClientView.UserID FROM ServicesWanted INNER JOIN NewClientView ON ServicesWanted.UserID = NewClientView.UserID WHERE ApprovalStatus = 1;'
             }
         })
             .then((ret) => data = ret.data)
             .then(() => { updateClientDisplay(data) })
             .catch(() => { alert("error"); });
     }
+
     function updateClientDisplay(data) {
         //alert("Here is the data: " + JSON.stringify(data));
         let clientList: Client[] = [];
@@ -69,7 +76,8 @@ export default function NewClientApproval() {
                 name: getFullName(client.FirstName, client.MiddleName, client.LastName),
                 email: client.Email,
                 phoneNumber: client.PhoneNumber,
-                service: client.ServiceName
+                service: client.ServiceName,
+                ID: client.UserID
             }
             clientList[i] = newClient;
             i += 1;
@@ -77,6 +85,7 @@ export default function NewClientApproval() {
         setNewClient(clientList);
         //alert("Upcoming List: " + JSON.stringify(appointmentList));
     }
+
     function getFullName(firstName, middleName, lastName) {
         //alert("The name is: " + JSON.stringify(name.data[0].FirstName));
         if (middleName == null) {
@@ -91,6 +100,17 @@ export default function NewClientApproval() {
         console.log(client.name + " Declined"); //for testing purposes
         alert(`${client.name} is Declined`);
         const updatedClients = newClient.filter((person) => person.name !== client.name);  //remove declined client from list
+        setNewClient(updatedClients);
+    }
+    
+    const handleAcceptClient = async (client) => {
+        database.put('/updateClientApproval', null, {
+            params: {
+                userID: client.ID
+            }
+        });
+        alert(`${client.name} has been accepted`);
+        const updatedClients = newClient.filter((person) => person.name !== client.name);
         setNewClient(updatedClients);
     }
 
@@ -130,7 +150,8 @@ export default function NewClientApproval() {
                                     </View>
                                     <View style={styles.buttonContainer}>
                                         <TouchableOpacity
-                                            style={styles.buttonStyling}>
+                                            style={styles.buttonStyling}
+                                            onPress={() => handleAcceptClient(item)}>
                                             <Text style={styles.buttonText}>Accept</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity

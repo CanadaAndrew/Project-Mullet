@@ -240,7 +240,7 @@ async function customQuery(queryString){
 //Takes the formatted date, time, and userID and updates the appointment so it is taken.
 async function updateAppointment(date, time, userID, type){
     try {
-        var poolConnection = await connect();
+        var poolConnection = await connect();//
         let query = 'UPDATE Appointments SET VacancyStatus = 1, UserID = \''+ userID + '\', TypeOfAppointment = \''+ type + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'';
         await poolConnection.request().query('UPDATE Appointments SET VacancyStatus = 1, UserID = \''+ userID + '\' WHERE AppointmentDate = '+'\''+date+' '+time+'\'');
         console.log(query);
@@ -415,6 +415,23 @@ async function QueryAppointmentByDaySelectedAndVacancy(beginDay, endDay)
     {
         const poolConnection = await connect();
         const query = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + beginDay + "' AND AppointmentDate <= '" + endDay + "' AND VacancyStatus = 0;";
+        const resultSet = await poolConnection.request().query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    }
+    catch(err)
+    {
+        console.error(err.message);
+        throw err;
+    }
+}
+
+async function UpdateClientApproval(userID)
+{
+    try
+    {
+        const poolConnection = await connect();
+        const query = "UPDATE NewClients SET ApprovalStatus = 0 WHERE UserID = " + userID + ";"
         const resultSet = await poolConnection.request().query(query);
         poolConnection.close();
         return sortingResults(resultSet);
@@ -743,7 +760,7 @@ app.get('/queryAppointmentByDaySelectedAndVacancy', async (req, res) =>{
         const endDay = req.query.endDay;
         if(!beginDay)
         {
-            throw new Error("Invalid request. Missin 'beginDay'")
+            throw new Error("Invalid request. Missing 'beginDay'")
         }
         if(!endDay)
         {
@@ -757,6 +774,24 @@ app.get('/queryAppointmentByDaySelectedAndVacancy', async (req, res) =>{
         res.status(400).send('Bad Request');
     }
 });
+
+app.put('/updateClientApproval', async (req, res) =>{
+    try
+    {
+        const userID = req.query.userID;
+        if(!userID)
+        {
+            throw new Error("Invalid request. Missing 'UserID'")
+        }
+        const result = await UpdateClientApproval(userID);
+        res.send(result);
+    }
+    catch
+    {
+        res.status(400).send('Bad Request');
+    }
+    
+})
 
 //This opens the server, printing to console 'up' when it is up.
 const PORT = process.env.PORT || 3000;
