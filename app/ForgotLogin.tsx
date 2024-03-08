@@ -3,6 +3,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import React, {useState} from 'react';
 import axios from 'axios';
+import firebase from './Firebase';
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 
 //Declaring Window as a global variable to be accessed
 declare global {
@@ -13,9 +15,13 @@ declare global {
   
 export default function ForgotLogin(){
 
+    const auth = getAuth(firebase);
+    auth.languageCode = 'en';
+
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000', //Andrew pc local
+        //baseURL: 'http://10.0.0.192:3000', //Andrew pc local
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://10.0.0.133:3000',
     })
     
     const [rawNum, setNum] = useState('');
@@ -37,7 +43,8 @@ export default function ForgotLogin(){
         }
         else if(rawNum.includes("@")){
             email = rawNum;
-            loginErrorMsg(email);
+            await sendPasswordResetEmail(auth, email);
+            loginErrorMsg('Password reset email send. Please checm your inbox.');
         }
         else{
             loginErrorMsg('Your email or phone number \n do not match any existing accounts \n please try again.');
