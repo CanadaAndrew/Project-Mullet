@@ -19,9 +19,9 @@ export default function ForgotLogin({ navigation }){
     auth.languageCode = 'en';
 
     const database = axios.create({
-        //baseURL: 'http://10.0.0.192:3000', //Andrew pc local
+        baseURL: 'http://10.0.0.192:3000', //Andrew pc local
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
-        baseURL: 'http://10.0.0.133:3000',
+        //baseURL: 'http://10.0.0.133:3000',
     })
     
     const [rawNum, setNum] = useState('');
@@ -30,22 +30,23 @@ export default function ForgotLogin({ navigation }){
     const onClickLogin = async () => {
         let email = rawNum;
         if(rawNum.length == 12){
-            alert(rawNum);
             database.get('/findEmailByPhoneNumber', {
                 params: {
                     PhoneNumber : rawNum,
                 }
             })
-            .then((ret) => {
+            .then(async (ret) => {
                 email = ret.data[0].Email;
-                loginErrorMsg(email);
-            });
+                await sendPasswordResetEmail(auth, email);
+                loginErrorMsg('Password reset email send. Please check your inbox.');
+            })
+            .catch(() => alert("error"));
         }
         else if(rawNum.includes("@")){
             email = rawNum;
             await sendPasswordResetEmail(auth, email);
-            loginErrorMsg('Password reset email send. Please checm your inbox.');
-            // For noe goes to HomeScreen cause LoginPage doesnt exist yet in this branch
+            loginErrorMsg('Password reset email send. Please check your inbox.');
+            // For now goes to HomeScreen cause LoginPage doesnt exist yet in this branch
             navigation.navigate('HomeScreen');
         }
         else{
