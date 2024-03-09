@@ -22,6 +22,7 @@ import { getAuth, createUserWithEmailAndPassword  } from "firebase/auth";
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
+
 export default function SignUp({ navigation, route }) { // added route for page navigation
 
     //initializes the Authentication and gets a reference to the service
@@ -120,8 +121,7 @@ export default function SignUp({ navigation, route }) { // added route for page 
     {
         setconfirmPasswordValid(password == confirmPassword ? true : false)
     }
-      
-    
+     
     //options for drop down menu
     const hairOptions = [
         { key: ' Mens Haircut', value: ' Mens Haircut' },
@@ -283,7 +283,6 @@ export default function SignUp({ navigation, route }) { // added route for page 
             navigation.navigate("Login")
         }
     }
-
     return (
         <>
             <StatusBar backgroundColor={'black'} />

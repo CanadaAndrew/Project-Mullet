@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View, Pressable, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Pressable, FlatList, Button } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState, } from 'react';
 import { Link } from 'expo-router';
 import { SelectList } from 'react-native-dropdown-select-list';
 import axios from 'axios'; //used to get data from the backend nodejs
 import moment from 'moment-timezone';
+import { TextInput } from 'react-native-gesture-handler';
+import { text } from 'express';
         
 export default function ClientHistory() {
 
@@ -58,10 +60,13 @@ export default function ClientHistory() {
     let filteredAps: Appointment[] = [];
 
     const database = axios.create({
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://10.0.0.133:3000', //Adrian's local pc
     });
     const [upcomingClientAppointments, setUpcomingClientAppointments] = useState([]);
     const [pastClientAppointments, setPastClientAppointments] = useState([]);
+
+    const [searchName, setSearchName] = useState('');
 
     //get today's date and convert it to PST
     const today = new Date();
@@ -210,9 +215,42 @@ export default function ClientHistory() {
         }
     }
 
+    const handleNameSearch = async () => {
+
+        console.log(pastClientAppointments);
+        console.log(searchName);
+
+        try {
+
+            const filteredAppointments = pastClientAppointments.filter(appointment => {
+                const clientName = `${appointment.FirstName} ${appointment.LastName}`.toLowerCase();
+                //console.log("Client Name");
+                //console.log(clientName);
+                //console.log('clientname: ', clientName);
+                return clientName.includes(searchName.toLowerCase());
+            });
+
+            setPastClientAppointments(filteredAppointments);
+            console.log("Filtered Appointments");
+            console.log(pastClientAppointments);
+            console.log(filteredAppointments);
+
+        } catch (error) {
+            console.error("Error filtering past appointments by name", error);
+        }
+
+    };
+
+    //Tester for checking appointment filter
+    const renderAppointmentText = () => {
+        return pastClientAppointments.map((appointment, index) => (
+            <p key = {index}>{appointment}</p>
+        ));
+    };
+
     useEffect(() => {
-        //console.log('pastClientAppointments: ', pastClientAppointments); //for debugging
-        //console.log('upcomingClientAppointments: ', upcomingClientAppointments); //for debugging
+        console.log('pastClientAppointments: ', pastClientAppointments); //for debugging
+        console.log('upcomingClientAppointments: ', upcomingClientAppointments); //for debugging
     }, [pastClientAppointments, upcomingClientAppointments]);
 
     return (
@@ -305,7 +343,39 @@ export default function ClientHistory() {
                             onSelect={() => handleSelection(selected)}
                         />
                     </View>
+                    <View style = {styles.appointBox}>
+                        <View style = {styles.textAlignment}>
 
+                                <TextInput
+                                    value={searchName}
+                                    onChangeText={text => setSearchName(text)}
+                                    placeholder="Enter Name"
+                                    style = {styles.textInput}
+                                />
+                                <Button
+                                    title = "Search"
+                                    onPress={handleNameSearch}
+                                    color = "#942989"
+                                />
+
+                        </View>
+                    </View>
+                    <View>
+                        <Text>Filtered Past Appointments:</Text>
+                    </View>
+
+                    {/*<FlatList
+                        data = {pastClientAppointments}
+                        renderItem = {({ item }) => (
+                            <View>
+                                <Text>Customer: {item.FirstName} {item.LastName}</Text>
+                                <Text>Service: {item.TypeOfAppointment}</Text>
+                                <Text>Date: {item.AppointmentDate.substring(0, 10)}</Text>
+                                <Text>Time: {item.AppointmentDate.substring(11, 16)}</Text>
+                            </View>
+                        )}
+                        keyExtractor={(item, index) => index.toString()}
+                    /> */}
                     {/* flat list is replacing the hard coded list from before as this can work with database data and print out the entire list at once */}
                     <FlatList
                         data={pastClientAppointments}
@@ -406,6 +476,13 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.5,
         shadowRadius: 3
+    },
+    textInput: {
+        flex: 1,
+        paddingHorizontal: 10,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 10,
+        marginRight: 10,
     },
     backButtonText: {
         color: 'white',

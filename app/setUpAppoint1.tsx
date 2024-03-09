@@ -33,21 +33,22 @@ export default function setUpAppoint1({navigation, route}) { // add navigation t
 
     //options for drop down menu
     const hairOptions = [
-        {key: ' Mens Haircut', value: ' Mens Haircut'},
-        {key: ' Womens Haircut', value: ' Womens Haircut'},
-        {key: ' Kids Haircut', value: ' Kids Haircut'},
-        {key: ' Partial Highlight', value: ' Partial Highlight'},
-        {key: ' Full Highlight', value: ' Full Highlight'},
-        {key: ' Root Touch Up', value: ' Root Touch Up'},
-        {key: ' Full Color', value: ' Full Color'},
-        {key: ' Extension Consultation', value: ' Extension Consultation'},
-        {key: ' Extension Installation', value: ' Extension Installation'},
-        {key: ' Extension Move-Up', value: ' Extension Move-Up'},
-        {key: ' Make-Up', value: ' Make-Up'},
-        {key: ' Special Occasion Hairstyle', value: ' Special Occasion Hairstyle'},
-        {key: ' Perm', value: ' Perm'},
-        {key: ' Deep Conditioning Treatment', value: ' Deep Conditioning Treatment'},
-        {key: ' Blow Dry and Style', value: 'Blow Dry and Style'}
+        {key: 'MENS_HAIRCUT', value: 'Mens Haircut'},
+        {key: 'WOMANS_HAIRCUT', value: 'Womens Haircut'},
+        {key: 'KIDS_HAIRCUT', value: 'Kids Haircut'},
+        {key: 'PARTIAL_HIGHLIGHT', value: 'Partial Highlight'},
+        {key: 'FULL_HIGHLIGHT', value: 'Full Highlight'},
+        {key: 'ROOT_TOUCH_UP', value: 'Root Touch Up'},
+        {key: 'FULL_COLOR', value: 'Full Color'},
+        {key: 'EXTENSION_CONSULTATION', value: 'Extension Consultation'},
+        {key: 'EXTENSION_INSTALLATION', value: 'Extension Installation'},
+        {key: 'EXTENSION_MOVE_UP', value: 'Extension Move-Up'},
+        {key: 'MAKEUP', value: 'Make-Up'},
+        {key: 'SPECIAL_OCCASION_HAIRSTYLE', value: 'Special Occasion Hairstyle'},
+        {key: 'PERM', value: 'Perm'},
+        {key: 'DEEP_CONDITIONING_TREATMENT', value: 'Deep Conditioning Treatment'},
+        {key: 'BLOW_DRY_AND_STYLE', value: 'Blow Dry and Style'},
+        {key: 'WAXING', value: 'Waxing'}
     ];
         
     /*I have genuinely no idea why this function is needed*/
@@ -106,7 +107,7 @@ export default function setUpAppoint1({navigation, route}) { // add navigation t
                         dropdownStyles = {{backgroundColor:'white'}}
                         badgeStyles = {styles.badgeStyle}
                         maxHeight = {270}
-                        save = 'value'
+                        save = 'key'
                         search = {false}
                         label = "Hair Options"
                         placeholder = "Hair Options"
@@ -140,9 +141,10 @@ export default function setUpAppoint1({navigation, route}) { // add navigation t
                         style={styles.appointmentButton}
                         onPress={() => {
                             const selectedDates = calendarContainerRef.current?.markedDates;
-                            navigation.navigate('setupAppointment2', { 
+                            navigation.navigate('setupAppointment2', {
                             hairStyleData: hairStyleSelected.join(', '),
                             dateData: selectedDates.join(', '),
+                            userData,
                             });
                             }}>
                         <Text style={styles.appointButtonText}>Schedule Appointment</Text>

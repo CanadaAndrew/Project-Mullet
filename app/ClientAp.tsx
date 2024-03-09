@@ -123,12 +123,20 @@ export default function ClientAp({ route }){
     async function updateAppointmentsDisplay(data){
         let appointmentList : Appointment[] = [];
         let i = 0;
+        const promises = [];
+        let names = [];
         data.forEach(async (appointment) => {
             let dateTimeArray = appointment.AppointmentDate.split("T");
             let newDate = dateTimeArray[0];
             let newTime = dateTimeArray[1].split("Z")[0];
+            if(names[appointment.UserID] == null){
+                let name = getName(appointment.UserID);
+                promises.push(name);
+                names[appointment.UserID] = name;
+            }
+            let completeName = await names[appointment.UserID]; 
             let newAppointment : Appointment = {
-                name: appointment.UserID,
+                name: completeName,
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
@@ -138,27 +146,28 @@ export default function ClientAp({ route }){
             i++;
         }
         )
+        await Promise.all(promises);
         setClientAppointments(appointmentList);
-        const prevSelect = selected;
-        setSelected("Adding new Info");
-        handleSelection(selected);
-        setSelected(prevSelect);
-        handleSelection(selected);
+        handleSelection(selected, appointmentList);
     }
 
     //Work on another sprint. Query for name instead of having userID as name.
-    function getName(userID){
-        database.get('/findCurrentClientFullNameByID', {
+    async function getName(userID){
+        let name = await database.get('/findCurrentClientFullNameByID', {
             params: {
                 queryId : userID 
             }
         })
-        .then()
+        if(name.data[0].MiddleName == null){
+            return name.data[0].FirstName + " " + name.data[0].LastName;
+        }else{
+            return name.data[0].FirstName + " " + name.data[0].MiddleName + " " + name.data[0].LastName
+        }
     }
     //handleSelection is called whenever a change is made in the drop down menu. It is passed the key value from the filter array above
     //it then decides which filtering option to use on the data based upon the key that it is passed in this function
     //it modifies the filteredAps global array and passes it back to the flatlist down below and the flatlist displays what was filtered
-    function handleSelection(selected) {
+    function handleSelection(selected, clientAppointments) {
         let temp: Appointment[] = [];
         if(selected == 'All')
         {
@@ -215,9 +224,6 @@ export default function ClientAp({ route }){
             const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
 
-            //making another temp array
-            let temp: Appointment[] = [];
-            
             //filtering out appointments that aren't in this month
             temp = clientAppointments.filter((item) => {
                 return item.realDate >= firstDayOfMonth && item.realDate <= lastDayOfMonth;
@@ -225,14 +231,13 @@ export default function ClientAp({ route }){
 
             //copies each value of temp into the global filteredAps array
             temp.forEach(val => filteredAps.push(Object.assign({}, val)));
-            
-            
+            setFilteredAps(temp);
         }
     }
 
     return(
       <ScrollView>
-        <LinearGradient 
+        <LinearGradient
         locations = {[0.7, 1]}
         colors = {['#EB73C9','white']}
         style = {styles.container}>
@@ -260,7 +265,7 @@ export default function ClientAp({ route }){
                     save = 'value'
                     search = {false}
                     defaultOption = {{key: 'All', value: 'All'}}
-                    onSelect = {() => handleSelection(selected) }
+                    onSelect = {() => handleSelection(selected, clientAppointments) }
                     
                 />
             </View>
