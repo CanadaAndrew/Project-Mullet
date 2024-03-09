@@ -142,10 +142,10 @@ export default function SignUp({ navigation, route }) { // added route for page 
     ];
 
     const database = axios.create({
-        //baseURL: 'http://10.0.0.192:3000'
+        baseURL: 'http://10.0.0.192:3000'
         //baseURL: 'http://10.0.0.199:3000',
         //baseURL: 'http://10.0.0.14:3000' Cameron's IP address for testing,
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
 
     //demo data for postNewUser function until Firebase authentication is set up
@@ -177,7 +177,6 @@ export default function SignUp({ navigation, route }) { // added route for page 
             //get the userID from response
             const userID = userResponse.data.userID;
             //console.log('userID', userID); //for testing
-
             //post to Clients -> must post to Clients before NewClients because of foreign key constraint
             await database.post('/newClientPost', {
                 /*userID: userID, //uses demo data
@@ -187,9 +186,9 @@ export default function SignUp({ navigation, route }) { // added route for page 
                 preferredWayOfContact: preferred_way_of_contact*/
                 userID: userID,
                 firstName: firstName,
-                //middleName: , //form info?
+                middleName: "filler", //form info?
                 lastName: lastName,
-                //preferredWayOfContact:  //form info?
+                preferredWayOfContact:"filler", //form info?
             });
             
             //post to NewClients

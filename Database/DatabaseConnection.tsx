@@ -581,7 +581,6 @@ app.post('/newUserPost', async (req, res) => {
 
         //create new user
         const newUser = await newUserPost(email, phoneNumber, pass, adminPrive);
-
         //send userID in response
         res.status(201).json({ userID: newUser.userID, message: 'User created successfully' });
     } catch (error) {
@@ -593,6 +592,11 @@ app.post('/newUserPost', async (req, res) => {
 app.post('/newClientPost', async (req, res) => {
     try {
         const { userID, firstName, middleName, lastName, preferredWayOfContact } = req.body;
+        console.log(userID)
+        console.log(firstName)
+        console.log(middleName)
+        console.log(lastName)
+        console.log(preferredWayOfContact)
         if (!userID || !firstName || !middleName || !lastName || !preferredWayOfContact) {
             throw new Error('Invalid request body. Missing "userID", "firstName", "middleName", "lastName", or "preferredWayOfContact".');
         }
@@ -800,8 +804,6 @@ app.get('/queryAdminPermissionsByUserID', (req, res) =>{
     const userID = req.query.userID;
     const query = "SELECT AdminPriv FROM Users WHERE UserID = " + userID +";";
     customQuery(query)
-    .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query))
     .then((ret) => res.send(ret))
     .catch(res.send("error"));
 })
