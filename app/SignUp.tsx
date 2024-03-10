@@ -15,11 +15,20 @@ import {
 import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
 import { Link } from 'expo-router';
 import axios from 'axios';
+//firebase imports VVV
+import firebase from './Firebase.js'
+import { getAuth, createUserWithEmailAndPassword  } from "firebase/auth";
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
 
-export default function SignUp({ route }) { // added route for page navigation
+
+export default function SignUp({ navigation, route }) { // added route for page navigation
+
+    //initializes the Authentication and gets a reference to the service
+    const auth = getAuth(firebase);
+    //sets the default language to the systems language
+    auth.languageCode = 'it';
 
     //useState for drop down menu
     const [selected, setSelected] = React.useState("");
@@ -33,6 +42,10 @@ export default function SignUp({ route }) { // added route for page navigation
         hairStyleSelected = temparr;
     }
 
+    /*useEffect(() => { //for testing purposes -> prints to console whenever lists are updated
+        console.log('hairStyleSelected', hairStyleSelected); //for testing purposes
+    }, [hairStyleSelected]);*/
+
     //using this dummy data because the dateData variable isn't working currently ^^^ keeps spitting out Monday, December 4th, 2023
     let dateChosen = 'Mon, 04 December 2023';
 
@@ -44,6 +57,71 @@ export default function SignUp({ route }) { // added route for page navigation
     const [password, newPassword] = React.useState('');
     const [confirmPassword, newConfirmPassword] = React.useState('');
 
+    //set length and character checks for text input fields
+    const [count, setCount] = useState(0);
+
+    
+    const [firstNameValid, setfirstNameValid] =  React.useState(false);
+    const [lastNameValid, setlastNameValid] =  React.useState(false);
+    const [emailValid, setemailValid] =  React.useState(false);
+    const [phoneNumberValid, setphoneNumberValid] =  React.useState(false);
+    const [passwordValid, setpasswordValid] =  React.useState(false);
+    const [confirmPasswordValid, setconfirmPasswordValid] =  React.useState(false);
+
+    //is everything filled out? if so, unlock the sign up button
+    const formComplete =  !(firstNameValid && lastNameValid && emailValid && phoneNumberValid && passwordValid && confirmPasswordValid && selected.length != 0); 
+
+    /*useEffect(() => { //for testing purposes -> prints to console whenever lists are updated
+        console.log('firstNameValid', firstNameValid); //for testing purposes
+        console.log('lastNameValid', lastNameValid); //for testing purposes
+        console.log('emailValid', emailValid); //for testing purposes
+        console.log('phoneNumberValid', phoneNumberValid); //for testing purposes
+        console.log('passwordValid', passwordValid); //for testing purposes
+        console.log('confirmPasswordValid', confirmPasswordValid); //for testing purposes
+        console.log('selected.length', selected.length); //for testing purposes
+    }, [firstNameValid, lastNameValid, emailValid, phoneNumberValid, passwordValid, confirmPasswordValid, selected.length]);*/
+
+    //check() functions set the letter/number/length requirement of each text field
+    //TODO: determine each requirement for each field 
+    function checkfirstNameValid()
+    {
+        setfirstNameValid(firstName.length>0 ? true : false);
+    }
+
+    function checklastNameValid()
+    {
+        setlastNameValid(lastName.length>0 ? true : false);
+    }
+
+    function checkemailValid()
+    {
+        //reg expression checks for ---@---.--- format
+        setemailValid(/\S+@\S+\.\S+/.test(email)); 
+    }
+
+    function checkphoneNumberValid()
+    {
+        //add dashes to maintain ###-###-#### format
+        if(phoneNumber.length == 3 || phoneNumber.length == 7) 
+        {
+            newPhoneNumber(phoneNumber + '-');
+        }
+
+        //13 to account for international phones
+        setphoneNumberValid(phoneNumber.length == 12 || phoneNumber.length == 13 ? true : false);
+       
+    }
+    function checkpasswordValid()
+    {
+        //if the password contains numbers and letters and is 8 chars or more in length...
+        if(password.match(/^[A-Za-z0-9]*$/))
+            setpasswordValid(password.length > 7 ? true : false);
+    }
+    function checkconfirmPasswordValid()
+    {
+        setconfirmPasswordValid(password == confirmPassword ? true : false)
+    }
+     
     //options for drop down menu
     const hairOptions = [
         { key: ' Mens Haircut', value: ' Mens Haircut' },
@@ -64,11 +142,147 @@ export default function SignUp({ route }) { // added route for page navigation
     ];
 
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000'
+        //baseURL: 'http://10.0.0.192:3000'
         //baseURL: 'http://10.0.0.199:3000',
-        //baseURL: 'http://10.0.0.14:3000' Cameron's IP address for testing
+        //baseURL: 'http://10.0.0.14:3000', // Cameron's IP address for testing
+        baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
 
+    //demo data for postNewUser function until Firebase authentication is set up
+    /*const e_mail = 'joeshmoe@anywhere.com';
+    const phone_number = '5555555555';
+    const pass_word = 'JoesPassword';
+    const admin_priv = 0; //no admin privileges
+    const first_name = 'Joe';
+    const middle_name = 'Sh';
+    const last_name = 'Moe';
+    const preferred_way_of_contact = 'email';
+    const approval_status = 1; //not sure what 1 represents - Chris*/
+
+    //posts new user to the database, assumes user is verified by firebase
+    const postNewUser = async () => {
+        try {
+            //post data for new user
+            const userResponse = await database.post('/newUserPost', {
+                /*email: e_mail, //uses demo data
+                phoneNumber: phone_number,
+                pass: pass_word,
+                adminPrive: admin_priv*/
+                email: email,
+                phoneNumber: phoneNumber,
+                pass: password,
+                adminPrive: 0
+            });
+                
+            //get the userID from response
+            const userID = userResponse.data.userID;
+            //console.log('userID', userID); //for testing
+            //post to Clients -> must post to Clients before NewClients because of foreign key constraint
+            await database.post('/newClientPost', {
+                /*userID: userID, //uses demo data
+                firstName: first_name,
+                middleName: middle_name,
+                lastName: last_name,
+                preferredWayOfContact: preferred_way_of_contact*/
+                userID: userID,
+                firstName: firstName,
+                middleName: "filler", //form info?
+                lastName: lastName,
+                preferredWayOfContact:"filler", //form info?
+            });
+            
+            //post to NewClients
+            await database.post('/new_newClientPost', {
+                /*userID: userID, //uses demo data
+                approvalStatus: approval_status*/
+                userID: userID,
+                approvalStatus: 1 //not sure what 1 represents - Chris
+            });
+
+            //post to ServicesWanted
+            const servicePromises = hairStyleSelected.map(async (service)=> {
+                try {
+                    const serviceResponse = await database.post('/servicesWantedPost', {
+                        userID: userID,
+                        serviceName: service
+                    });
+                } catch (error) {
+                    console.error('Error posting services wanted:', error.serviceResponse.data);
+                }
+            });
+            await Promise.all(servicePromises); //wait for all services to be posted
+             
+            console.log('New user and related data posted successfully.');
+            alert('new account created successfully');
+        } catch (error) {
+            console.error('Error posting new user data:', error);
+            alert('problem with creating new account');
+        }
+    };
+
+    function newUserSignUp()
+    {
+        //password conditionals if these are both false move onto setting the 
+        if(password != confirmPassword)
+        {
+            alert("Passwords did not match. Please try again.")
+        }
+        else if(password == "" || confirmPassword == "")
+        {
+            alert("No password was entered. Please enter in a password.")
+        }
+        else
+        {
+            /*
+            IMPORTANT
+
+            We are going to talk with Melissa about using emails instead of Phone numbers for authentication
+            For some reason the phone number verification doesn't want to work and we've been trying but have only had
+            success with the email verification. We may implement this at a later date.
+            */
+            //if(phoneNumber != "")
+            //{
+                //not able to get the phone number verification to work. 
+                /*window.RecaptchaVerifier = new RecaptchaVerifier(auth, 'sign-in-button', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                    // reCAPTCHA solved, allow signInWithPhoneNumber.
+                    }
+                });*/
+            //}
+            //else
+            //{
+                createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.log(errorCode);
+                    console.log(errorMessage);
+                    return 1; //returns 1 on sign up fail so that way it doesn't post this user to the database
+                });
+            //}
+            return 0;
+        }
+        //returns 1 if something along the way messed up so it doesn't post the new user to the database
+        alert("Something went wrong. Please enter account information and try again2.")
+        return 1;
+    }
+
+    function handleSignUpPress()
+    {
+        //registers the user with Firebase first then if the function returns 0 meaning a successful user creation
+        //it will post the user to the database and route them back to the login page
+        let verify = newUserSignUp();
+
+        if(verify == 0)
+        {
+            postNewUser();
+            navigation.navigate("Login")
+        }
+    }
     return (
         <>
             <StatusBar backgroundColor={'black'} />
@@ -78,58 +292,66 @@ export default function SignUp({ route }) { // added route for page navigation
                 </View>
                 <LinearGradient locations={[0.8, 1]} colors={['#DDA0DD', 'white']} style={styles.linearGradientStyle}>
                     <View style={styles.body}>
-                        <View style = {styles.createAccountContainer}>
+                        <View style={styles.createAccountContainer}>
                             <Text style={styles.createAccountText}>Create an Account</Text>
                         </View>
-                        <View style = {styles.textFieldContainer}>
+                        <View style={styles.textFieldContainer}>
                             <TextInput
                                 style={styles.textField}
                                 value={firstName}
                                 onChangeText={newFirstName}
-                                placeholder = "First Name"
+                                onTextInput={() => checkfirstNameValid()}
+                                placeholder="First Name"
                             />
                             <TextInput
                                 style={styles.textField}
                                 value={lastName}
                                 onChangeText={newLastName}
-                                placeholder = "Last Name"
+                                onTextInput={() => checklastNameValid()}
+                                placeholder="Last Name"
                             />
                             <TextInput
                                 style={styles.textField}
                                 value={email}
                                 onChangeText={newEmail}
-                                placeholder = "Email"
+                                onTextInput={() => checkemailValid()}
+                                placeholder="Email"
                             />
                             <TextInput
                                 style={styles.textField}
                                 value={phoneNumber}
-                                onChangeText = {newPhoneNumber}
-                                placeholder = "Phone Number"
-                                keyboardType = "numeric"
-                                maxLength={11}  // putting 11 for now if international number
+                                onChangeText={newPhoneNumber}
+                                onTextInput={() => checkphoneNumberValid()}
+                                placeholder="Phone Number"
+                                keyboardType="numeric"
+                                maxLength={14}  // putting 14 for now if international number + added dashes , originally 11
                             />
                             <TextInput
                                 style={styles.textField}
+                                secureTextEntry={true}
                                 value={password}
-                                onChangeText = {newPassword}
-                                placeholder = "Password"
+                                onChangeText={newPassword}
+                                onTextInput={() => {checkpasswordValid(); checkconfirmPasswordValid()}} /*extra measure if user changes password*/
+                                placeholder="Password"
                             />
                             <TextInput
                                 style={styles.textField}
+                                secureTextEntry={true}
                                 value={confirmPassword}
-                                onChangeText = {newConfirmPassword}
-                                placeholder = "Confirm Password"
+                                onChangeText={newConfirmPassword}
+                                onTextInput={() => checkconfirmPasswordValid()}
+                                placeholder="Confirm Password"
                             />
                         </View>
-                        <View style = {styles.serviceContainer}>
+                        <View style={styles.serviceContainer}>
                             <MultipleSelectList
                                 setSelected={(val) => setSelected(val)}
                                 data={hairOptions}
 
                                 // styles
                                 boxStyles={styles.dropDown}
-                                inputStyles={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}
-                                labelStyles={{color: 'white', fontWeight: 'bold', textAlign: 'center' }}
+                                inputStyles={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}
+                                labelStyles={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}
                                 dropdownStyles={{
                                     backgroundColor: 'white',
                                     width: '85%'
@@ -144,8 +366,12 @@ export default function SignUp({ route }) { // added route for page navigation
                                 onSelect={() => handleHairSelection(selected)}
                             />
                         </View>
-                        <View style = {styles.signUpContainer}>
-                            <TouchableOpacity style={styles.signUpButton}>
+                        
+                        <View style={styles.signUpContainer}>
+                            <TouchableOpacity 
+                                disabled={formComplete}
+                                style={styles.signUpButton}
+                                onPress={handleSignUpPress}>
                                 <Text style={styles.signUpText}>Sign Up</Text>
                             </TouchableOpacity>
                         </View>
@@ -155,6 +381,17 @@ export default function SignUp({ route }) { // added route for page navigation
         </>
     );
 }
+
+//a bunch of checks to see if the text fields are being filled correctly.
+
+//{ firstNameValid && <Text> firstName is valid</Text> /*debugging*/ } 
+//{ lastNameValid && <Text> lastName is valid</Text> /*debugging*/ } 
+//{ emailValid && <Text> email is valid</Text> /*debugging*/ } 
+//{ phoneNumberValid && <Text> phone is valid</Text> /*debugging*/ } 
+//{ passwordValid && <Text> password is valid</Text> /*debugging*/ } 
+//{confirmPasswordValid && <Text>confirm password is valid</Text> /*debugging*/ }
+//{phoneNumber.length != 0 && <Text> phoneNumber length is: {phoneNumber.length} </Text>}
+//{selected.length != 0 && <Text> service/services selected </Text>}
 
 const styles = StyleSheet.create({
     container: {

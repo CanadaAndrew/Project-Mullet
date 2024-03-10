@@ -32,6 +32,14 @@ export default function NavigateHome(){
                 onPress={() => navigation.navigate("HomeScreen")}
             />
             <Button
+                title = "Forgot Login page"
+                onPress={() => navigation.navigate("ForgotLogin")}
+            />
+            <Button
+                title = "Login"
+                onPress={() => navigation.navigate("Login")}
+            />
+            <Button
                 title = "Client Appointment page Client View"
                 onPress={() => navigation.navigate("appointmentsClientView", {userData})}
             />
@@ -66,8 +74,16 @@ export default function NavigateHome(){
                     userData,
                     hairStyleData: "",
                     dataDate: ""
-                })}  
-            />
+                })}
+              />
+            <Button
+                title="New Client Approval page"
+                onPress={() => navigation.navigate("NewClientApproval", { userData })}
+             />
+            <Button
+                title = "Sign Up page"
+                onPress = {() => navigation.navigate("SignUp", {userData})}
+            
             
         </View>
     )
