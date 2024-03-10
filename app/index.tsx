@@ -14,6 +14,7 @@ import HomeScreen from './HomeScreen';
 import appointmentsClientView from './appointmentsClientView';
 import ClientHistory from './ClientHistory';
 import AboutMe from './AboutMe';
+import newClientInfo from './newClientInfo';
 import NewClientApproval from './NewClientApproval';
 import ForgotLogin from './ForgotLogin';
 import SignUp from './SignUp';
@@ -67,6 +68,7 @@ export default function index() {
             title: "Your Appointments"
            }}
          />
+         <Stack.Screen name = "newClientInfo" component={newClientInfo}/>
         <Stack.Screen name="NewClientApproval" component={NewClientApproval}
             options={{
                 title: "Client Approval"

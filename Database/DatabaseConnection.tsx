@@ -237,6 +237,7 @@ async function customQuery(queryString){
         console.error(err.message);
     }
 }
+
 //Takes the formatted date, time, and userID and updates the appointment so it is taken.
 async function updateAppointment(date, time, userID, type){
     try {
@@ -320,7 +321,9 @@ async function servicesWantedPost(userID, serviceName) {
 async function appointmentQuery(startDate, endDate, vacancyStatus){
     try {
         const poolConnection = await connect();
-        const query = `SELECT * FROM Appointments WHERE AppointmentDate>='${startDate}' AND AppointmentDate<='${endDate}' AND VacancyStatus=${vacancyStatus};`;
+        const query = `SELECT * FROM Appointments 
+            WHERE AppointmentDate>='${startDate}' AND AppointmentDate<='${endDate}' 
+                AND VacancyStatus=${vacancyStatus};`;
         const resultSet = await poolConnection.request()
             .query(query);
         poolConnection.close();
@@ -346,7 +349,21 @@ async function addAvailability(addDateTimeString, notBooked) {
     }
 }
 
-//removes an admin availability date/time from the database
+//add client to CurrentClients
+async function currentClientPost(userID, street, city, state, zip) {
+    try {
+        const poolConnection = await connect();
+        const query = `INSERT INTO CurrentClients (UserID, Street, City, StateAbbreviation, Zip)
+            VALUES (${userID}, '${street}', '${city}', '${state}', '${zip}');`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+        throw err; // rethrow error so it can be caught in calling code
+    }
+}
+
+//remove availability time slot
 async function removeAvailability(removeDateTimeString){
     try {
         const poolConnection = await connect();
@@ -396,7 +413,9 @@ async function appointmentPost(queryString, values){
 async function clientHistoryAppointmentsQuery(startDate, endDate){
     try {
         const poolConnection = await connect();
-        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate BETWEEN \'' + startDate + '\' AND \'' + endDate + '\'';
+        const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
+            FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
+            WHERE AppointmentDate BETWEEN \'' + startDate + '\' AND \'' + endDate + '\'`;
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -408,10 +427,13 @@ async function clientHistoryAppointmentsQuery(startDate, endDate){
     }
 }
 
+//gets all past appointments
 async function allPastAppointmentsQuery(todaysDate){
     try {
         const poolConnection = await connect();
-        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate < \'' + todaysDate + '\'';
+        const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
+            FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
+            WHERE AppointmentDate < \'' + todaysDate + '\'`;
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -423,10 +445,13 @@ async function allPastAppointmentsQuery(todaysDate){
     }
 }
 
+//gets all upcoming appointments
 async function allUpcomingAppointmentsQuery(todaysDate){
     try {
         const poolConnection = await connect();
-        const query = 'SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID WHERE AppointmentDate >= \'' + todaysDate + '\'';
+        const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
+            FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
+            WHERE AppointmentDate >= \'' + todaysDate + '\'`;
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -699,6 +724,32 @@ app.post('/servicesWantedPost', async (req, res) => {
         }
         await servicesWantedPost(userID, serviceName);
         res.status(201).send('Service wanted created successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post('/currentClientPost', async (req, res) => {
+    try {
+        const { userID, street, city, state, zip } = req.body;
+        if (!userID) {
+            throw new Error('Invalid request body. Missing "userID"');
+        }
+        if (!street) {
+            throw new Error('Invalid request body. Missing "street"');
+        }
+        if (!city) {
+            throw new Error('Invalid request body. Missing "city"');
+        }
+        if (!state) {
+            throw new Error('Invalid request body. Missing "state"');
+        }
+        if (!zip) {
+            throw new Error('Invalid request body. Missing "zip"');
+        }
+        await currentClientPost(userID, street, city, state, zip);
+        res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
