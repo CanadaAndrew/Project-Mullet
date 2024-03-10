@@ -83,7 +83,7 @@ export default function NavigateHome(){
             <Button
                 title = "Sign Up page"
                 onPress = {() => navigation.navigate("SignUp", {userData})}
-            
+            />
             
         </View>
     )
