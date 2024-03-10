@@ -69,6 +69,10 @@ export default function NavigateHome(){
                 })}  
             />
             <Button
+                title="New Client Approval page"
+                onPress={() => navigation.navigate("NewClientApproval", { userData })}
+             />
+            <Button
                 title = "Sign Up page"
                 onPress = {() => navigation.navigate("SignUp", {userData})}
             />
