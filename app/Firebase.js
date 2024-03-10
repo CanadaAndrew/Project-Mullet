@@ -1,7 +1,3 @@
-//I copy and pasted Cameron's code from DT-5 so that I could test
-//The two files should be nearly identical, so hopefully there won't be too many issues merging
-
-
 //It was necessary to name this as a JS file due to TS having an error reading captchas
 import {initializeApp} from 'firebase/app';
 

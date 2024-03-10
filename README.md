@@ -67,6 +67,11 @@ npm install express
 npm install cors
 npm install moment-timezone
 npm install @react-native-community/datetimepicker --save
+npm install firebase
+npm install @expo/vector-icons
+npm i react-native-vector-icons
+npm install firebase
+npm install @react-native-async-storage/async-storage
 ```
     
 ### Running the Program

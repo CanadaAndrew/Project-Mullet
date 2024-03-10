@@ -36,6 +36,10 @@ export default function NavigateHome(){
                 onPress={() => navigation.navigate("ForgotLogin")}
             />
             <Button
+                title = "Login"
+                onPress={() => navigation.navigate("Login")}
+            />
+            <Button
                 title = "Client Appointment page Client View"
                 onPress={() => navigation.navigate("appointmentsClientView", {userData})}
             />
@@ -63,6 +67,10 @@ export default function NavigateHome(){
                     hairStyleData: "",
                     dataDate: ""
                 })}  
+            />
+            <Button
+                title = "Sign Up page"
+                onPress = {() => navigation.navigate("SignUp", {userData})}
             />
             
         </View>
