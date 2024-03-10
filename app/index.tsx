@@ -14,6 +14,7 @@ import HomeScreen from './HomeScreen';
 import appointmentsClientView from './appointmentsClientView';
 import ClientHistory from './ClientHistory';
 import AboutMe from './AboutMe';
+import ForgotLogin from './ForgotLogin';
 import SignUp from './SignUp';
 import Login from './Login';
 
@@ -65,9 +66,26 @@ export default function index() {
             title: "Your Appointments"
            }}
          />
-         <Stack.Screen name = "ServicesOffered" component={ServicesOffered} />
-         <Stack.Screen name = "ClientHistory" component={ClientHistory} />
-         <Stack.Screen name = "AboutMe" component={AboutMe}/>
+         <Stack.Screen name = "ServicesOffered" component={ServicesOffered} 
+          options = {{
+            title: "Services Offered"
+          }}
+         />
+         <Stack.Screen name = "ClientHistory" component={ClientHistory} 
+          options = {{
+            title: "Client History"
+          }}
+         />
+         <Stack.Screen name = "AboutMe" component={AboutMe}
+          options = {{
+            title: "About Me"
+          }}
+         />
+         <Stack.Screen name = "ForgotLogin" component={ForgotLogin}
+          options = {{
+            title: "Forgot Login"
+          }}
+         />
          <Stack.Screen name="SignUp" component={SignUp}
             options={{
                 title: "Sign Up"
