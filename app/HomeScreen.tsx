@@ -6,20 +6,16 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 // button viewablility based on workflow in google drive green = new clients, blue = existing clients, and red = Admin with some 
 // overlap. comments have been added above each button for clarification.
 
-export default function HomeScreen({navigation}){
+export default function HomeScreen({route, navigation}){
 
   /*
     Creates a const of data to be sent to the other pages in the app
     You can add other consts or just add another variable to the existing userData const
   */
 
-  const userData = {
-
-    UserId: '1',
-    AdminPriv: true,
-    NewClient: false
-
-  };
+    const { userData } = route.params;
+    console.log('You are in the Home Screen Now!');
+    console.log('Proof', userData);
         
     return(
         <ScrollView>

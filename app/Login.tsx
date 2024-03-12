@@ -5,12 +5,14 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import React, {useState} from 'react';
 import firebase from './Firebase.js'  // import firebase
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import axios from 'axios';
   
 export default function Login({ route, navigation }) {
 
+    //test@fakemail.com
     const auth = getAuth(firebase);
     //sets the default language to the systems language
-    auth.languageCode = 'it';
+    auth.languageCode = 'en';
 
     //Variables to use for login info
     const [email, setEmail] = useState('');
@@ -19,7 +21,23 @@ export default function Login({ route, navigation }) {
     // error msg if wrong login info is put in
     const [loginError, loginErrorMsg] = useState('');
 
+    const database = axios.create({
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://10.0.0.133:3000',
+    });
+
+    const userData = {
+        userID: undefined, // You can omit this line, it will default to undefined
+        adminPriv: undefined, // You can omit this line, it will default to undefined
+        newClient: undefined // You can omit this line, it will default to undefined
+    };
+
+    const [Currentuser, setUser] = useState([]);
+      
+
     const onClickLogin = () => {
+
+        //console.log(email);
 
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
@@ -37,7 +55,11 @@ export default function Login({ route, navigation }) {
         //redeclare the variable and set the auth to the current user
         const user = auth.currentUser;
             if (user !== null) {
-                navigation.navigate("HomeScreen");
+                //console.log(email);
+                checkEmailExists(email);
+                console.log('Right Before Navigation');
+                console.log(userData);
+                navigation.navigate("HomeScreen", {userData});
             } else {
                 //Once branches are merged change this to route to the signup page
             }
@@ -65,6 +87,32 @@ export default function Login({ route, navigation }) {
     const setPhoneNumFormat = (input) => { 
         const formatPhoNum = formattingPhoneNumber(input); 
         setNum(formatPhoNum);
+    }
+
+    async function checkEmailExists(email) {
+        
+        try {
+
+            const response = await database.get('/queryCurrentUserFromEmail', {
+                params: {
+                    email: email
+                }
+            });
+            //userData.userID = response.data.UserID;
+            //setUser(response.data);
+            console.log('response', response.data); // For debugging
+            userData.userID = response.data[0].UserID;
+            userData.adminPriv = false;
+            userData.newClient = false;
+            console.log(userData);
+
+        } catch (error) {
+            //console.error('Error finding User from email: ', error);
+            userData.adminPriv = false;
+            userData.newClient = true;
+            console.log(userData);
+        }
+
     }
 
     return (
