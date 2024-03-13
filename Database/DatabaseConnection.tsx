@@ -187,6 +187,7 @@ async function queryCurrentClients(){
     }
 }
 
+
 async function queryNewClients(){
     try {
         var poolConnection = await connect();
@@ -427,6 +428,23 @@ async function clientHistoryAppointmentsQuery(startDate, endDate){
     }
 }
 
+async function queryCurrentUserFromEmail(email) {
+
+    try {
+        const poolConnection = await connect();
+        const query = `SELECT UserID FROM CurrentClientView WHERE Email = '${email}';`;
+        const resultSet = await poolConnection
+            .request()
+            .query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    } catch (err) {
+        console.error(err.message);
+        throw err;
+    }
+
+}
+
 //gets all past appointments
 async function allPastAppointmentsQuery(todaysDate){
     try {
@@ -501,6 +519,55 @@ async function errorHandle(currentFunction, arguement, res){
     res.send(ret);
 }
 
+async function checkEmailExists(email) {
+
+    try {
+
+        var poolConnection = await connect();
+        var resultSet = await poolConnection.request()
+            .input('email', email)
+            .query(`
+                SELECT TOP 1 *
+                FROM CurrentClient
+                WHERE Email = @email
+            `);
+        poolConnection.close();
+        return resultSet.rowsAffected > 0;
+
+    } catch (err) {
+
+        console.error(err.message);
+        return false;
+
+    }
+
+}
+
+async function getUserIDByEmail(email) {
+
+    try {
+
+        var poolConnection = await connect();
+        var resultSet = await poolConnection.request()
+            .input('email', email)
+            .query(`
+                SELECT UserID
+                FROM CurrentClient
+                Where Email = @email
+            `);
+        poolConnection.close();
+        if (resultSet.rowsAffected > 0) {
+            return resultSet.recordSet[0].UserID;
+        } else {
+            return null; //AKA no user user found with provided email
+        }
+    } catch (err) {
+        console.error(err.message);
+        return null;
+    }
+
+}
+        
 async function QueryAppointmentByDaySelectedAndVacancy(beginDay, endDay)
 {
     try
@@ -546,6 +613,7 @@ app.get('/queryNewClient', (req, res) => queryNewClients().then((ret) => res.sen
 app.get('/queryServicesWanted', (req, res) => queryServicesWanted().then((ret) => res.send(ret)).catch(() => console.log('error')))
 app.get('/queryNewClient', (req, res) => queryNewClients().then((ret) => res.send(ret)).catch(() => console.log('error')))
 app.get('/queryAppointments', (req, res) => queryAppointments().then((ret) => res.send(ret)).catch(() => console.log('error')))
+
 /**
  * This breaks down the params, getting the string and storing it before calling the query method.
  */
@@ -556,6 +624,23 @@ app.get('/customQuery', (req, res) => {
     .then((ret) => res.send(ret))
     .catch(() => errorHandle(customQuery, query, res))
 })
+
+app.get('/getUserIDByEmail', (req, res) => {
+    const email = req.query.email;
+    getUserIDByEmail(email)
+        .then(UserID => {
+            if (UserID !== null) {
+                res.json({ UserID });
+            } else {
+                res.status(404).json({ error: 'User not found' });
+            }
+        })
+        .catch(err => {
+            console.error('Error querying user:', err.message);
+            res.status(500).json({ error: 'Internal server error' });
+        });
+});
+
 
 /**
  * This breaks down the params, getting the string and storing it before calling the query method.
@@ -584,6 +669,19 @@ app.get('/clientHistoryAppointmentsQuery', async (req, res) => {
     //const result = await someAppointmentsQuery(startDate, endDate)
     const result = await clientHistoryAppointmentsQuery(startDate, endDate);
     res.send(result);   
+    } catch {
+        res.status(400).send('Bad Request');
+    }
+});
+
+app.get('/queryCurrentUserFromEmail', async (req, res) => {
+    try {
+        const email = req.query.email;
+        if (!email) {
+            throw new Error('Invalid request. Missing "email"');
+        }
+    const result = await queryCurrentUserFromEmail(email);
+    res.send(result);
     } catch {
         res.status(400).send('Bad Request');
     }
@@ -783,7 +881,6 @@ app.delete('/customDelete', async (req, res) => { // Provide explicit types for 
         res.status(500).send('Internal Server Error');
     }
 });
-  
 //Formats the date and time before sending it to the method to update the appointments.
 //In the future might just format this in the front end and then send it over, might be a lot easier.
 app.put('/confirmAppointment', (req, res) => {

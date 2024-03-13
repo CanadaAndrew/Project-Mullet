@@ -3,30 +3,65 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 //import { MaterialCommunityIcons as Icon} from "@expo/vector-icons";
 import React, {useState} from 'react';
-//import firebase from './Firebase.js'  // import firebase
-
-//Declaring Window as a global variable to be accessed
-declare global {
-    interface Window { // ⚠️ notice that "Window" is capitalized here
-      RecaptchaVerifier: any;
-    }
-  }
-
-/*To use an invisible reCAPTCHA, create a RecaptchaVerifier object with the size parameter set to invisible,
-specifying the ID of the button that submits your sign-in form.*/
-/*window.RecaptchaVerifier = new firebase.RecaptchaVerifier(firebase.auth, 'loginButton', {
-    'size': 'invisible',
-    'callback': (response) => {
-    // reCAPTCHA solved, allow signInWithPhoneNumber.
-    }
-});*/
+import firebase from './Firebase.js'  // import firebase
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import axios from 'axios';
   
-export default function Login(){
+export default function Login({ route, navigation }) {
+
+    //test@fakemail.com
+    const auth = getAuth(firebase);
+    //sets the default language to the systems language
+    auth.languageCode = 'en';
+
+    //Variables to use for login info
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     // error msg if wrong login info is put in
     const [loginError, loginErrorMsg] = useState('');
-    const onClickLogin = () => {
-        loginErrorMsg('Your email and password \n do not match please try again.');
+
+    const database = axios.create({
+        baseURL: 'http://10.0.0.192:3000'
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        //baseURL: 'http://10.0.0.133:3000',
+    });
+
+    const userData = {
+        userID: undefined, // You can omit this line, it will default to undefined
+        adminPriv: undefined, // You can omit this line, it will default to undefined
+        newClient: undefined // You can omit this line, it will default to undefined
+    };
+
+      
+
+    const onClickLogin = async () => {
+
+        //console.log(email);
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+            // Signed in
+            loginErrorMsg('Login successful!');
+            // Has no effect as far as I can tell, but good to leave it in the code anyway just in case
+            const user = userCredential.user;
+         })
+        .catch((error) => {
+            loginErrorMsg('Your email and password \n do not match. Please try again.');
+            console.log(error.message, error.code);
+        });
+
+        //Since the previously declared user only exists in the scope of its function,
+        //redeclare the variable and set the auth to the current user
+        const user = auth.currentUser;
+            if (user !== null) {
+                //console.log(email);
+                await checkEmailExists(email);
+                console.log('Right Before Navigation');
+                navigation.navigate("HomeScreen", {userData});
+            } else {
+                //Once branches are merged change this to route to the signup page
+            }
     }
 
     // to show and hide password
@@ -38,10 +73,10 @@ export default function Login(){
         textH(!textS);
     }
 
-    // put user input into phone number format
+    //put user input into phone number format
     const [rawNum, setNum] = useState('');
     const formattingPhoneNumber = (input) => {
-        if (/^\d*$/.test(input)){
+        if (/^\d*$/.test(input)) {
             if (input.length <=10){
                 return input.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
             }
@@ -50,8 +85,33 @@ export default function Login(){
     }
     const setPhoneNumFormat = (input) => { 
         const formatPhoNum = formattingPhoneNumber(input); 
-        setNum(formatPhoNum); 
-    } 
+        setNum(formatPhoNum);
+    }
+
+    async function checkEmailExists(email) {
+        
+        try {
+
+            const response = await database.get('/queryCurrentUserFromEmail', {
+                params: {
+                    email: email
+                }
+            });
+            //userData.userID = response.data.UserID;
+            //setUser(response.data);
+            console.log('response', response.data); // For debugging
+            userData.userID = response.data[0].UserID;
+            userData.adminPriv = false;
+            userData.newClient = false;
+
+        } catch (error) {
+            //console.error('Error finding User from email: ', error);
+            userData.adminPriv = false;
+            userData.newClient = true;
+            console.log(userData);
+        }
+
+    }
 
     return (
         <View style = {styles.container}>
@@ -68,6 +128,7 @@ export default function Login(){
               style = {styles.background}
              >
 
+                {/*Login error loginError in brackets*/}
                 <Text style = {styles.errorTitle}>{loginError}</Text>
                 <Text style = {styles.objectTitle}>Login</Text>
 
@@ -77,8 +138,8 @@ export default function Login(){
                   placeholderTextColor = {'gray'} 
                   keyboardType = 'default'
                   style = {styles.inputBox}
-                  value = {rawNum}
-                  onChangeText={setPhoneNumFormat}
+                  value = {email}
+                  onChangeText = {setEmail}
                 />
 
                 <View>
@@ -89,6 +150,8 @@ export default function Login(){
                       keyboardType = 'default'
                       secureTextEntry = {showPassword}
                       style = {styles.inputBox}
+                      value = {password}
+                      onChangeText={setPassword}
                   />
                  
                  {/*button to show password is functional*/}
@@ -107,7 +170,8 @@ export default function Login(){
                 </View>
 
 
-                  {/*button to login limited functionality*/}
+                  {/*button to login limited functionality
+                   Note from dru: to succesfully login, login button must be pressed twice. Not sure why*/}
                   <View>
                     <TouchableOpacity
                       style = {styles.loginButton}

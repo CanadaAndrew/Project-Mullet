@@ -178,4 +178,4 @@ const listOfStates =
     "WI": "Wisconsin",
     "WY": "Wyoming"
 }
-export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST, listOfStates};
+export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST, listOfStates, SERVICES};

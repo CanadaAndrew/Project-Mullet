@@ -141,10 +141,10 @@ export default function setUpAppoint1({navigation, route}) { // add navigation t
                         style={styles.appointmentButton}
                         onPress={() => {
                             const selectedDates = calendarContainerRef.current?.markedDates;
-                            navigation.navigate('setupAppointment2', {
+                            navigation.navigate('setupAppointment2', { 
+                            userData,
                             hairStyleData: hairStyleSelected.join(', '),
                             dateData: selectedDates.join(', '),
-                            userData,
                             });
                             }}>
                         <Text style={styles.appointButtonText}>Schedule Appointment</Text>

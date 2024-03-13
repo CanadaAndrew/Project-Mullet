@@ -1,29 +1,25 @@
-import { StyleSheet, Text, View, Pressable, Image, ImageBackground, FlatList,} from 'react-native';
+
+import { StyleSheet, Text, View, Pressable, Image, ImageBackground, ScrollView, Button, Touchable, FlatList} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 // button viewablility based on workflow in google drive green = new clients, blue = existing clients, and red = Admin with some 
 // overlap. comments have been added above each button for clarification.
 
-export default function HomeScreen({navigation}){
-  //create each button in here by doing what i did down there for each one. Push it to the array and then display the array in a
-  //flatlist 
+export default function HomeScreen({route, navigation}){
   /*
     Creates a const of data to be sent to the other pages in the app
     You can add other consts or just add another variable to the existing userData const
   */
-  const userData = {
 
-    UserId: '1',
-    AdminPriv: true,
-    NewClient: false
-  
-  };
-
-  //The buttons array that stores all individual buttons on a page load/reload
+    const { userData } = route.params;
+    console.log('You are in the Home Screen Now!');
+    console.log('Proof', userData);
+     //The buttons array that stores all individual buttons on a page load/reload
   let buttons = [];
-
+  let [buttonDisplay, setButtonDisplay] = React.useState([]);
+  
   /*
   This might be a little confusing. I did these if statements like they are because it will only load the correct buttons that
   need to be viewed by the user depending on their role. It won't load any other buttons beside the ones that they are supposed to be 
@@ -31,9 +27,10 @@ export default function HomeScreen({navigation}){
   need to add a button, you add it to the corresponding if/elsif block that I have labeled as "Admin" "Old Client" or "New Client"
   depending on who is supposed to see the button.
   */
- 
-  //This block constructs buttons that the Admin can see
-  if(userData.AdminPriv == true)
+
+//This block constructs buttons that the Admin can see
+function filterButtons(){
+  if(userData.adminPriv == true)
   {
     //Modifies Calendar Availability
     var modifyAvButton = <TouchableOpacity
@@ -42,7 +39,7 @@ export default function HomeScreen({navigation}){
       >  
       <Text style = {styles.homeButtonText}>Modify Calendar</Text>
     </TouchableOpacity>
-
+        
     //Views Existing Client Appointments
     var clientApButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -50,7 +47,6 @@ export default function HomeScreen({navigation}){
       >  
       <Text style = {styles.homeButtonText}>Existing Appointments</Text>
     </TouchableOpacity>
-
     //Views Client Info !WIP! no functionality
     var clientInfoButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -58,7 +54,6 @@ export default function HomeScreen({navigation}){
       >  
       <Text style = {styles.homeButtonText}>modify Client Info</Text>
     </TouchableOpacity>
-
     //Views Client History !WIP! no functionality
     var clientHistoryButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -66,7 +61,6 @@ export default function HomeScreen({navigation}){
       >  
       <Text style = {styles.homeButtonText}>Client History</Text>
     </TouchableOpacity>
-
     //Takes you to the New Client Approval page !WIP! no functionality
     var newClientApprovalButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -74,7 +68,6 @@ export default function HomeScreen({navigation}){
       >  
       <Text style = {styles.homeButtonText}>New Client approval</Text>
     </TouchableOpacity>
-
     //Takes you to the Set Up Appiontment Page
     var scheduleAppointmentButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -82,7 +75,6 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>Schedule Appointments</Text>
     </TouchableOpacity>
-
     //takes you to the Services Offered Page
     var servicesOfferedButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -90,7 +82,6 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>Services Offered</Text>
     </TouchableOpacity>
-
     //Takes you to the About Me Page
     var aboutMeButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -98,7 +89,6 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>About Me</Text>
     </TouchableOpacity>
-
     //Takes you to the FAQ page !WIP! no functionality
     var FAQButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -106,7 +96,6 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>FAQ</Text>
     </TouchableOpacity>
-
     buttons.push(modifyAvButton);
     buttons.push(clientApButton);
     buttons.push(clientInfoButton);
@@ -116,9 +105,10 @@ export default function HomeScreen({navigation}){
     buttons.push(servicesOfferedButton);
     buttons.push(aboutMeButton);
     buttons.push(FAQButton);
+    setButtonDisplay(buttons);
   }
   //This block constructs buttons that only old clients can see
-  else if(userData.NewClient == false)
+  else if(userData.newClient == false)
   {
     //Takes you to the Set Up Appointment Page !WIP! no functionality
     var scheduleAppointmentButton2 = <TouchableOpacity
@@ -127,7 +117,6 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>Schedule Appointments</Text>
     </TouchableOpacity>
-
     //Takes you to the Your Appointments page
     var yourAppointmentsButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -135,7 +124,6 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>Your Appointments</Text>
     </TouchableOpacity>
-
     //Takes you to the Services offered page
     var servicesOfferedButton2 = <TouchableOpacity
       style = {styles.homeButton}
@@ -143,7 +131,6 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>Services Offered</Text>
     </TouchableOpacity>
-
     //Takes you to the About Me page
     var aboutMeButton2 = <TouchableOpacity
       style = {styles.homeButton}
@@ -151,7 +138,6 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>About Me</Text>
     </TouchableOpacity>
-
     //takes you to the FAQ page !WIP! no functionality
     var FAQButton2 = <TouchableOpacity
       style = {styles.homeButton}
@@ -159,15 +145,15 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>FAQ</Text>
     </TouchableOpacity>
-
     buttons.push(scheduleAppointmentButton2);
     buttons.push(yourAppointmentsButton);
     buttons.push(servicesOfferedButton2);
     buttons.push(aboutMeButton2);
     buttons.push(FAQButton2);
+    setButtonDisplay(buttons);
   }
   //This block constructs buttons that the new clients can see
-  else if(userData.NewClient == true)
+  else if(userData.newClient == true)
   {
     //Takes you to the services offerd page
     var servicesOfferedButton3 = <TouchableOpacity
@@ -176,7 +162,6 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>Services Offered</Text>
     </TouchableOpacity>
-
     //Takes you to the About Me page
     var aboutMeButton3 = <TouchableOpacity
       style = {styles.homeButton}
@@ -184,7 +169,6 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>About Me</Text>
     </TouchableOpacity>
-
     //Takes you to the FAQ page !WIP! no functionality
     var FAQButton3 = <TouchableOpacity
       style = {styles.homeButton}
@@ -192,20 +176,17 @@ export default function HomeScreen({navigation}){
       >
       <Text style = {styles.homeButtonText}>FAQ</Text>
     </TouchableOpacity>
-
     buttons.push(servicesOfferedButton3);
     buttons.push(aboutMeButton3);
     buttons.push(FAQButton3);
+    setButtonDisplay(buttons);
   }
-
-
-
-
-        
+}
+  useEffect(()=>{
+    filterButtons();
+  }, [])
   return(
-        
             <View style = {styles.container}>
-
             {/*added logo image*/}
              <ImageBackground
               style = {styles.logo}
@@ -218,7 +199,6 @@ export default function HomeScreen({navigation}){
               colors = {['#EB73C9', 'white']}
               style = {styles.background}
              >
-              
               <View style = {styles.background}>
 
                 {/*add title for homepage*/}
@@ -230,13 +210,12 @@ export default function HomeScreen({navigation}){
                 */}
                 <View style = {styles.listView}>
                 <FlatList
-                  data = {buttons}
+                  data = {buttonDisplay}
                   renderItem={({item}) => (
                     <View>
                       {item}
                     </View>
                   )}
-                  
                   contentContainerStyle = {{flexGrow: 1}}
                 />
                 </View>
@@ -245,11 +224,7 @@ export default function HomeScreen({navigation}){
               </View>
              </LinearGradient>
 
-            </View>
-        
-
-
-
+            </View> 
     );
 }
 
