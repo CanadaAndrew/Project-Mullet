@@ -141,6 +141,7 @@ export default function setUpAppoint1({navigation, route}) { // add navigation t
                         onPress={() => {
                             const selectedDates = calendarContainerRef.current?.markedDates;
                             navigation.navigate('setupAppointment2', { 
+                            userData,
                             hairStyleData: hairStyleSelected.join(', '),
                             dateData: selectedDates.join(', '),
                             });
