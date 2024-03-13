@@ -145,7 +145,6 @@ export default function setUpAppoint1({navigation, route}) { // add navigation t
                             userData,
                             hairStyleData: hairStyleSelected.join(', '),
                             dateData: selectedDates.join(', '),
-                            userData,
                             });
                             }}>
                         <Text style={styles.appointButtonText}>Schedule Appointment</Text>

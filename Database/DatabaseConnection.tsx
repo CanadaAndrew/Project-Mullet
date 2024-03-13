@@ -881,7 +881,6 @@ app.delete('/customDelete', async (req, res) => { // Provide explicit types for 
         res.status(500).send('Internal Server Error');
     }
 });
-  
 //Formats the date and time before sending it to the method to update the appointments.
 //In the future might just format this in the front end and then send it over, might be a lot easier.
 app.put('/confirmAppointment', (req, res) => {

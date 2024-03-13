@@ -19,9 +19,6 @@ export default function HomeScreen({route, navigation}){
      //The buttons array that stores all individual buttons on a page load/reload
   let buttons = [];
   let [buttonDisplay, setButtonDisplay] = React.useState([]);
-
-  //The buttons array that stores all individual buttons on a page load/reload
-  let buttons = [];
   
   /*
   This might be a little confusing. I did these if statements like they are because it will only load the correct buttons that
