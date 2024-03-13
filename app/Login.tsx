@@ -22,8 +22,9 @@ export default function Login({ route, navigation }) {
     const [loginError, loginErrorMsg] = useState('');
 
     const database = axios.create({
+        baseURL: 'http://10.0.0.192:3000'
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
-        baseURL: 'http://10.0.0.133:3000',
+        //baseURL: 'http://10.0.0.133:3000',
     });
 
     const userData = {
@@ -32,10 +33,9 @@ export default function Login({ route, navigation }) {
         newClient: undefined // You can omit this line, it will default to undefined
     };
 
-    const [Currentuser, setUser] = useState([]);
       
 
-    const onClickLogin = () => {
+    const onClickLogin = async () => {
 
         //console.log(email);
 
@@ -56,9 +56,8 @@ export default function Login({ route, navigation }) {
         const user = auth.currentUser;
             if (user !== null) {
                 //console.log(email);
-                checkEmailExists(email);
+                await checkEmailExists(email);
                 console.log('Right Before Navigation');
-                console.log(userData);
                 navigation.navigate("HomeScreen", {userData});
             } else {
                 //Once branches are merged change this to route to the signup page
@@ -104,7 +103,6 @@ export default function Login({ route, navigation }) {
             userData.userID = response.data[0].UserID;
             userData.adminPriv = false;
             userData.newClient = false;
-            console.log(userData);
 
         } catch (error) {
             //console.error('Error finding User from email: ', error);
