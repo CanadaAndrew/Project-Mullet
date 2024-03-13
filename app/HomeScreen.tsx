@@ -1,3 +1,4 @@
+
 import { StyleSheet, Text, View, Pressable, Image, ImageBackground, ScrollView, Button, Touchable, FlatList} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
@@ -7,7 +8,6 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 // overlap. comments have been added above each button for clarification.
 
 export default function HomeScreen({route, navigation}){
-
   /*
     Creates a const of data to be sent to the other pages in the app
     You can add other consts or just add another variable to the existing userData const
@@ -20,6 +20,9 @@ export default function HomeScreen({route, navigation}){
   let buttons = [];
   let [buttonDisplay, setButtonDisplay] = React.useState([]);
 
+  //The buttons array that stores all individual buttons on a page load/reload
+  let buttons = [];
+  
   /*
   This might be a little confusing. I did these if statements like they are because it will only load the correct buttons that
   need to be viewed by the user depending on their role. It won't load any other buttons beside the ones that they are supposed to be 
@@ -39,7 +42,7 @@ function filterButtons(){
       >  
       <Text style = {styles.homeButtonText}>Modify Calendar</Text>
     </TouchableOpacity>
-  
+        
     //Views Existing Client Appointments
     var clientApButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -47,7 +50,6 @@ function filterButtons(){
       >  
       <Text style = {styles.homeButtonText}>Existing Appointments</Text>
     </TouchableOpacity>
-  
     //Views Client Info !WIP! no functionality
     var clientInfoButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -55,7 +57,6 @@ function filterButtons(){
       >  
       <Text style = {styles.homeButtonText}>modify Client Info</Text>
     </TouchableOpacity>
-  
     //Views Client History !WIP! no functionality
     var clientHistoryButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -63,7 +64,6 @@ function filterButtons(){
       >  
       <Text style = {styles.homeButtonText}>Client History</Text>
     </TouchableOpacity>
-  
     //Takes you to the New Client Approval page !WIP! no functionality
     var newClientApprovalButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -71,7 +71,6 @@ function filterButtons(){
       >  
       <Text style = {styles.homeButtonText}>New Client approval</Text>
     </TouchableOpacity>
-  
     //Takes you to the Set Up Appiontment Page
     var scheduleAppointmentButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -79,7 +78,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>Schedule Appointments</Text>
     </TouchableOpacity>
-  
     //takes you to the Services Offered Page
     var servicesOfferedButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -87,7 +85,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>Services Offered</Text>
     </TouchableOpacity>
-  
     //Takes you to the About Me Page
     var aboutMeButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -95,7 +92,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>About Me</Text>
     </TouchableOpacity>
-  
     //Takes you to the FAQ page !WIP! no functionality
     var FAQButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -103,7 +99,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>FAQ</Text>
     </TouchableOpacity>
-  
     buttons.push(modifyAvButton);
     buttons.push(clientApButton);
     buttons.push(clientInfoButton);
@@ -125,7 +120,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>Schedule Appointments</Text>
     </TouchableOpacity>
-  
     //Takes you to the Your Appointments page
     var yourAppointmentsButton = <TouchableOpacity
       style = {styles.homeButton}
@@ -133,7 +127,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>Your Appointments</Text>
     </TouchableOpacity>
-  
     //Takes you to the Services offered page
     var servicesOfferedButton2 = <TouchableOpacity
       style = {styles.homeButton}
@@ -141,7 +134,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>Services Offered</Text>
     </TouchableOpacity>
-  
     //Takes you to the About Me page
     var aboutMeButton2 = <TouchableOpacity
       style = {styles.homeButton}
@@ -149,7 +141,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>About Me</Text>
     </TouchableOpacity>
-  
     //takes you to the FAQ page !WIP! no functionality
     var FAQButton2 = <TouchableOpacity
       style = {styles.homeButton}
@@ -157,7 +148,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>FAQ</Text>
     </TouchableOpacity>
-  
     buttons.push(scheduleAppointmentButton2);
     buttons.push(yourAppointmentsButton);
     buttons.push(servicesOfferedButton2);
@@ -175,7 +165,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>Services Offered</Text>
     </TouchableOpacity>
-  
     //Takes you to the About Me page
     var aboutMeButton3 = <TouchableOpacity
       style = {styles.homeButton}
@@ -183,7 +172,6 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>About Me</Text>
     </TouchableOpacity>
-  
     //Takes you to the FAQ page !WIP! no functionality
     var FAQButton3 = <TouchableOpacity
       style = {styles.homeButton}
@@ -191,14 +179,10 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>FAQ</Text>
     </TouchableOpacity>
-  
     buttons.push(servicesOfferedButton3);
     buttons.push(aboutMeButton3);
     buttons.push(FAQButton3);
     setButtonDisplay(buttons);
-  }
-  else{
-    alert(userData.adminPriv);
   }
 }
   useEffect(()=>{
@@ -252,8 +236,8 @@ const styles = StyleSheet.create({
         borderRadius: 90
     },
     listView:{
-      height: 475
-  },
+        height: 475
+    },
     // title styling 
     objectTitle: {
         fontSize: 25,
@@ -314,7 +298,7 @@ const styles = StyleSheet.create({
     },
     // home button style
     homeButton: {
-        width: 350, //
+        width: 300, //
         height: 50, //
         paddingTop: 15,
         margin: 25,

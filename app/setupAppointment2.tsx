@@ -8,45 +8,46 @@ import {
     View,
     Pressable,
     FlatList,
-    Image
+    Image,
+    ScrollView
 } from 'react-native';
+
 import { Link } from 'expo-router';
 import axios from 'axios';
+import { SERVICES, militaryHours, displayHours} from './Enums/Enums';
 
 export default function SetupAppointment2({route}) { // added route for page navigation
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]); //list of selected times to push to db upon confirmation
     const [selectedTime, setSelectedTime] = useState(null);       //updates the selected time state
-    const [alteredListOfTimes, setAlteredTimes] = useState([]);
+    const [alteredListOfTimes, setAlteredTimes] = useState([[]]);
 
     // for data transfer between appointment pages
     const {hairStyleData} = route.params;
     const {dateData} = route.params;
     const { userData } = route.params;
 
-    //using this dummy data because the dateData variable isn't working currently ^^^ keeps spitting out Monday, December 4th, 2023
-    let dateChosen = 'Mon, 04 December 2023';
-    
 
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000'
+        //baseURL: 'http://10.0.0.192:3000'
         //baseURL: 'http://10.0.0.199:3000',
-        //baseURL: 'http://10.0.0.14:3000' Cameron's IP address for testing
+        //baseURL: 'http://10.0.0.14:3000',
+        baseURL: 'http://192.168.1.150:3000', //Chris pc local 
     })
 
-
-    function updateTimeList(appointmentData){
+    //Doesn't work anymore, this is getting replaced by the function directly below this one.
+    /*function updateTimeList(appointmentData){
         //creates a new date object based on the dateChosen variable. getter/setter isn't working properly for it yet so it is still
         //using dummy data
         var appointmentDateChosen = new Date(dateChosen).toISOString().slice(0, 10);
 
         let appointment;
         let Times = [];
-        /*
+        
         for loop that searches the appointments in the database. If it matches the appointments that are of the same date chosen
         and the vacancy status is 0 meaning that there is no appointment scheduled for that time slot then it formats the time from
         the database and puts it into the Times array
-        */
+        
         for(appointment in appointmentData)
         {
             let databaseDate = appointmentData[appointment].AppointmentDate.slice(0, 10);
@@ -82,20 +83,63 @@ export default function SetupAppointment2({route}) { // added route for page nav
         //useState that keeps track of the alteredListOfTimes array. Setting the alteredListOfTimes array to the correctly
         //formatted and ordered Times array so it can be used outside of this function.
         setAlteredTimes(Times);
+    }*/
+
+
+    const displayDateTimes = async() =>
+    {
+        //the temporary array of arrays that holds the time strings for each date
+        var temp: string[][] = [];
+
+        //since dateData acts as a giant string from how it is passed in here by setUpAppointment1 I have to split each
+        //string up into their own array
+        let dateDataQ = dateData.split(/[\s,]+/);
+
+        let date;
+        //for loop that formats each date selected and gets the vacant times for each. It stores the found times into an array
+        //then pushes that array to an array of arrays.
+        for(date in dateDataQ)
+        {
+            //formats the day passed into this function to include the information needed to query it
+            const beginDay = dateDataQ[date] + 'T00:00:00.000Z';
+            const endDay = dateDataQ[date] + 'T23:59:59.000Z';
+
+            let appointmentData;
+            //Queries the database for appointments with the beginning and end of the day selected and a vacant time
+            let response = await database.get('/queryAppointmentByDaySelectedAndVacancy', {
+                params: {
+                    beginDay: beginDay,
+                    endDay: endDay
+                }
+            });
+            appointmentData = response.data;
+            //appointmentData then gets the data from the responding query
+            let apptData;
+            var temptimelist: string[] = [];
+            //for loop that formats the time so it is more readable to normies, then pushes them each to an array
+            for(apptData in appointmentData)
+            {
+                let apptTime = appointmentData[apptData].AppointmentDate.slice(11,19);
+                let formattedTime = displayHours[apptTime];
+                temptimelist.push(formattedTime);
+            }
+
+            //takes said array above and pushes that array into another array that holds arrays(confusing? I know...)
+            temp.push(temptimelist);
+
+        }
+        
+        //updates the main time array of arrays with the one that we have constructed as shown above.
+        setAlteredTimes(temp);
+
     }
-
-    //This is the call to get the appointments from the database. It calls updateTimeList with the data that the call recieves
-    let appointmentData;
-    database.get('/queryAppointments').then((ret) => appointmentData = ret.data).then(() => updateTimeList(appointmentData)).catch(() => {alert("error");});
-
-    //this sets the original listOfTimes to the altered list of times based on the vacancy status in the database.
-    const listOfTimes = alteredListOfTimes;
+    
 
     const month = [
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
 
-    const services = [];
+    const [services, setServices] = React.useState('');
 
     const dates = [];
     const dummyDates = dateData.split(', ')
@@ -103,8 +147,43 @@ export default function SetupAppointment2({route}) { // added route for page nav
     const legendWords = ['Available:', 'Selected:'];
 
     useEffect(() => {
-        setAppointmentTimes(listOfTimes);
+        displayDateTimes();
     }, []);
+
+    const [hours, setHours] = React.useState(0);
+    const [firstLoad, setFirstLoad] = React.useState(0);
+
+    if(firstLoad == 0){
+        setFirstLoad(1);
+        calculateHours();
+        formatServices()
+    }
+    function calculateHours(){
+            let hairStyleArray = hairStyleData.split(', ');
+            let totalHours = 0;
+            hairStyleArray.forEach((hairStyle) => {
+                //alert(JSON.stringify(SERVICES[hairStyle]));
+                try{
+                    totalHours += SERVICES[hairStyle]['time'];
+                }catch(e){
+                    totalHours += 0;
+                }
+            })
+            alert(totalHours);
+            setHours(totalHours);
+    }
+    function formatServices(){
+        let hairStyleArray = hairStyleData.split(', ');
+        let services = [];
+        hairStyleArray.forEach((hairStyle) => {
+            try{
+                services.push(SERVICES[hairStyle]['service']);
+            }catch(e){
+
+            }
+        })
+        setServices(services.join(', '));
+    }
 
     const handleAppointmentPress = (time, date) => {
         setSelectedDate((prevDate) => {
@@ -119,13 +198,13 @@ export default function SetupAppointment2({route}) { // added route for page nav
         });
     };
 
+
     return (
         <>
             <StatusBar backgroundColor={'black'} />
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={styles.backButton}>
-                        
                     </View>
                     <View style={styles.logoContainer}>
                         <Image source={require('./images/logo.png')} style={styles.logo} />
@@ -140,7 +219,6 @@ export default function SetupAppointment2({route}) { // added route for page nav
                             </View>
                             <View style={styles.appointmentServicesSelected}>
                                 <Text style={styles.appointmentText}>Services Selected:</Text>
-                                <Text style={styles.appointmentText}>{hairStyleData}</Text> 
                                 <FlatList
                                     data={services}
                                     renderItem={({ item }) => (
@@ -169,7 +247,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
                             <View style={styles.availableTimesHeader}>
                                 <Text style={styles.appointmentText}>Available Times:</Text>
                             </View>
-                            <View style={styles.availableIterable}>
+                            <View>
                                 <FlatList
                                     data={dummyDates}
                                     keyExtractor={(item, index) => index.toString()}
@@ -180,7 +258,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                             </View>
                                             <View style={styles.availableTimeContainer}>
                                                 <FlatList
-                                                    data={listOfTimes}
+                                                    data={alteredListOfTimes[index]}
                                                     keyExtractor={(item, index) => index.toString()}
                                                     renderItem={({ item }) => (
                                                         <View style={styles.availableTimeCell}>
@@ -221,17 +299,45 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                 },
                                 styles.confirmButton
                                 ]}
-                                onPress = {() => database.put('/confirmAppointment', null, {
-                                    params:{
-                                        date:selectedDate,
-                                        time:selectedTime,
-                                        userID: '321-422-4215'
+                                onPress = {() => {
+                                    let startingTimeNum
+                                    try{
+                                        startingTimeNum = militaryHours[selectedTime].split(':')[0];
+                                    }catch(e){
+                                        alert("Error: Invalid time/Date");
+                                        return;
                                     }
-                                }).then(()=>{alert('success')}).catch(() => alert('error'))}
+                                    for(let i = 1; i < hours; i++){
+                                        let newTime;
+                                        newTime = parseInt(startingTimeNum) + i;
+                                        if(newTime < 10){
+                                            newTime = '0' + newTime;
+                                        }
+                                        if(!appointmentTimes.includes(displayHours[newTime + ":00:00"]) || parseInt(startingTimeNum) + i > 23){
+                                            alert("Error, not enough available time");
+                                            return;
+                                        }
+                                    }
+                                    for(let j = 0; j < hours; j++){
+                                        let newTime;
+                                        newTime = parseInt(startingTimeNum) + j;
+                                        if(newTime < 10){
+                                            newTime = '0' + newTime;
+                                        }
+                                        database.put('/confirmAppointment', null, {
+                                            params:{
+                                                date:selectedDate,
+                                                time:(newTime + ':00:00'),
+                                                userID: userData.UserId,
+                                                type: services.split('\'').join('')
+                                            }
+                                        }).then(()=>{alert('success')}).catch(() => alert('error'));
+                                    }
+                                    }
+                                }
                                 >
                                 {({ pressed }) => (
                                     <Text style={styles.confirmButtonText}>Confirm Appointment</Text>
-                                    
                                 )}
                             </Pressable>
                         </View>
@@ -336,13 +442,12 @@ const styles = StyleSheet.create({
     },
     // Available Times styling
     availableContainer: {
-        paddingTop: 5,
-        paddingBottom: 5
+       //paddingTop: 5,
+        //paddingBottom: 5
     },
     availableTimesHeader: {
     },
     availableIterable:{
-        //paddingBottom: 5
     },
     availableViewInFlatList: {
     },
@@ -356,13 +461,15 @@ const styles = StyleSheet.create({
     },
     availableTimeContainer: {
         alignItems: 'center',
+        paddingLeft: 5,
+        paddingRight: 5,
     },
     availableTimeCell: {
-        width: '25%',             //Adjust width to 25% for four buttons per row
+        width: 80,             //Adjust width to 25% for four buttons per row
         justifyContent: 'center', //center content vertically
         alignItems: 'center',     //center content horizontally
         paddingTop: 5,
-        paddingBottom: 5
+        paddingBottom: 5,
     },
     availableTimeCellButton: {
         padding: 5,
