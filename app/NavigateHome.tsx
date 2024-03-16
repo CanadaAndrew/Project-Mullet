@@ -84,6 +84,10 @@ export default function NavigateHome(){
                 title = "Sign Up page"
                 onPress = {() => navigation.navigate("SignUp", {userData})}
             />
+            <Button
+                title = "modify client info Admin view"
+                onPress = {() => navigation.navigate("modifyClientInfo", {userData})}
+            />
             
         </View>
     )
