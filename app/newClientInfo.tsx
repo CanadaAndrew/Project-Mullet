@@ -20,14 +20,15 @@ import { listOfStates } from './Enums/Enums';
 
 const database = axios.create({
     //baseURL: 'http://10.0.0.192:3000',
-    baseURL: 'http://192.168.1.150:3000', //Chris pc local
+    baseURL: 'http://10.0.0.119:3000',  // Wilson local
+    //baseURL: 'http://192.168.1.150:3000', //Chris pc local
 })
 
 export default function newClientInfo() {
 
     //temp name, need to import the client's name from somewhere else
     const [firstName, newFirstName] = useState('Sam'); 
-    const welcomeMessage = 'Congratulations ' + firstName + '! You’ve been approved as a new client. Fill in some additional info to complete your sign up process.';
+    const welcomeMessage = 'Congratulations ' + firstName + '! You\'ve been approved as a new client. Fill in some additional info to complete your sign up process.';
 
     const [StreetAddress, newStreetAddress] = useState(''); 
     const [City, newCity] = useState('');
@@ -42,7 +43,7 @@ export default function newClientInfo() {
     const formComplete = StreetAddressValid && CityValid && StateValid && ZipValid;
 
     //dummy data for testing purposes
-    const user_ID = 10; //will need to be replaced with actual userID once ok'd from admin (ApprovalStatus in NewClients) -> do we need to check approval status?
+    const user_ID = 7; //will need to be replaced with actual userID once ok'd from admin (ApprovalStatus in NewClients) -> do we need to check approval status?
     const strt = "1234 Main St";
     const cty = "Anytown";
     const stat = "TX";
@@ -68,7 +69,25 @@ export default function newClientInfo() {
         } catch (error) {
             console.error('Error adding current client:', error.response.data);
         }
-    };  
+    }
+
+    function getApprovalStatus(userId){
+        let data;
+        database.get('/customQuery', {
+            params: {
+                query: 'SELECT UserID, ApprovalStatus FROM NewClientView WHERE UserID = ' + userId + ';'
+            }
+        })
+            .then((ret) => data = ret.data)
+            .then(() => { isApproved(data) })
+            .catch(() => { alert("error"); });
+    }
+
+    function isApproved(data){
+        if (data[0].ApprovalStatus == 0) {
+            handleCurrentClientPost()
+        }
+    }
 
     function checkStreetAddressValid()
     {
@@ -148,9 +167,9 @@ export default function newClientInfo() {
                     </View>
                 <Text >{'\n'}{'\n'}{'\n'}</Text>
                 <TouchableOpacity 
-                    //disabled={!formComplete} //until everything is filled out, button is disabled.
+                    disabled={!formComplete} //until everything is filled out, button is disabled.
                     style={styles.signUpButton}
-                    onPress={handleCurrentClientPost}
+                    onPress={() => getApprovalStatus(user_ID)}
                 >
                     <Text style={styles.signUpText}>Save Changes</Text>
                 </TouchableOpacity>                
