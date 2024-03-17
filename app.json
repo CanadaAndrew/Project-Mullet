@@ -2,5 +2,8 @@
     "scheme": "url",
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "DB_CONNECTION_STRING": "Driver={ODBC Driver 18 for SQL Server};Server=tcp:hair-done-wright530.database.windows.net,1433;Database=mobile_app;Uid=hdw530;Pwd={your_password_here};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    }
 }

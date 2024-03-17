@@ -8,18 +8,19 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
 import { ScrollView } from 'react-native-gesture-handler';
+import Constants from 'expo-constants';
 
 
 export default function ClientAp({ route }){ 
 
     const { userData } = route.params;
 
-    //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
-    //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
+    //server connection
+    const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
     const database = axios.create({
-        //baseURL: 'http://10.0.0.192:3000', //Andrew pc local
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
-    })
+        baseURL: dbConnectionString,
+    });
+
 
     interface Appointment {
         name: string;

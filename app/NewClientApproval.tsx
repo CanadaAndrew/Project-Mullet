@@ -2,16 +2,18 @@ import { StyleSheet, Text, View, ScrollView, FlatList, TouchableOpacity, Dimensi
 import { LinearGradient } from 'expo-linear-gradient';
 import React, {useEffect} from 'react';
 import axios from 'axios';
+import Constants from 'expo-constants';
 
 export default function NewClientApproval() {
 
     const windowDimensions = Dimensions.get('window')
+
+    //server connection
+    const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
     const database = axios.create({
-        //baseURL: 'http://10.0.0.119:3000',  // Wilson local
-        //baseURL: 'http://10.0.0.192:3000',
-        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
-        baseURL: 'http://10.0.0.14:3000', //Cameron Local
-    })
+        baseURL: dbConnectionString,
+    });
+
 
     const [first, setFirst] = React.useState(0);
 

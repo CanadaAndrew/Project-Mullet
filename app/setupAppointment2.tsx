@@ -11,12 +11,19 @@ import {
     Image,
     ScrollView
 } from 'react-native';
-
 import { Link } from 'expo-router';
 import axios from 'axios';
 import { SERVICES, militaryHours, displayHours} from './Enums/Enums';
+import Constants from 'expo-constants';
 
 export default function SetupAppointment2({route}) { // added route for page navigation
+    
+    //server connection
+    const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
+    const database = axios.create({
+        baseURL: dbConnectionString,
+    });
+
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([]); //list of selected times to push to db upon confirmation
     const [selectedTime, setSelectedTime] = useState(null);       //updates the selected time state
@@ -26,14 +33,6 @@ export default function SetupAppointment2({route}) { // added route for page nav
     const {hairStyleData} = route.params;
     const {dateData} = route.params;
     const { userData } = route.params;
-
-
-    const database = axios.create({
-        //baseURL: 'http://10.0.0.192:3000'
-        //baseURL: 'http://10.0.0.199:3000',
-        //baseURL: 'http://10.0.0.14:3000',
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local 
-    })
 
     //Doesn't work anymore, this is getting replaced by the function directly below this one.
     /*function updateTimeList(appointmentData){

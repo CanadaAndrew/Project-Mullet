@@ -17,14 +17,15 @@ import { Link } from 'expo-router';
 import axios from 'axios';
 //import {initializeApp} from 'firebase/app';
 import { listOfStates } from './Enums/Enums';
-
-const database = axios.create({
-    //baseURL: 'http://10.0.0.192:3000',
-    baseURL: 'http://10.0.0.119:3000',  // Wilson local
-    //baseURL: 'http://192.168.1.150:3000', //Chris pc local
-})
+import Constants from 'expo-constants';
 
 export default function newClientInfo() {
+
+    //server connection
+    const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
+    const database = axios.create({
+        baseURL: dbConnectionString,
+    });
 
     //temp name, need to import the client's name from somewhere else
     const [firstName, newFirstName] = useState('Sam'); 

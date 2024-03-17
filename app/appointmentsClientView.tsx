@@ -2,8 +2,15 @@ import { StyleSheet, Text, View, ScrollView, FlatList, Dimensions, useWindowDime
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import axios from 'axios';
+import Constants from 'expo-constants';
 
 export default function appointmentsClientView(){
+
+    //server connection
+    const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
+    const database = axios.create({
+        baseURL: dbConnectionString,
+    });
 
     const windowDimensions = Dimensions.get('window')
     interface Appointment {
@@ -17,12 +24,6 @@ export default function appointmentsClientView(){
     let defaultAppointment : Appointment[] = [];
     const [upcomingClientAppointments, setUpcomingClientAppointments] = React.useState(defaultAppointment);
     const [pastClientAppointments, setPastClientAppointments] = React.useState(defaultAppointment);
-
-    const database = axios.create({
-        //baseURL: 'http://10.0.0.192:3000',
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
-    })
-
     const [first, setFirst] = React.useState(0);
     firstUpdate();
     async function firstUpdate(){

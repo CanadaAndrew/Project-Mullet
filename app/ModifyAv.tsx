@@ -10,6 +10,7 @@ import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
 import { displayHours } from './Enums/Enums';
 import { validateLocaleAndSetLanguage } from 'typescript';
+import Constants from 'expo-constants';
 
 //add route as a param to the function of every page that requires data from the const established in HomeScreen
 //You can also make another const here and transfer data as well here up to you
@@ -17,6 +18,13 @@ export default function ModifyAv({ route }) {
 
     //make a local const this way using route.params
     const { userData } = route.params;
+
+    //server connection
+    const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
+    const database = axios.create({
+        baseURL: dbConnectionString,
+    });
+
 
     //Tester lines for console
     // console.log("Test");
@@ -37,14 +45,6 @@ export default function ModifyAv({ route }) {
         "10:00AM", "11:00AM", "12:00PM", "01:00PM","02:00PM","03:00PM","04:00PM","05:00PM","06:00PM","07:00PM","08:00PM",
         "09:00PM","10:00PM","11:00PM"
     ]; 
-    
-    //Creates a gateway to the server, make sure to replace with local IP of the computer hosting the backend,
-    //in addition remember to turn on backend with node DatabaseConnection.tsx after going into the Database file section in a seperate terminal.
-    const database = axios.create({
-        //baseURL: 'http://10.0.0.192:3000', //Andrew pc local
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
-        //baseURL: 'http://10.0.0.14:3000'
-    })
 
     //converts to 12 hour time
     const convertTo12Hour = (time24) => {

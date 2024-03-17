@@ -7,8 +7,16 @@ import axios from 'axios'; //used to get data from the backend nodejs
 import moment from 'moment-timezone';
 import { TextInput } from 'react-native-gesture-handler';
 import { text } from 'express';
+import Constants from 'expo-constants';
         
 export default function ClientHistory() {
+
+    //server connection
+    const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
+    const database = axios.create({
+        baseURL: dbConnectionString,
+    });
+
 
     interface Appointment {
         name: string;
@@ -59,10 +67,6 @@ export default function ClientHistory() {
     //filteredAps is used as an global array to hold the filtered appointments if there is any that need to be filtered by date
     let filteredAps: Appointment[] = [];
 
-    const database = axios.create({
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
-        //baseURL: 'http://10.0.0.133:3000', //Adrian's local pc
-    });
     const [upcomingClientAppointments, setUpcomingClientAppointments] = useState([]);
     const [pastClientAppointments, setPastClientAppointments] = useState([]);
 
