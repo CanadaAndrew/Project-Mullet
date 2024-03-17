@@ -2,19 +2,19 @@ import { StyleSheet, Text, TextInput, View, ScrollView, FlatList, TouchableOpaci
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
 import axios from 'axios';
+import Constants from 'expo-constants';
 
 export default function ModifyClientInfoSearch() {
 
     const windowDimensions = Dimensions.get('window')
+
+    //server connection                                 //***do we need a server connection?***
+    const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
     const database = axios.create({
-        baseURL: 'http://10.0.0.119:3000',  // Wilson local
-        //baseURL: 'http://10.0.0.192:3000',
-        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
-        //baseURL: 'http://10.0.0.14:3000', //Cameron Local
-    })
+        baseURL: dbConnectionString,
+    });
 
     const [nameInput, newNameInput] = React.useState('');
-
     const dummyClients = ['John Seed', 'John Smith', 'John Taylor', 'John Zimmer', 'name5', 'name6', 'name7', 'name8', 'name9', 'name10', 'name11', 'name12', 'name13', 'name14', 'name15'];
     function filterNames(){
 
