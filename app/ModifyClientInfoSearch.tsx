@@ -76,7 +76,6 @@ export default function ModifyClientInfoSearch() {
             else if(clientNames[client2].charAt(0) != clientNames[client2 - 1].charAt(0))
             {
                 tempNameArr.push(temp);
-
                 temp.length = 0;
                 temp.push(clientNames[client2]);
                 //detects if it is at the end of the clientNames list. If so then it pushes whatever is in temp to the array of arrays
@@ -87,6 +86,7 @@ export default function ModifyClientInfoSearch() {
                     temp.length = 0;
                 }
             }
+            alert(tempNameArr);
         }
         setFirstLetterArr(tempFirstLetterArr);
         setClientList(clientData);
