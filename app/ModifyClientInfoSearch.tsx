@@ -18,7 +18,6 @@ export default function ModifyClientInfoSearch() {
     const [firstLetterArr, setFirstLetterArr] = React.useState([]);
     const [clientList2, setClientList2] = React.useState([[]]);
 
-    //const dummyClients = ['John Seed', 'John Smith', 'John Taylor', 'John Zimmer', 'name5', 'name6', 'name7', 'name8', 'name9', 'name10', 'name11', 'name12', 'name13', 'name14', 'name15'];
     function filterNames(){
 
     }
@@ -53,41 +52,42 @@ export default function ModifyClientInfoSearch() {
             clientNames.push(name);
         }
 
-
+        //set two variables to use in the loop down below
         let temp: string[] = [];
-        //this loop splits clientData up into multiple seperate arrays that have names all beginning with the same letter.
-        for(let client2 = 0; client2 < clientNames.length; client2++)
+        let currentLetter = '';
+        //this loop splits clientData up into multiple seperate arrays that have first names all beginning with the same letter.
+        for(let client of clientNames)
         {
-            //if temp is empty
-            if(temp.length == 0)
+            //a first letter var that holds the first letter of the clients first name
+            const firstLetter = client.charAt(0);
+            
+            //if first letter != current letter then check to see if temp has anything in it. if it does then push whatever is in temp
+            //to the temp array of arrays then set the current letter to the first letter and temp to the name of client to use
+            //in the next loop
+            if(firstLetter != currentLetter)
             {
-                temp.push(clientNames[client2]);
-            }
-            else if(clientNames[client2].charAt(0) == clientNames[client2 - 1].charAt(0))
-            {
-                
-                temp.push(clientNames[client2]);
-                if(clientNames[client2 + 1] == null)
+                if(temp.length > 0)
                 {
                     tempNameArr.push(temp);
-                    temp.length = 0;
                 }
+                currentLetter = firstLetter;
+                temp = [client];
             }
-            else if(clientNames[client2].charAt(0) != clientNames[client2 - 1].charAt(0))
+            //else if they are equal just push the clients name to temp.
+            else if(firstLetter == currentLetter)
             {
-                tempNameArr.push(temp);
-                temp.length = 0;
-                temp.push(clientNames[client2]);
-                //detects if it is at the end of the clientNames list. If so then it pushes whatever is in temp to the array of arrays
-                //and sets temp to empty
-                if(clientNames[client2 + 1] == null)
-                {
-                    tempNameArr.push(temp);
-                    temp.length = 0;
-                }
+                temp.push(client)
             }
-            alert(tempNameArr);
         }
+
+        //after loop finishes if temp has anything in it make sure to push whatever is in it to the temp array of arrays
+        if(temp.length > 0)
+        {
+            tempNameArr.push(temp);
+        }
+
+        //setting all the lists that are needed for displaying
+        setClientList2(tempNameArr);
         setFirstLetterArr(tempFirstLetterArr);
         setClientList(clientData);
 
@@ -96,7 +96,7 @@ export default function ModifyClientInfoSearch() {
     useEffect(() => {
         displayClientList();
     }, []);
-
+    
     return (
         <SafeAreaView>
             
@@ -116,18 +116,33 @@ export default function ModifyClientInfoSearch() {
                             placeholder="Search"
                         />
                     </View>
-                    <View style={[styles.nameContainer, styles.boxShadowIOS, styles.boxShadowAndroid]}>
+                    <View>
                         <FlatList
-                            data={clientList}
-                            renderItem={({ item }) => (
+                            data={firstLetterArr}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={({ item, index }) => (
                                 <View>
-                                    <TouchableOpacity
-                                        style={styles.nameButton}>
-                                        <Text style={styles.nameText}>{item.FirstName + " " + item.LastName}</Text>
-                                    </TouchableOpacity>
-                                    <View style = {styles.nameLine}></View>
+                                    <View style={styles.availableLetterContainer}>
+                                        <Text style={styles.availableLetterText}>{item}</Text>
+                                    </View>
+                                    <View style={styles.availableNameContainer}>
+                                        <FlatList
+                                            data = {clientList2[index]}
+                                            keyExtractor={(item, index) => index.toString()}
+                                            renderItem={({item}) => (
+                                                <View style={[styles.nameContainer, styles.boxShadowIOS, styles.boxShadowAndroid]}>
+                                                    <TouchableOpacity
+                                                    style={styles.nameButton}>
+                                                        <Text style={styles.nameText}>{item}</Text>  
+                                                    </TouchableOpacity>
+
+                                                </View>
+                                            )}
+                                        />
+                                    </View>
                                 </View>
                             )}
+                            style={styles.letterFlatListStyle}
                         />
                     </View>
                 </View>
@@ -177,11 +192,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         margin: 20,
         borderRadius: 20,
-        paddingVertical: 5,
-        paddingHorizontal: 10,
         rowGap: 10,
-        width: useWindowDimensions().width*.9,
-        height: useWindowDimensions().height*.7,
     },
     nameButton: {
         padding: 10,
@@ -190,10 +201,27 @@ const styles = StyleSheet.create({
         color: 'black',
         fontWeight: 'bold',
         fontSize: 20,
-        textAlign: 'left'
+        textAlign: 'center'
     },
     nameLine: {
         borderTopColor: 'black',
         borderTopWidth: 1
-    }
+    },
+    availableLetterContainer: {
+        paddingLeft: 12,
+    },
+    availableLetterText: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+    availableNameContainer: {
+        alignItems: 'center',
+        paddingLeft: 5,
+        paddingRight: 5,
+    },
+    letterFlatListStyle: {
+        height: useWindowDimensions().height*.78
+    },
+
 })
