@@ -7,55 +7,132 @@ export default function ModifyClientInfoSearch() {
 
     const windowDimensions = Dimensions.get('window')
     const database = axios.create({
-        baseURL: 'http://10.0.0.119:3000',  // Wilson local
+        //baseURL: 'http://10.0.0.119:3000',  // Wilson local
         //baseURL: 'http://10.0.0.192:3000',
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
-        //baseURL: 'http://10.0.0.14:3000', //Cameron Local
+        baseURL: 'http://10.0.0.14:3000', //Cameron Local
     })
 
     const [nameInput, newNameInput] = React.useState('');
+    const [clientList, setClientList] = React.useState([]);
+    const [firstLetterArr, setFirstLetterArr] = React.useState([]);
+    const [clientList2, setClientList2] = React.useState([[]]);
 
-    const dummyClients = ['John Seed', 'John Smith', 'John Taylor', 'John Zimmer', 'name5', 'name6', 'name7', 'name8', 'name9', 'name10', 'name11', 'name12', 'name13', 'name14', 'name15'];
+    //const dummyClients = ['John Seed', 'John Smith', 'John Taylor', 'John Zimmer', 'name5', 'name6', 'name7', 'name8', 'name9', 'name10', 'name11', 'name12', 'name13', 'name14', 'name15'];
     function filterNames(){
 
     }
 
+    async function displayClientList()
+    {
+        let clientNames: string[] = [];
+        let tempFirstLetterArr: string[] = [];
+        let tempNameArr: string[][] = [];
+        let response = await database.get('/queryClients');
+
+        let clientData = response.data;
+        let client1;
+        //sorts clientData to be in alphabetical order
+        clientData.sort((a, b) => a.FirstName.localeCompare(b.FirstName))
+
+        //this loop makes the array of all the first letters in first names to be used to sort the list later.
+        for(client1 in clientData)
+        {
+            let firstLetter = clientData[client1].FirstName[0];
+            if(tempFirstLetterArr.find(o => o === firstLetter) == null)
+            {
+                tempFirstLetterArr.push(firstLetter);
+            }
+        }
+
+        //loop that makes a string array with only the names of the clients and nothing else.
+        let iterable;
+        for(iterable in clientData)
+        {
+            let name = clientData[iterable].FirstName + " " + clientData[iterable].LastName;
+            clientNames.push(name);
+        }
+
+
+        let temp: string[] = [];
+        //this loop splits clientData up into multiple seperate arrays that have names all beginning with the same letter.
+        for(let client2 = 0; client2 < clientNames.length; client2++)
+        {
+            //if temp is empty
+            if(temp.length == 0)
+            {
+                temp.push(clientNames[client2]);
+            }
+            else if(clientNames[client2].charAt(0) == clientNames[client2 - 1].charAt(0))
+            {
+                
+                temp.push(clientNames[client2]);
+                if(clientNames[client2 + 1] == null)
+                {
+                    tempNameArr.push(temp);
+                    temp.length = 0;
+                }
+            }
+            else if(clientNames[client2].charAt(0) != clientNames[client2 - 1].charAt(0))
+            {
+                tempNameArr.push(temp);
+                temp.length = 0;
+                temp.push(clientNames[client2]);
+                //detects if it is at the end of the clientNames list. If so then it pushes whatever is in temp to the array of arrays
+                //and sets temp to empty
+                if(clientNames[client2 + 1] == null)
+                {
+                    tempNameArr.push(temp);
+                    temp.length = 0;
+                }
+            }
+            alert(tempNameArr);
+        }
+        setFirstLetterArr(tempFirstLetterArr);
+        setClientList(clientData);
+
+    }
+
+    useEffect(() => {
+        displayClientList();
+    }, []);
+
     return (
         <SafeAreaView>
-            <ScrollView>
-                <LinearGradient
-                    locations={[0.7, 1]}
-                    colors={['#EB73C9', 'white']}
-                    //style={{ width: windowDimensions.width, height: windowDimensions.height - 85 }}
-                    style={{ width: useWindowDimensions().width, height: useWindowDimensions().height - 85 }}
-                >
-                    <View style={styles.container}>
-                        <View style={[styles.searchBarContainer, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                            <TextInput
-                                style={styles.textField}
-                                value={nameInput}
-                                onChangeText={newNameInput}
-                                onTextInput={() => filterNames()}
-                                placeholder="Search"
-                            />
-                        </View>
-                        <View style={[styles.nameContainer, styles.boxShadowIOS, styles.boxShadowAndroid]}>
-                            <FlatList
-                                data={dummyClients}
-                                renderItem={({ item }) => (
-                                    <View>
-                                        <TouchableOpacity
-                                            style={styles.nameButton}>
-                                            <Text style={styles.nameText}>{item}</Text>
-                                        </TouchableOpacity>
-                                        <View style = {styles.nameLine}></View>
-                                    </View>
-                                )}
-                            />
-                        </View>
+            
+            <LinearGradient
+                locations={[0.7, 1]}
+                colors={['#EB73C9', 'white']}
+                //style={{ width: windowDimensions.width, height: windowDimensions.height - 85 }}
+                style={{ width: useWindowDimensions().width, height: useWindowDimensions().height - 85 }}
+            >
+                <View style={styles.container}>
+                    <View style={[styles.searchBarContainer, styles.boxShadowIOS, styles.boxShadowAndroid]}>
+                        <TextInput
+                            style={styles.textField}
+                            value={nameInput}
+                            onChangeText={newNameInput}
+                            onTextInput={() => filterNames()}
+                            placeholder="Search"
+                        />
                     </View>
-                </LinearGradient>
-            </ScrollView>
+                    <View style={[styles.nameContainer, styles.boxShadowIOS, styles.boxShadowAndroid]}>
+                        <FlatList
+                            data={clientList}
+                            renderItem={({ item }) => (
+                                <View>
+                                    <TouchableOpacity
+                                        style={styles.nameButton}>
+                                        <Text style={styles.nameText}>{item.FirstName + " " + item.LastName}</Text>
+                                    </TouchableOpacity>
+                                    <View style = {styles.nameLine}></View>
+                                </View>
+                            )}
+                        />
+                    </View>
+                </View>
+            </LinearGradient>
+            
         </SafeAreaView>
     );
 }
