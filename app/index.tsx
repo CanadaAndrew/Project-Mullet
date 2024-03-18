@@ -17,9 +17,9 @@ import AboutMe from './AboutMe';
 import newClientInfo from './newClientInfo';
 import NewClientApproval from './NewClientApproval';
 import ModifyClientInfoSearch from './ModifyClientInfoSearch';
-//import ForgotLogin from './ForgotLogin';
-//import SignUp from './SignUp';
-//import Login from './Login';
+import ForgotLogin from './ForgotLogin';
+import SignUp from './SignUp';
+import Login from './Login';
 
 const Stack = createNativeStackNavigator()
 
@@ -90,11 +90,23 @@ export default function index() {
             title: "About Me"
           }}
          />
+        <Stack.Screen name="ForgotLogin" component={ForgotLogin}
+            options={{
+                title: "Forgot Login"
+            }}
+        />
+        <Stack.Screen name="SignUp" component={SignUp}
+            options={{
+                title: "Sign Up"
+            }}
+        />
+        <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="ModifyClientInfoSearch" component={ModifyClientInfoSearch}
             options={{
                 title: "Search"
             }}
         />
+        
       </Stack.Navigator>
    </NavigationContainer>
   
