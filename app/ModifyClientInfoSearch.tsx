@@ -48,7 +48,7 @@ export default function ModifyClientInfoSearch() {
         let iterable;
         for(iterable in clientData)
         {
-            let name = clientData[iterable].FirstName + " " + clientData[iterable].LastName;
+            let name = clientData[iterable].FirstName + " " + clientData[iterable].MiddleName + " " + clientData[iterable].LastName;
             clientNames.push(name);
         }
 
