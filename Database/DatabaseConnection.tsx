@@ -340,7 +340,7 @@ async function addAvailability(addDateTimeString, notBooked) {
     try {
         const poolConnection = await connect();
         poolConnection.setMaxListeners(24);
-        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${vacancyStatus});`;
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${notBooked});`;
         await poolConnection.request()
             .query(query);
         poolConnection.close();
@@ -416,7 +416,8 @@ async function clientHistoryAppointmentsQuery(startDate, endDate){
         const poolConnection = await connect();
         const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
             FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
-            WHERE AppointmentDate BETWEEN \'' + startDate + '\' AND \'' + endDate + '\'`;
+            WHERE AppointmentDate BETWEEN \'${startDate}\' AND \'${endDate}\';`;
+        console.log(query);
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -451,7 +452,8 @@ async function allPastAppointmentsQuery(todaysDate){
         const poolConnection = await connect();
         const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
             FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
-            WHERE AppointmentDate < \'' + todaysDate + '\'`;
+            WHERE AppointmentDate < \'${todaysDate}\';`;
+        console.log(query);
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -469,7 +471,7 @@ async function allUpcomingAppointmentsQuery(todaysDate){
         const poolConnection = await connect();
         const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
             FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
-            WHERE AppointmentDate >= \'' + todaysDate + '\'`;
+            WHERE AppointmentDate >= \'${todaysDate}\';`;
         const resultSet = await poolConnection
             .request()
             .query(query);
