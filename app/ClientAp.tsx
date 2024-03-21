@@ -240,7 +240,7 @@ export default function ClientAp({ route }){
       <ScrollView>
         <LinearGradient
         locations = {[0.7, 1]}
-        colors = {['#EB73C9','white']}
+        colors = {['#DDA0DD','white']}
         style = {styles.container}>
             <View style = {styles.container}>
                 <View style = {styles.backButton}></View>

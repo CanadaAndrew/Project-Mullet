@@ -21,6 +21,7 @@ import { getAuth, createUserWithEmailAndPassword  } from "firebase/auth";
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
+export let contactSelected: string[] = [];
 
 
 export default function SignUp({ navigation, route }) { // added route for page navigation
@@ -32,6 +33,7 @@ export default function SignUp({ navigation, route }) { // added route for page 
 
     //useState for drop down menu
     const [selected, setSelected] = React.useState("");
+    const [selectedCont, setSelectedCont] = React.useState("");
 
     // hair selection
     function handleHairSelection(selected) {
@@ -40,6 +42,15 @@ export default function SignUp({ navigation, route }) { // added route for page 
         var temp = selected.toString();
         temparr = temp.split(",");
         hairStyleSelected = temparr;
+    }
+
+    // contact selection
+    function contactSelection(selectedCont) {
+        let temparr: string[] = [];
+
+        var temp = selectedCont.toString();
+        temparr = temp.split(",");
+        contactSelected = temparr;
     }
 
     /*useEffect(() => { //for testing purposes -> prints to console whenever lists are updated
@@ -51,6 +62,7 @@ export default function SignUp({ navigation, route }) { // added route for page 
 
     // for text input fields
     const [firstName, newFirstName] = React.useState('');
+    const [middleName, newMiddleName] = React.useState('');
     const [lastName, newLastName] = React.useState('');
     const [email, newEmail] = React.useState('');
     const [phoneNumber, newPhoneNumber] = React.useState('');
@@ -62,6 +74,7 @@ export default function SignUp({ navigation, route }) { // added route for page 
 
     
     const [firstNameValid, setfirstNameValid] =  React.useState(false);
+    const [middleNameValid, setmiddleNameValid] =  React.useState(false);
     const [lastNameValid, setlastNameValid] =  React.useState(false);
     const [emailValid, setemailValid] =  React.useState(false);
     const [phoneNumberValid, setphoneNumberValid] =  React.useState(false);
@@ -69,7 +82,7 @@ export default function SignUp({ navigation, route }) { // added route for page 
     const [confirmPasswordValid, setconfirmPasswordValid] =  React.useState(false);
 
     //is everything filled out? if so, unlock the sign up button
-    const formComplete =  !(firstNameValid && lastNameValid && emailValid && phoneNumberValid && passwordValid && confirmPasswordValid && selected.length != 0); 
+    const formComplete =  !(firstNameValid && middleNameValid && lastNameValid && emailValid && phoneNumberValid && passwordValid && confirmPasswordValid && selected.length != 0 && selectedCont.length != 0); 
 
     /*useEffect(() => { //for testing purposes -> prints to console whenever lists are updated
         console.log('firstNameValid', firstNameValid); //for testing purposes
@@ -86,6 +99,11 @@ export default function SignUp({ navigation, route }) { // added route for page 
     function checkfirstNameValid()
     {
         setfirstNameValid(firstName.length>0 ? true : false);
+    }
+
+    function checkmiddleNameValid()
+    {
+        setmiddleNameValid(middleName.length>0 ? true : false);
     }
 
     function checklastNameValid()
@@ -141,6 +159,11 @@ export default function SignUp({ navigation, route }) { // added route for page 
         { key: ' Blow Dry and Style', value: 'Blow Dry and Style' }
     ];
 
+    const contactPref = [
+        {key: ' Phone number ', value: ' Phone Number'},
+        {key: ' email ', value: ' Email '}
+    ];
+
     const database = axios.create({
         //baseURL: 'http://10.0.0.192:3000'
         //baseURL: 'http://10.0.0.199:3000',
@@ -186,7 +209,7 @@ export default function SignUp({ navigation, route }) { // added route for page 
                 preferredWayOfContact: preferred_way_of_contact*/
                 userID: userID,
                 firstName: firstName,
-                middleName: "filler", //form info?
+                middleName: middleName, //form info?
                 lastName: lastName,
                 preferredWayOfContact:"filler", //form info?
             });
@@ -305,6 +328,13 @@ export default function SignUp({ navigation, route }) { // added route for page 
                             />
                             <TextInput
                                 style={styles.textField}
+                                value={middleName}
+                                onChangeText={newMiddleName}
+                                onTextInput={() => checkmiddleNameValid()}
+                                placeholder="Middle Name"
+                            />
+                            <TextInput
+                                style={styles.textField}
                                 value={lastName}
                                 onChangeText={newLastName}
                                 onTextInput={() => checklastNameValid()}
@@ -364,6 +394,30 @@ export default function SignUp({ navigation, route }) { // added route for page 
                                 label="Preferred Services"
                                 placeholder="Preferred Services"
                                 onSelect={() => handleHairSelection(selected)}
+                            />
+                        </View>
+
+                        <View style={styles.serviceContainer}>
+                            <MultipleSelectList
+                                setSelected={(val) => setSelectedCont(val)}
+                                data={contactPref}
+
+                                // styles
+                                boxStyles={styles.dropDown}
+                                inputStyles={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}
+                                labelStyles={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}
+                                dropdownStyles={{
+                                    backgroundColor: 'white',
+                                    width: '85%'
+                                }}
+                                badgeStyles={styles.badgeStyle}
+
+                                maxHeight={1500}
+                                save='value'
+                                search={false}
+                                label="Preferred Contact"
+                                placeholder="Preferred Contact"
+                                onSelect={() => contactSelection(selectedCont)}
                             />
                         </View>
                         

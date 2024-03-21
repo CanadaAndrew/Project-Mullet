@@ -126,7 +126,7 @@ export default function appointmentsClientView(){
             <View style = {styles.container}>
                 <LinearGradient
                   locations = {[0.7, 1]}
-                  colors = {['#EB73C9', 'white']}
+                  colors = {['#DDA0DD', 'white']}
                   style = {{width: windowDimensions.width, height: windowDimensions.height - 85}}
                 >
                     <View style = {styles.background}>
@@ -194,7 +194,8 @@ export default function appointmentsClientView(){
 
 const styles = StyleSheet.create({
     container:{
-        borderRadius: 90
+        borderRadius: 90,
+        //color: '#DDA0DD'
     },
     // title styling 
     objectTitle: {
@@ -210,7 +211,8 @@ const styles = StyleSheet.create({
         //paddingTop: 20,
         //paddingBottom: 775,
         //alignItems: 'center',
-        borderRadius: 30
+        borderRadius: 30,
+        //color: '#DDA0DD'
     },
     // shadow for objects IOS
     boxShadowIOS: {

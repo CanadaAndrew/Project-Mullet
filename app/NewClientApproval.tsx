@@ -121,7 +121,7 @@ export default function NewClientApproval() {
             <ScrollView>
                 <LinearGradient
                     locations={[0.7, 1]}
-                    colors={['#EB73C9', 'white']}
+                    colors={['#DDA0DD', 'white']}
                     //style={{ width: windowDimensions.width, height: windowDimensions.height - 85 }}
                     style={{ width: useWindowDimensions().width, height: useWindowDimensions().height - 85 }}
                 >
@@ -178,6 +178,7 @@ const styles = StyleSheet.create({
     container: {
         rowGap: 20,
         paddingVertical: 30,
+        //color: '#DDA0DD'
     },
     // shadow for objects IOS
     boxShadowIOS: {

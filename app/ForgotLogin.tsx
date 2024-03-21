@@ -83,7 +83,7 @@ export default function ForgotLogin({ navigation }){
 
             <LinearGradient
               locations = {[0.7, 1]}
-              colors = {['#EB73C9', 'white']}
+              colors = {['#DDA0DD', 'white']}
               style = {styles.background}
              >
 
