@@ -15,8 +15,36 @@ declare global {
   
 export default function newClientInfo_ClientView({ navigation }){
 
+    //Variables to set customer info
+    //I just kept the default text as the original dummy data, can be changed later
+    const [editingContactInfo, setEditingContactInfo] = useState(false);
+    const [custNumber, setCustNumber] = useState('(123) 456 7890');
+    const [custEmail, setCustEmail] = useState('email@email.com');
+    const [custAddress, setCustAddress] = useState('N/A');
+
+    const [editingPreferences, setEditingPreferences] = useState(false);
+    const [custServices, setCustServices] = useState('Woman’s Haircuts\nHair Coloring');
+    const [custNotes, setCustNotes] = useState('Allergic to hair dyes with \nparaphenylenediamine (PPD) in them.');
+
     const auth = getAuth(firebase);
     auth.languageCode = 'en';
+
+    //Toggles the edit permissions for the contact info box
+    const toggleEditContactInfo = () => {
+        setEditingContactInfo(prevState => !prevState);
+      };
+    
+      //Toggles the edit permissions for the preferences info box
+      const toggleEditPreferences = () => {
+        setEditingPreferences(prevState => !prevState);
+      };
+    
+      //Saves the information by setting the editing flag to false
+      const saveChanges = () => {
+        // Here you can implement logic to save changes to the database
+        setEditingContactInfo(false); // After saving, switch back to view mode
+        setEditingPreferences(false); // After saving, switch back to view mode
+      };
 
     const database = axios.create({
         baseURL: 'http://10.0.0.192:3000', //Andrew pc local
@@ -45,58 +73,96 @@ export default function newClientInfo_ClientView({ navigation }){
                 </View>
 
                 {/*Edit button and title*/}
-                <View style = {styles.inlineLayout}>
-                    <Text style = {styles.objectTitle}>Contact Info</Text>
-                    <View>
-                        <TouchableOpacity
-                          style = {styles.editButton}
-                        >
-                            <Text style = {styles.editButtonText}>Edit</Text>
-                        </TouchableOpacity>
-                    </View>
+                <View style={styles.inlineLayout}>
+                    <Text style={styles.objectTitle}>Contact Info</Text>
+                    <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={editingContactInfo ? saveChanges : toggleEditContactInfo}
+                    >
+                    <Text style={styles.editButtonText}>{editingContactInfo ? 'Save' : 'Edit'}</Text>
+                    </TouchableOpacity>
                 </View>
 
                 {/*Client Info Box*/}
-                <View style = {[styles.clientBox, styles.container]}>
-                    <Text style = {styles.clientTilteText}>Email</Text>
-                    <Text style = {styles.clientText}>s******h@gmail.com</Text>
+                <View style={[styles.clientBox, styles.container]}>
+                    <Text style={styles.clientTilteText}>Email</Text>
+                    {editingContactInfo ? (
+                        <TextInput
+                            style={styles.clientTextInput}
+                            value={custEmail}
+                            onChangeText={setCustEmail}
+                        />
+                    ) : (
+                    <Text style={styles.clientText}>{custEmail}</Text>
+                    )}
                     <Text>{'\n'}</Text>
-                    <Text style = {styles.clientTilteText}>Phone Number</Text>
-                    <Text style = {styles.clientText}>(xxx) xxx-5555</Text>
-                    <Text>{'\n'}</Text>
-                    <Text style = {styles.clientTilteText}>Address</Text>
-                    <Text style = {styles.clientText}>N/A</Text>
+                    <Text style={styles.clientTilteText}>Phone Number</Text>
+                    {editingContactInfo ? (
+                        <TextInput
+                            style={styles.clientTextInput}
+                            value={custNumber}
+                            onChangeText={setCustNumber}
+                        />
+                    ) : (
+                    <Text style={styles.clientText}>{custNumber}</Text>
+                    )}
+                        <Text>{'\n'}</Text>
+                        <Text style={styles.clientTilteText}>Address</Text>
+                    {editingContactInfo ? (
+                        <TextInput
+                            style={styles.clientTextInput}
+                            value={custAddress}
+                            onChangeText={setCustAddress}
+                        />
+                    ) : (
+                    <Text style={styles.clientText}>{custAddress}</Text>
+                    )}
                 </View>
                 <View>
-                    <Text >{'\n'}</Text>
-                </View>
-
-                {/*Edit button and title*/}
-                <View style = {styles.inlineLayout}>
-                    <Text style = {styles.objectTitle}>Preferences</Text>
-                    <View>
-                        <TouchableOpacity
-                          style = {styles.editButton}
-                        >
-                            <Text style = {styles.editButtonText}>Edit</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-
-                {/*Client Info Box*/}
-                <View style = {[styles.clientBox, styles.container]}>
-                    <Text style = {styles.clientTilteText}>Preferred Services</Text>
-                    <Text style = {styles.clientText}>Woman’s Haircuts</Text>
-                    <Text style = {styles.clientText}>Hair Coloring</Text>
-                    <Text>{'\n'}</Text>
-                    <Text style = {styles.clientTilteText}>Phone Number</Text>
-                    <Text style = {styles.clientText}>Allergic to hair dyes with paraphenylenediamine (PPD) in them.</Text>
                     <Text>{'\n'}</Text>
                 </View>
 
-             </LinearGradient>
+                {/* Edit button and title for Preferences */}
+                <View style={styles.inlineLayout}>
+                <Text style={styles.objectTitle}>Preferences</Text>
+                <TouchableOpacity
+                style={styles.editButton}
+                onPress={toggleEditPreferences}
+                >
+                <Text style={styles.editButtonText}>{editingPreferences ? 'Save' : 'Edit'}</Text>
+                </TouchableOpacity>
+            </View>
+
+                {/* Client Info Box for Preferences */}
+            <View style={[styles.clientBox, styles.container]}>
+                <Text style={styles.clientTilteText}>Preferred Services</Text>
+                {editingPreferences ? (
+                <TextInput
+                    style={styles.clientTextInput}
+                    value={custServices}
+                    onChangeText={setCustServices}
+                    multiline={true}
+                />
+                ) : (
+                <Text style={styles.clientText}>{custServices}</Text>
+                )}
+                <Text>{'\n'}</Text>
+                <Text style={styles.clientTilteText}>Notes</Text>
+                {editingPreferences ? (
+                <TextInput
+                    style={styles.clientTextInput}
+                    value={custNotes}
+                    onChangeText={setCustNotes}
+                    multiline={true}
+                />
+                ) : (
+                <Text style={styles.clientText}>{custNotes}</Text>
+                )}
+            </View>
+
+            </LinearGradient>
              
-           </ScrollView>
+            </ScrollView>
         </View>
     );
 }
@@ -136,6 +202,12 @@ const styles = StyleSheet.create({
     // client text info
     clientText: {
         color: 'black',
+        fontWeight: 'bold',
+        fontSize: 18
+    },
+
+    clientTextInput: {
+        color: 'grey',
         fontWeight: 'bold',
         fontSize: 18
     },
@@ -203,6 +275,10 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         backgroundColor: '#BE42B2',
         borderRadius: 20,
+    },
+    //Unused for now. Was too glitchy. Was going to use to change save button color
+    saveButton: {
+        backgroundColor: 'green',
     },
     // to split title and edit button on one line
     inlineLayout: {
