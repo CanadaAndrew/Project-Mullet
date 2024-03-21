@@ -21,12 +21,13 @@ export default function SetupAppointment2({route}) { // added route for page nav
     //server connection
     const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
     const database = axios.create({
-        baseURL: dbConnectionString,
+        baseURL: "http://10.0.0.192:3000"
+        //baseURL: dbConnectionString,
     });
 
     const [selectedDate, setSelectedDate] = useState(null);
     const [appointmentTimes, setAppointmentTimes] = useState([[]]); //list of selected times to push to db upon confirmation
-    const [selectedTime, setSelectedTime] = useState(null);       //updates the selected time state
+    const [selectedTime, setSelectedTime] = useState([]);       //updates the selected time state
     const [alteredListOfTimes, setAlteredTimes] = useState([[]]);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -149,16 +150,12 @@ export default function SetupAppointment2({route}) { // added route for page nav
 
     useEffect(() => {
         displayDateTimes();
+        calculateHours();
+        formatServices()
     }, []);
 
     const [hours, setHours] = React.useState(0);
-    const [firstLoad, setFirstLoad] = React.useState(0);
 
-    if(firstLoad == 0){
-        setFirstLoad(1);
-        calculateHours();
-        formatServices()
-    }
     function calculateHours(){
             let hairStyleArray = hairStyleData.split(', ');
             let totalHours = 0;
@@ -187,16 +184,40 @@ export default function SetupAppointment2({route}) { // added route for page nav
     }
 
     const handleAppointmentPress = (time, date, index) => {
+        let currentTime; 
+        currentTime = selectedTime;
+        setSelectedTime((prevTime) => {
+                if(!(prevTime.length === 0) && prevTime.includes(time)){
+                    currentTime = [];
+                    return currentTime;
+                }else{
+                    currentTime = [];
+                    currentTime[0] = time;
+                    let startingTimeNum = militaryHours[time].split(':')[0];
+                    for(let i = 1; i < hours; i++){
+                        let newTime;
+                        newTime = parseInt(startingTimeNum) + i;
+                        if(newTime < 10){
+                            newTime = '0' + newTime;
+                        }
+                        if(!alteredListOfTimes[index].includes(displayHours[newTime + ":00:00"]) || parseInt(startingTimeNum) + i > 23 ){
+                            alert("Error, not enough available time");
+                            return [];
+                        }else{
+                            currentTime[i] = displayHours[newTime +":00:00"];
+                        }
+                    }
+                    alert(JSON.stringify(currentTime));
+                    return currentTime;
+                }
+        }
+        );
         setSelectedDate((prevDate) => {
-            const newDate = prevDate === date ? null : date;
+            const newDate = currentTime === null ? null : date;
             alert('selected date: ' + newDate); //for testing purposes
             return newDate;
         });
-        setSelectedTime((prevTime) => {
-            const newTime = prevTime === time ? null : time;
-            alert('selected time: ' + newTime); //for testing purposes
-            return newTime;
-        });
+
         setSelectedIndex(index)
         alert('index: '+selectedIndex)
     };
@@ -269,7 +290,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                                                 style={[styles.availableTimeCellButton, { backgroundColor: 'white' }]}
                                                                 onPress={() => handleAppointmentPress(item, dummyDates[index], index)}
                                                             >
-                                                                <Text style={[styles.availableTimeCellText, { color: selectedTime === item && selectedDate === dummyDates[index] ? 'green' : 'black' }]}>
+                                                                <Text style={[styles.availableTimeCellText, { color: !(selectedTime.length === 0) && selectedTime.includes(item) && selectedDate === dummyDates[index] ? 'green' : 'black' }]}>
                                                                     {item}
                                                                 </Text>
                                                             </TouchableOpacity>
@@ -305,7 +326,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                 onPress = {() => {
                                     let startingTimeNum
                                     try{
-                                        startingTimeNum = militaryHours[selectedTime].split(':')[0];
+                                        startingTimeNum = militaryHours[selectedTime[0]].split(':')[0];
                                     }catch(e){
                                         alert("Error: Invalid time/Date");
                                         return;
