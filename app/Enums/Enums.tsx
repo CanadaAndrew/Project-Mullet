@@ -111,6 +111,11 @@ function UTCtoPST(date: Date)
     return new Date(moment(date).tz('America/Los_Angeles').format('YYYY-MM-DDTHH:mm:ss.SSS'));
 }
 
+function UTCtoPSTString(date: Date)
+{
+    return moment(date).tz('America/Los_Angeles').format('YYYY-MM-DDTHH:mm:ss.SSS');
+}
+
 const listOfStates =
 {
     "AL": "Alabama",
@@ -173,4 +178,4 @@ const listOfStates =
     "WI": "Wisconsin",
     "WY": "Wyoming"
 }
-export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST, listOfStates, SERVICES};
+export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST, UTCtoPSTString, listOfStates, SERVICES};
