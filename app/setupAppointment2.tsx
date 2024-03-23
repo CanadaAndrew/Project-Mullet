@@ -15,6 +15,7 @@ import { Link } from 'expo-router';
 import axios from 'axios';
 import { SERVICES, militaryHours, displayHours} from './Enums/Enums';
 import Constants from 'expo-constants';
+import { UTCtoPST } from './Enums/Enums';
 
 export default function SetupAppointment2({route}) { // added route for page navigation
     
@@ -215,7 +216,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
         setSelectedDate((prevDate) => {
             const newDate = currentTime === null ? null : date;
             alert('selected date: ' + newDate); //for testing purposes
-            return newDate;
+            return UTCtoPST(newDate);
         });
 
         setSelectedIndex(index)

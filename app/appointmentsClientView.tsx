@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import axios from 'axios';
 import Constants from 'expo-constants';
-
+import { UTCtoPST } from './Enums/Enums';
 export default function appointmentsClientView(){
 
     //server connection
@@ -77,7 +77,7 @@ export default function appointmentsClientView(){
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
-                realDate: new Date(newDate)
+                realDate: UTCtoPST(newDate)
             }
             appointmentList[i] = newAppointment;
             i += 1;
@@ -99,7 +99,7 @@ export default function appointmentsClientView(){
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
-                realDate: new Date(newDate)
+                realDate: UTCtoPST(newDate)
             }
             appointmentList[i] = newAppointment;
             i += 1;
