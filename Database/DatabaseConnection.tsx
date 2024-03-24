@@ -340,7 +340,7 @@ async function addAvailability(addDateTimeString, vacancyStatus) {
     try {
         const poolConnection = await connect();
         poolConnection.setMaxListeners(24);
-        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${vacancyStatus});`;
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${notBooked});`;
         await poolConnection.request()
             .query(query);
         poolConnection.close();

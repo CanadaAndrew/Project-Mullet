@@ -104,16 +104,16 @@ displayHours['21:00:00'] = '09:00PM';
 displayHours['22:00:00'] = '10:00PM';
 displayHours['23:00:00'] = '11:00PM';
 
-function UTCtoPST(today: Date)
+function UTCtoPST(date: Date)
 {
-    //get today's date and convert it to PST
-   
-    const pstDateString =  moment(today).tz('America/Los_Angeles').format('YYYY-MM-DDTHH:mm:ss.SSS');
-    const todaysDate = pstDateString.slice(11, 16); //cuts off the date section
-    //console.log('todaysDate: ', todaysDate); //for debugging
+    //get the date and convert it to PST
+    //returns the date in PST format
+    return new Date(moment(date).tz('America/Los_Angeles').format('YYYY-MM-DDTHH:mm:ss.SSS'));
+}
 
-    return todaysDate; //returns time as a string in HH:MM format
-   
+function UTCtoPSTString(date: Date)
+{
+    return moment(date).tz('America/Los_Angeles').format('YYYY-MM-DDTHH:mm:ss.SSS');
 }
 
 const listOfStates =
@@ -178,4 +178,4 @@ const listOfStates =
     "WI": "Wisconsin",
     "WY": "Wyoming"
 }
-export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST, listOfStates, SERVICES};
+export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST, UTCtoPSTString, listOfStates, SERVICES};

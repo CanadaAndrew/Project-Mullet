@@ -11,7 +11,7 @@ import axios from 'axios';  //Used to get data from the backend nodejs
 import { displayHours } from './Enums/Enums';
 import { validateLocaleAndSetLanguage } from 'typescript';
 import Constants from 'expo-constants';
-
+import { UTCtoPST, UTCtoPSTString } from './Enums/Enums';
 //add route as a param to the function of every page that requires data from the const established in HomeScreen
 //You can also make another const here and transfer data as well here up to you
 export default function ModifyAv({ route }) {
@@ -61,7 +61,7 @@ export default function ModifyAv({ route }) {
         setListOfTimes([...listOfTimesDefault])
     
         //get today's date and convert it to PST
-        const pstDateString =  moment(day.dateString).tz('America/Los_Angeles').format('YYYY-MM-DDTHH:mm:ss.SSS');
+        const pstDateString =  UTCtoPSTString(day);
         //console.log('pstDateString: ', pstDateString); //for debugging
         setSelectedDate(pstDateString);
         setDisplayedDate(moment(pstDateString).format('ddd, MMMM Do'));

@@ -8,7 +8,8 @@ import moment from 'moment-timezone';
 import { TextInput } from 'react-native-gesture-handler';
 import { text } from 'express';
 import Constants from 'expo-constants';
-        
+import { UTCtoPST, UTCtoPSTString } from './Enums/Enums';
+
 export default function ClientHistory() {
 
     //server connection
@@ -74,7 +75,7 @@ export default function ClientHistory() {
 
     //get today's date and convert it to PST
     const today = new Date();
-    const pstDateString =  moment(today).tz('America/Los_Angeles').format('YYYY-MM-DDTHH:mm:ss.SSS');
+    const pstDateString =  UTCtoPSTString(today);
     const todaysDate = pstDateString.slice(0, 10) + "T00:00:00.000Z";
     //console.log('todaysDate: ', todaysDate); //for debugging
 

@@ -15,6 +15,7 @@ import { Link } from 'expo-router';
 import axios from 'axios';
 import { SERVICES, militaryHours, displayHours} from './Enums/Enums';
 import Constants from 'expo-constants';
+import { UTCtoPST } from './Enums/Enums';
 
 export default function SetupAppointment2({route}) { // added route for page navigation
     
@@ -25,9 +26,10 @@ export default function SetupAppointment2({route}) { // added route for page nav
     });
 
     const [selectedDate, setSelectedDate] = useState(null);
-    const [appointmentTimes, setAppointmentTimes] = useState([]); //list of selected times to push to db upon confirmation
-    const [selectedTime, setSelectedTime] = useState(null);       //updates the selected time state
+    const [appointmentTimes, setAppointmentTimes] = useState([[]]); //list of selected times to push to db upon confirmation
+    const [selectedTime, setSelectedTime] = useState([]);       //updates the selected time state
     const [alteredListOfTimes, setAlteredTimes] = useState([[]]);
+    const [selectedIndex, setSelectedIndex] = useState(0);
 
     // for data transfer between appointment pages
     const {hairStyleData} = route.params;
@@ -115,22 +117,23 @@ export default function SetupAppointment2({route}) { // added route for page nav
             //appointmentData then gets the data from the responding query
             let apptData;
             var temptimelist: string[] = [];
+            var realTimeList: string [] =[];
             //for loop that formats the time so it is more readable to normies, then pushes them each to an array
             for(apptData in appointmentData)
             {
                 let apptTime = appointmentData[apptData].AppointmentDate.slice(11,19);
+                realTimeList.push(apptTime);
                 let formattedTime = displayHours[apptTime];
                 temptimelist.push(formattedTime);
             }
 
             //takes said array above and pushes that array into another array that holds arrays(confusing? I know...)
             temp.push(temptimelist);
-
+            
         }
         
         //updates the main time array of arrays with the one that we have constructed as shown above.
         setAlteredTimes(temp);
-
     }
     
 
@@ -147,16 +150,12 @@ export default function SetupAppointment2({route}) { // added route for page nav
 
     useEffect(() => {
         displayDateTimes();
+        calculateHours();
+        formatServices()
     }, []);
 
     const [hours, setHours] = React.useState(0);
-    const [firstLoad, setFirstLoad] = React.useState(0);
 
-    if(firstLoad == 0){
-        setFirstLoad(1);
-        calculateHours();
-        formatServices()
-    }
     function calculateHours(){
             let hairStyleArray = hairStyleData.split(', ');
             let totalHours = 0;
@@ -184,17 +183,43 @@ export default function SetupAppointment2({route}) { // added route for page nav
         setServices(services.join(', '));
     }
 
-    const handleAppointmentPress = (time, date) => {
-        setSelectedDate((prevDate) => {
-            const newDate = prevDate === date ? null : date;
-            alert('selected date: ' + newDate); //for testing purposes
-            return newDate;
-        });
+    const handleAppointmentPress = (time, date, index) => {
+        let currentTime; 
+        currentTime = selectedTime;
         setSelectedTime((prevTime) => {
-            const newTime = prevTime === time ? null : time;
-            alert('selected time: ' + newTime); //for testing purposes
-            return newTime;
+                if(!(prevTime.length === 0) && prevTime.includes(time)){
+                    currentTime = [];
+                    return currentTime;
+                }else{
+                    currentTime = [];
+                    currentTime[0] = time;
+                    let startingTimeNum = militaryHours[time].split(':')[0];
+                    for(let i = 1; i < hours; i++){
+                        let newTime;
+                        newTime = parseInt(startingTimeNum) + i;
+                        if(newTime < 10){
+                            newTime = '0' + newTime;
+                        }
+                        if(!alteredListOfTimes[index].includes(displayHours[newTime + ":00:00"]) || parseInt(startingTimeNum) + i > 23 ){
+                            alert("Error, not enough available time");
+                            return [];
+                        }else{
+                            currentTime[i] = displayHours[newTime +":00:00"];
+                        }
+                    }
+                    alert(JSON.stringify(currentTime));
+                    return currentTime;
+                }
+        }
+        );
+        setSelectedDate((prevDate) => {
+            const newDate = currentTime === null ? null : date;
+            alert('selected date: ' + newDate); //for testing purposes
+            return UTCtoPST(newDate);
         });
+
+        setSelectedIndex(index)
+        alert('index: '+selectedIndex)
     };
 
 
@@ -263,9 +288,9 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                                         <View style={styles.availableTimeCell}>
                                                             <TouchableOpacity
                                                                 style={[styles.availableTimeCellButton, { backgroundColor: 'white' }]}
-                                                                onPress={() => handleAppointmentPress(item, dummyDates[index])}
+                                                                onPress={() => handleAppointmentPress(item, dummyDates[index], index)}
                                                             >
-                                                                <Text style={[styles.availableTimeCellText, { color: selectedTime === item && selectedDate === dummyDates[index] ? 'green' : 'black' }]}>
+                                                                <Text style={[styles.availableTimeCellText, { color: !(selectedTime.length === 0) && selectedTime.includes(item) && selectedDate === dummyDates[index] ? 'green' : 'black' }]}>
                                                                     {item}
                                                                 </Text>
                                                             </TouchableOpacity>
@@ -301,7 +326,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                 onPress = {() => {
                                     let startingTimeNum
                                     try{
-                                        startingTimeNum = militaryHours[selectedTime].split(':')[0];
+                                        startingTimeNum = militaryHours[selectedTime[0]].split(':')[0];
                                     }catch(e){
                                         alert("Error: Invalid time/Date");
                                         return;
@@ -312,7 +337,8 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                         if(newTime < 10){
                                             newTime = '0' + newTime;
                                         }
-                                        if(!appointmentTimes.includes(displayHours[newTime + ":00:00"]) || parseInt(startingTimeNum) + i > 23){
+                                        if(!alteredListOfTimes[selectedIndex].includes(displayHours[newTime + ":00:00"]) || parseInt(startingTimeNum) + i > 23 ){
+                                            alert(newTime);
                                             alert("Error, not enough available time");
                                             return;
                                         }
@@ -327,7 +353,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                             params:{
                                                 date:selectedDate,
                                                 time:(newTime + ':00:00'),
-                                                userID: userData.UserId,
+                                                userID: userData.userID,
                                                 type: services.split('\'').join('')
                                             }
                                         }).then(()=>{alert('success')}).catch(() => alert('error'));

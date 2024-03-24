@@ -9,6 +9,7 @@ import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
 import { ScrollView } from 'react-native-gesture-handler';
 import Constants from 'expo-constants';
+import { UTCtoPST, UTCtoPSTString } from './Enums/Enums';
 
 
 export default function ClientAp({ route }){ 
@@ -38,28 +39,28 @@ export default function ClientAp({ route }){
             service: "Mens Haircut",
             date: "10/27/23, Fri, 1:00pm",
             stylist: 'Melissa Wright',
-            realDate: new Date("2023-10-27")
+            realDate: UTCtoPST(new Date("2023-10-27"))
         },
         {
             name: "Bob Smith",
             service: "Mens Haircut",
             date: "11/27/23, Mon, 2:00pm",
             stylist: 'Melissa Wright',
-            realDate: (new Date("2023-11-27"))
+            realDate: UTCtoPST(new Date("2023-11-27"))
         },
         {
             name: "Jane Doe",
             service: "Womens Haircut",
             date: "11/18/23, Fri, 3:00pm",
             stylist: 'Melissa Wright',
-            realDate: new Date("2023-11-18")
+            realDate: UTCtoPST(new Date("2023-11-18"))
         },
         {
             name: "Melinda Jackson",
             service: "Hair Extensions",
             date: "11/15/23, Sat, 2:00pm",
             stylist: 'Melissa Wright',
-            realDate: new Date("2023-11-15")
+            realDate: UTCtoPST(new Date("2023-11-15"))
         }
     ]
 
@@ -103,7 +104,7 @@ export default function ClientAp({ route }){
         if(first === 0 ){
             setFirst(1);
             let date = new Date;
-            let dateString = date.toISOString(); //NOTE THAT THE DATE IS CURRENTLY OFF, NEED TO FIX IN ANOTHER SPRINT
+            let dateString = UTCtoPSTString(date); //NOTE THAT THE DATE IS CURRENTLY OFF, NEED TO FIX IN ANOTHER SPRINT
             updateAppointments(dateString.split("T")[0]);
         }
     }
@@ -112,7 +113,7 @@ export default function ClientAp({ route }){
         let data;
         database.get('/queryUpcomingAppointments', {
             params: {
-                queryDate : date 
+                queryDate : UTCtoPST(date)
             }
         })
         .then((ret) => data = ret.data)
@@ -140,7 +141,7 @@ export default function ClientAp({ route }){
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
-                realDate: new Date(newDate)
+                realDate: UTCtoPST(newDate)
             }
             appointmentList[i] = newAppointment;
             i++;
@@ -183,7 +184,7 @@ export default function ClientAp({ route }){
             //this filters out the appointments that are not today
 
             //making a new date object with the systems current time
-            const curDay = new Date();
+            const curDay = UTCtoPST(new Date());
 
             //filters the appointments by adding the appointments that have the date in the date string, to the filteredAps array
             //with a temp array as a mediator because javascript is stupid and won't let me copy directly over between the two
@@ -197,9 +198,9 @@ export default function ClientAp({ route }){
         { 
             //kinda the same thing as filtering by today but a little more in depth getting todays date from the system and
             //calculating the first and last days of the week for comparison down below
-            const today = new Date();
-            const firstDayOfWeek = new Date(today);
-            const lastDayOfWeek = new Date(today);
+            const today = UTCtoPST(new Date());
+            const firstDayOfWeek = UTCtoPST(today);
+            const lastDayOfWeek = UTCtoPST(today);
             firstDayOfWeek.setDate(today.getDate() - today.getDay());
             lastDayOfWeek.setDate(today.getDate() + (6 - today.getDay()));
 
@@ -219,9 +220,9 @@ export default function ClientAp({ route }){
         else if(selected == "This Month")
         {
             //very similar to filter by week except you are getting the first and last day of the month instead of the week
-            const today = new Date();
-            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            const today = UTCtoPST(new Date());
+            const firstDayOfMonth = UTCtoPST(new Date(today.getFullYear(), today.getMonth(), 1));
+            const lastDayOfMonth = UTCtoPST(new Date(today.getFullYear(), today.getMonth() + 1, 0));
 
 
             //filtering out appointments that aren't in this month
@@ -239,7 +240,7 @@ export default function ClientAp({ route }){
       <ScrollView>
         <LinearGradient
         locations = {[0.7, 1]}
-        colors = {['#EB73C9','white']}
+        colors = {['#DDA0DD','white']}
         style = {styles.container}>
             <View style = {styles.container}>
                 <View style = {styles.backButton}></View>

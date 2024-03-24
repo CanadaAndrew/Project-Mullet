@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import axios from 'axios';
 import Constants from 'expo-constants';
-
+import { UTCtoPST, UTCtoPSTString } from './Enums/Enums';
 export default function appointmentsClientView(){
 
     //server connection
@@ -29,8 +29,8 @@ export default function appointmentsClientView(){
     async function firstUpdate(){
         if(first === 0 ){
             setFirst(1);
-            let date = new Date;
-            let dateString = date.toISOString(); //NOTE THAT THE DATE IS CURRENTLY OFF, NEED TO FIX IN ANOTHER SPRINT
+            let date = UTCtoPST(new Date);
+            let dateString = UTCtoPSTString(date); //NOTE THAT THE DATE IS CURRENTLY OFF, NEED TO FIX IN ANOTHER SPRINT //UTCtoPSTString should fix this -Tai
             let name = await getName(1);
             updateUpcomingAppointments(dateString.split("T")[0], 1, name); //Note that currently using ID 1 until the use of UserID transfer comes in
             updatePastAppointments(dateString.split("T")[0], 1, name);
@@ -41,7 +41,7 @@ export default function appointmentsClientView(){
         let data;
         database.get('/queryUpcomingAppointmentsByUserIDAndDate', {
             params: {
-                date : date,
+                date : UTCtoPST(date),
                 userID: userID //temp value, will be changed
             }
         })
@@ -54,7 +54,7 @@ export default function appointmentsClientView(){
         let data;
         database.get('/queryPastAppointmentsByUserIDAndDate', {
             params: {
-                date : date,
+                date : UTCtoPST(date),
                 userID: userID //temp value, will be changed
             }
         })
@@ -77,7 +77,7 @@ export default function appointmentsClientView(){
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
-                realDate: new Date(newDate)
+                realDate: UTCtoPST(newDate)
             }
             appointmentList[i] = newAppointment;
             i += 1;
@@ -99,10 +99,13 @@ export default function appointmentsClientView(){
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
-                realDate: new Date(newDate)
+                realDate: UTCtoPST(newDate)
+
+               
             }
             appointmentList[i] = newAppointment;
             i += 1;
+            
         }
         )
         setPastClientAppointments(appointmentList);
@@ -120,13 +123,13 @@ export default function appointmentsClientView(){
             return name.data[0].FirstName + " " + name.data[0].MiddleName + " " + name.data[0].LastName
         }
     }
-
+   
     return(
         <ScrollView>
             <View style = {styles.container}>
                 <LinearGradient
                   locations = {[0.7, 1]}
-                  colors = {['#EB73C9', 'white']}
+                  colors = {['#DDA0DD', 'white']}
                   style = {{width: windowDimensions.width, height: windowDimensions.height - 85}}
                 >
                     <View style = {styles.background}>
@@ -194,7 +197,8 @@ export default function appointmentsClientView(){
 
 const styles = StyleSheet.create({
     container:{
-        borderRadius: 90
+        borderRadius: 90,
+        //color: '#DDA0DD'
     },
     // title styling 
     objectTitle: {
@@ -210,7 +214,8 @@ const styles = StyleSheet.create({
         //paddingTop: 20,
         //paddingBottom: 775,
         //alignItems: 'center',
-        borderRadius: 30
+        borderRadius: 30,
+        //color: '#DDA0DD'
     },
     // shadow for objects IOS
     boxShadowIOS: {
