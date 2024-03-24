@@ -604,6 +604,56 @@ async function UpdateClientApproval(userID)
     }
 }
 
+async function QueryClientViewWithID(userID)
+{
+    try
+    {
+        const poolConnection = await connect();
+        const query = `SELECT * FROM ClientView WHERE UserID = '${userID}';`;
+        const resultSet = await poolConnection.request().query(query);
+        poolConnection.close();//
+        return sortingResults(resultSet);
+    }
+    catch(err)
+    {
+        console.error(err.message);
+        throw err;
+    }
+}
+
+async function QueryCurrentClientViewWithID(userID)
+{
+    try
+    {
+        const poolConnection = await connect();
+        const query = `SELECT * FROM CurrentClientView WHERE UserID = '${userID}';`;
+        const resultSet = await poolConnection.request().query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    }
+    catch(err)
+    {
+        console.error(err.message);
+        throw err;
+    }
+}
+
+async function QueryServicesWantedWithID(userID){
+    try
+    {
+        const poolConnection = await connect();
+        const query = `SELECT * FROM ServicesWanted WHERE UserID = '${userID}';`;
+        const resultSet = await poolConnection.request().query(query);
+        poolConnection.close();
+        return sortingResults(resultSet);
+    }
+    catch(err)
+    {
+        console.error(err.message);
+        throw err;
+    }
+}
+
 //For each query/function, a REST API needs to be created, a way for the frontend of our program to call methods to our backend.
 //app.get means the front end will GET stuff from the backend
 //app.post means the front end will POST stuff to the backend(read up on the Axion api for more information.)
@@ -1079,7 +1129,58 @@ app.put('/updateClientApproval', async (req, res) =>{
         res.status(400).send('Bad Request');
     }
     
-})
+});
+
+app.get('/queryClientViewWithID', async (req, res) => {
+    try
+    {
+        const userID = req.query.UserID;
+        if(!userID)
+        {
+            throw new Error("Invalid request. Missing 'UserID'")
+        }
+        const result = await QueryClientViewWithID(userID);
+        res.send(result);
+    }
+    catch
+    {
+        res.status(400).send('Bad Request');
+    }
+});
+
+app.get('/queryCurrentClientViewWithID', async (req, res) => {
+    try
+    {
+        const userID = req.query.UserID;
+        if(!userID)
+        {
+            throw new Error("Invalid request. Missing 'UserID'")
+        }
+        const result = await QueryCurrentClientViewWithID(userID);
+        res.send(result);
+    }
+    catch
+    {
+        res.status(400).send('Bad Request');
+    }
+});
+
+app.get('/queryServicesWantedWithID', async (req, res) => {
+    try
+    {
+        const userID = req.query.UserID;
+        if(!userID)
+        {
+            throw new Error("Invalid request. Missing 'UserID'")
+        }
+        const result = await QueryServicesWantedWithID(userID);
+        res.send(result);
+    }
+    catch
+    {
+        res.status(400).send('Bad Request');
+    }
+});
 
 //This opens the server, printing to console 'up' when it is up.
 const PORT = process.env.PORT || 3000;
