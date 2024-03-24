@@ -13,7 +13,7 @@ declare global {
     }
   }
   
-export default function newClientInfo_ClientView({ navigation }){
+export default function newClientInfo_AdminView({ navigation }){
 
     //Variables to set customer info
     //I just kept the default text as the original dummy data, can be changed later
@@ -47,9 +47,10 @@ export default function newClientInfo_ClientView({ navigation }){
       };
 
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000', //Andrew pc local
+        //baseURL: 'http://10.0.0.192:3000', //Andrew pc local
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
         //baseURL: 'http://10.0.0.133:3000',
+        baseURL: 'http://10.0.0.14:3000',
     })
 
     return (
