@@ -7,9 +7,9 @@ import Constants from 'expo-constants';
 export default function appointmentsClientView(){
 
     //server connection
-    const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
     const database = axios.create({
-        baseURL: dbConnectionString,
+        baseURL: 'http://hair-done-wright530.azurewebsites.net', //Azure server
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
     });
 
     const windowDimensions = Dimensions.get('window')

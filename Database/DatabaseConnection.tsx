@@ -336,7 +336,7 @@ async function appointmentQuery(startDate, endDate, vacancyStatus){
 }
 
 //adds an admin availability date/time to the database
-async function addAvailability(addDateTimeString, notBooked) {
+async function addAvailability(addDateTimeString, vacancyStatus) {
     try {
         const poolConnection = await connect();
         poolConnection.setMaxListeners(24);
