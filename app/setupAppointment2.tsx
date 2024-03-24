@@ -20,10 +20,9 @@ import { UTCtoPST } from './Enums/Enums';
 export default function SetupAppointment2({route}) { // added route for page navigation
     
     //server connection
-    const dbConnectionString = Constants.expoConfig.extra.DB_CONNECTION_STRING;
     const database = axios.create({
-        baseURL: "http://10.0.0.192:3000"
-        //baseURL: dbConnectionString,
+        baseURL: 'http://hair-done-wright530.azurewebsites.net', //Azure server
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
     });
 
     const [selectedDate, setSelectedDate] = useState(null);
