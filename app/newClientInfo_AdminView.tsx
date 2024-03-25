@@ -37,19 +37,63 @@ export default function newClientInfo_AdminView({ navigation }){
     //Toggles the edit permissions for the contact info box
     const toggleEditContactInfo = () => {
         setEditingContactInfo(prevState => !prevState);
-      };
+    };
     
-      //Toggles the edit permissions for the preferences info box
-      const toggleEditPreferences = () => {
+    //Toggles the edit permissions for the preferences info box
+    const toggleEditPreferences = () => {
         setEditingPreferences(prevState => !prevState);
-      };
+    };
     
-      //Saves the information by setting the editing flag to false
-      const saveChanges = () => {
-        // Here you can implement logic to save changes to the database
-        setEditingContactInfo(false); // After saving, switch back to view mode
-        setEditingPreferences(false); // After saving, switch back to view mode
-      };
+    //updates database with contact info changes
+    const saveContactInfoChanges = () => {
+        //***either decatenate address string for street, city, state, zip or get from fields if added***
+         //update client's contact info in database
+        try {
+            //if address is decatenated
+            /*const addressTokens = custAddress.split(',');
+            const custStreet = addressTokens[0];
+            const custCity = addressTokens[1];
+            const custState = addressTokens[2];
+            const custZip = addressTokens[3];*/
+            database.patch('/updateCurrentClientViewContactInfo', {
+                userID: userID,
+                email: custEmail,
+                phoneNumber: custNumber,
+                //street: custStreet,
+                //city: custCity,
+                //stateAbbreviation: custState,
+                //zipcode: custZip
+            });
+        } catch (error) {
+            console.error('Problem updating contact info', error);
+        };
+        setEditingContactInfo(false); //after saving, switch back to view mode
+    };
+
+    //updates database with preferences changes
+    const savePreferencesChanges = () => {
+
+         //update client's notes in database
+        try {
+            database.patch('/updateCurrentClientViewNotes', {
+                userID: userID,
+                clientNotes: custNotes
+            });
+        } catch (error) {
+            console.error("Problem updating client's notes", error);
+        };
+
+        //update client's services wanted in database
+        try {
+            database.patch('/updateServicesWanted', {
+                userID: userID,
+                serviceName: custServices
+                });
+        } catch (error) {
+            console.error('Problem updating services wanted', error);
+        };
+        setEditingPreferences(false); //after saving, switch back to view mode
+    };
 
     const database = axios.create({
         //baseURL: 'http://10.0.0.192:3000', //Andrew pc local
@@ -156,7 +200,7 @@ export default function newClientInfo_AdminView({ navigation }){
                     <Text style={styles.objectTitle}>Contact Info</Text>
                     <TouchableOpacity
                     style={styles.editButton}
-                    onPress={editingContactInfo ? saveChanges : toggleEditContactInfo}
+                    onPress={editingContactInfo ? saveContactInfoChanges : toggleEditContactInfo}
                     >
                     <Text style={styles.editButtonText}>{editingContactInfo ? 'Save' : 'Edit'}</Text>
                     </TouchableOpacity>
@@ -206,7 +250,7 @@ export default function newClientInfo_AdminView({ navigation }){
                 <Text style={styles.objectTitle}>Preferences</Text>
                 <TouchableOpacity
                 style={styles.editButton}
-                onPress={toggleEditPreferences}
+                onPress={editingPreferences ? savePreferencesChanges : toggleEditPreferences}
                 >
                 <Text style={styles.editButtonText}>{editingPreferences ? 'Save' : 'Edit'}</Text>
                 </TouchableOpacity>
