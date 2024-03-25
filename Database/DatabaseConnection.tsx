@@ -254,6 +254,49 @@ async function updateAppointment(date, time, userID, type){
     
 }
 
+//updates CurrentClientView with email, phone number, street, city, state, and zip
+async function currentClientViewContactInfoUpdate(userID, email, phoneNumber, street, city, state, zip) {
+    try {
+        const poolConnection = await connect();
+        const query = `UPDATE CurrentClientView
+            SET Email = '${email}', PhoneNumber = '${phoneNumber}', Street = '${street}', 
+                City = '${city}', StateAbbreviation = '${state}', Zip = '${zip}'
+            WHERE UserID = ${userID};`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+    }
+};
+
+//updates CurrentClientView with client notes
+async function currentClientViewNotesUpdate(userID, clientNotes) {
+    try {
+        const poolConnection = await connect();
+        const query = `UPDATE CurrentClientView
+            SET ClientNotes = '${clientNotes}'
+            WHERE UserID = ${userID};`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+    }
+};
+
+//updates ServicesWanted with service name
+async function servicesWantedUpdate(userID, serviceName) {
+    try {
+        const poolConnection = await connect();
+        const query = `UPDATE ServicesWanted
+            SET ServiceName = '${serviceName}'
+            WHERE UserID = ${userID};`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+    }
+};
+
 //adds new user to database
 async function newUserPost(email, phoneNumber, pass, adminPrive) {
     try {
@@ -809,6 +852,48 @@ app.post('/addAvailability', async (req, res) => {
             throw new Error('Invalid request body. Missing "vacancyStatus".');
         }
         await addAvailability(addDateTimeString, vacancyStatus);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.update('/updateCurrentClientViewContactInfo', async (req, res) => {
+    try {
+        const { userID, email, phoneNumber, street, city, state, zip } = req.body;
+        if (!userID) {
+            throw new Error('Invalid request body. Missing "userID"');
+        }
+        await currentClientViewContactInfoUpdate(userID, email, phoneNumber, street, city, state, zip);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.update('/updateCurrentClientViewNotes', async (req, res) => {
+    try {
+        const { userID, clientNotes } = req.body;
+        if (!userID) {
+            throw new Error('Invalid request body. Missing "userID"');
+        }
+        await currentClientViewNotesUpdate(userID, clientNotes);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.update('/updateServicesWanted', async (req, res) => {
+    try {
+        const { userID, serviceName } = req.body;
+        if (!userID) {
+            throw new Error('Invalid request body. Missing "userID"');
+        }
+        await servicesWantedUpdate(userID, serviceName);
         res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
