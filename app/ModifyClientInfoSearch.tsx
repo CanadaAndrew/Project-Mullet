@@ -2,6 +2,7 @@ import { StyleSheet, Text, TextInput, View, ScrollView, FlatList, TouchableOpaci
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
 import axios from 'axios';
+import { SearchBar } from 'react-native-screens';
 
 export default function ModifyClientInfoSearch() {
 
@@ -10,7 +11,8 @@ export default function ModifyClientInfoSearch() {
         //baseURL: 'http://10.0.0.119:3000',  // Wilson local
         //baseURL: 'http://10.0.0.192:3000',
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
-        baseURL: 'http://10.0.0.14:3000', //Cameron Local
+        //baseURL: 'http://10.0.0.14:3000', //Cameron Local
+        baseURL: 'http://hair-done-wright530.azurewebsites.net', //Azure server
     })
 
     const [nameInput, newNameInput] = React.useState('');
@@ -18,9 +20,13 @@ export default function ModifyClientInfoSearch() {
     const [firstLetterArr, setFirstLetterArr] = React.useState([]);
     const [clientList2, setClientList2] = React.useState([[]]);
 
-    function filterNames(){
+    const handleNameSearch = () => {
 
-    }
+        const filteredClients = clientList2.map(clientArray =>
+           clientArray.filter(clientName => clientName.toLowerCase().includes(nameInput.toLowerCase())) 
+        );
+        setClientList2(filteredClients);
+    };
 
     async function displayClientList()
     {
@@ -112,7 +118,7 @@ export default function ModifyClientInfoSearch() {
                             style={styles.textField}
                             value={nameInput}
                             onChangeText={newNameInput}
-                            onTextInput={() => filterNames()}
+                            onTextInput={() => handleNameSearch()}
                             placeholder="Search"
                         />
                     </View>
