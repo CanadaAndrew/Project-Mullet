@@ -27,6 +27,13 @@ export default function newClientInfo_AdminView({ navigation }){
     const [custEmail, setCustEmail] = useState('');
     const [custAddress, setCustAddress] = useState('');
 
+    /**/
+    const [street, setStreet] = useState('');
+    const [city, setCity] = useState('');
+    const [stateAbbrev, setStateAbbrev] = useState('');
+    const [zip, setZip] = useState('');
+    /**/
+
     const [editingPreferences, setEditingPreferences] = useState(false);
     const [custServices, setCustServices] = useState('');
     const [custNotes, setCustNotes] = useState('');
@@ -140,6 +147,13 @@ export default function newClientInfo_AdminView({ navigation }){
             setCustAddress(clientAddress);
             setCustNotes(clientData2[0].ClientNotes);
 
+            /* */
+            setStreet(clientData2[0].Street);
+            setCity(clientData2[0].City);
+            setStateAbbrev(clientData2[0].StateAbbreviation);
+            setZip(clientData2[0].Zip);
+            /* */
+            
             //the last query gets the services wanted. Since we know the client is in the current client view in this block of the code
             //they should have entered in their preferred services when being made a current client. 
             let response3 = await database.get('/queryServicesWantedWithID', {
