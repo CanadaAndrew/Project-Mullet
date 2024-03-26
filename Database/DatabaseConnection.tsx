@@ -859,7 +859,7 @@ app.post('/addAvailability', async (req, res) => {
     }
 });
 
-app.update('/updateCurrentClientViewContactInfo', async (req, res) => {
+app.patch('/updateCurrentClientViewContactInfo', async (req, res) => {
     try {
         const { userID, email, phoneNumber, street, city, state, zip } = req.body;
         if (!userID) {
@@ -873,7 +873,7 @@ app.update('/updateCurrentClientViewContactInfo', async (req, res) => {
     }
 });
 
-app.update('/updateCurrentClientViewNotes', async (req, res) => {
+app.patch('/updateCurrentClientViewNotes', async (req, res) => {
     try {
         const { userID, clientNotes } = req.body;
         if (!userID) {
@@ -887,7 +887,7 @@ app.update('/updateCurrentClientViewNotes', async (req, res) => {
     }
 });
 
-app.update('/updateServicesWanted', async (req, res) => {
+app.patch('/updateServicesWanted', async (req, res) => {
     try {
         const { userID, serviceName } = req.body;
         if (!userID) {
