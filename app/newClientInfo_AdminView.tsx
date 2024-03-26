@@ -27,13 +27,6 @@ export default function newClientInfo_AdminView({ navigation }){
     const [custEmail, setCustEmail] = useState('');
     const [custAddress, setCustAddress] = useState('');
 
-    /**/
-    const [street, setStreet] = useState('');
-    const [city, setCity] = useState('');
-    const [stateAbbrev, setStateAbbrev] = useState('');
-    const [zip, setZip] = useState('');
-    /**/
-
     const [editingPreferences, setEditingPreferences] = useState(false);
     const [custServices, setCustServices] = useState('');
     const [custNotes, setCustNotes] = useState('');
@@ -53,26 +46,38 @@ export default function newClientInfo_AdminView({ navigation }){
     
     //updates database with contact info changes
     const saveContactInfoChanges = () => {
-        //***either decatenate address string for street, city, state, zip or get from fields if added***
-         //update client's contact info in database
+        
+         //update client's address info in database
         try {
-            //if address is decatenated
-            /*const addressTokens = custAddress.split(',');
-            const custStreet = addressTokens[0];
-            const custCity = addressTokens[1];
-            const custState = addressTokens[2];
-            const custZip = addressTokens[3];*/
-            database.patch('/updateCurrentClientViewContactInfo', {
+            const addressTokens = custAddress.split(','); //tokenize address string
+            const custStreet = addressTokens[0].trim();
+            const custCity = addressTokens[1].trim();
+            const custStateAbbrev = addressTokens[2].trim();
+            const custZip = addressTokens[3].trim();
+
+            //database.patch('/updateCurrentClientViewContactInfo', {
+            database.patch('/updateCurrentClientsAddress', {
+                userID: userID,
+                street: custStreet,
+                city: custCity,
+                stateAbbreviation: custStateAbbrev,
+                zip: custZip
+            });
+            alert('Address updated successfully');
+        } catch (error) {
+            console.error('Problem updating address info', error);
+        };
+
+        //update client's email and phone number in database
+        try {
+            database.patch('/updateUsersEmailPhone', {
                 userID: userID,
                 email: custEmail,
-                phoneNumber: custNumber,
-                //street: custStreet,
-                //city: custCity,
-                //stateAbbreviation: custState,
-                //zipcode: custZip
+                phoneNumber: custNumber
             });
+            alert('Email and phone number updated successfully');
         } catch (error) {
-            console.error('Problem updating contact info', error);
+            console.error('Problem updating email', error);
         };
         setEditingContactInfo(false); //after saving, switch back to view mode
     };
@@ -80,12 +85,14 @@ export default function newClientInfo_AdminView({ navigation }){
     //updates database with preferences changes
     const savePreferencesChanges = () => {
 
-         //update client's notes in database
+        //update client's notes in database
         try {
-            database.patch('/updateCurrentClientViewNotes', {
+            //database.patch('/updateCurrentClientViewNotes', {
+            database.patch('/updateCurrentClientsNotes', {
                 userID: userID,
                 clientNotes: custNotes
             });
+            alert('Notes updated successfully');
         } catch (error) {
             console.error("Problem updating client's notes", error);
         };
@@ -96,6 +103,7 @@ export default function newClientInfo_AdminView({ navigation }){
                 userID: userID,
                 serviceName: custServices
                 });
+            alert('Services wanted updated successfully');
         } catch (error) {
             console.error('Problem updating services wanted', error);
         };
@@ -104,9 +112,9 @@ export default function newClientInfo_AdminView({ navigation }){
 
     const database = axios.create({
         //baseURL: 'http://10.0.0.192:3000', //Andrew pc local
-        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        baseURL: 'http://192.168.1.150:3000', //Chris pc local
         //baseURL: 'http://10.0.0.133:3000',
-        baseURL: 'http://10.0.0.14:3000', //Cameron pc local
+        //baseURL: 'http://10.0.0.14:3000', //Cameron pc local
     })
 
     //this function gets the client info based on the UserID that is passed in to this page
@@ -143,16 +151,9 @@ export default function newClientInfo_AdminView({ navigation }){
         if(clientData2 != null)
         {
             //formatting the address of the client and setting it along with the clients notes
-            let clientAddress = clientData2[0].Street + " " + clientData2[0].City + ", " + clientData2[0].StateAbbreviation + ", " + clientData2[0].Zip;
+            let clientAddress = clientData2[0].Street + ", " + clientData2[0].City + ", " + clientData2[0].StateAbbreviation + ", " + clientData2[0].Zip;
             setCustAddress(clientAddress);
             setCustNotes(clientData2[0].ClientNotes);
-
-            /* */
-            setStreet(clientData2[0].Street);
-            setCity(clientData2[0].City);
-            setStateAbbrev(clientData2[0].StateAbbreviation);
-            setZip(clientData2[0].Zip);
-            /* */
             
             //the last query gets the services wanted. Since we know the client is in the current client view in this block of the code
             //they should have entered in their preferred services when being made a current client. 
