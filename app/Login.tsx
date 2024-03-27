@@ -58,7 +58,7 @@ export default function Login({ route, navigation }) {
         //redeclare the variable and set the auth to the current user
         const user = auth.currentUser;
             if (user !== null) {
-                //console.log(email);
+                console.log(email);
                 await checkEmailExists(email);
                 console.log('Right Before Navigation');
                 navigation.navigate("HomeScreen", {userData});
@@ -97,7 +97,7 @@ export default function Login({ route, navigation }) {
             const funcObj:funcObj = {
                 entireFunction: () => database.get('/queryCurrentUserFromEmail',{
                     params: {
-                        email: 1
+                        email: email
                     }
                 }),
                 type: 'get'
@@ -105,6 +105,7 @@ export default function Login({ route, navigation }) {
             const response = await functionGetRetry(funcObj);
             //userData.userID = response.data.UserID;
             //setUser(response.data);
+            console.log('Look here dumbass');
             console.log('response', response.data); // For debugging
             userData.userID = response.data[0].UserID;
             userData.adminPriv = false;
