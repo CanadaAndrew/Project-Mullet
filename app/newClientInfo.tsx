@@ -16,7 +16,7 @@ import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-lis
 import { Link } from 'expo-router';
 import axios from 'axios';
 //import {initializeApp} from 'firebase/app';
-import { listOfStates } from './Enums/Enums';
+import { listOfStates, funcObj, functionGetRetry } from './Enums/Enums';
 import Constants from 'expo-constants';
 
 export default function newClientInfo() {
@@ -53,17 +53,21 @@ export default function newClientInfo() {
     //adds current client to database
     const handleCurrentClientPost = async () => {
         try {
-            const response = await database.post('/currentClientPost', { //userID, street, city, state, zip
-                userID: user_ID, //for demo -> need to replace with actual imported userID -> can use UserID 9-22 for testing but must increment after each use
-                //street: strt,
-                //city: cty,
-                //state: stat,
-                //zip: zp
-                street: StreetAddress,
-                city: City,
-                state: State,
-                zip: ZipCode
-            });
+            let funcObj:funcObj = {
+                entireFunction: () => database.post('/currentClientPost', { //userID, street, city, state, zip
+                    userID: user_ID, //for demo -> need to replace with actual imported userID -> can use UserID 9-22 for testing but must increment after each use
+                    //street: strt,
+                    //city: cty,
+                    //state: stat,
+                    //zip: zp
+                    street: StreetAddress,
+                    city: City,
+                    state: State,
+                    zip: ZipCode
+                }),
+                type: 'post'
+            };
+            const response = await functionGetRetry(funcObj);
             //console.log(response); //for testing purposes
             alert('Your information has been updated!');
             //should navigate to home page after successful submission -> need to implement
@@ -74,11 +78,15 @@ export default function newClientInfo() {
 
     function getApprovalStatus(userId){
         let data;
-        database.get('/customQuery', {
-            params: {
-                query: 'SELECT UserID, ApprovalStatus FROM NewClientView WHERE UserID = ' + userId + ';'
-            }
-        })
+        let funcObj:funcObj = {
+            entireFunction: () => database.get('/customQuery', {
+                params: {
+                    query: 'SELECT UserID, ApprovalStatus FROM NewClientView WHERE UserID = ' + userId + ';'
+                }
+            }),
+            type: 'get'
+        };
+            functionGetRetry(funcObj)
             .then((ret) => data = ret.data)
             .then(() => { isApproved(data) })
             .catch(() => { alert("error"); });

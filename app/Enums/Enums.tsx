@@ -1,5 +1,10 @@
 import moment from 'moment-timezone';
+import axios, { AxiosResponse } from 'axios';
 
+const database = axios.create({
+    baseURL: 'http://hair-done-wright530.azurewebsites.net', //Azure server
+    //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+});
 
 const monthsNum = {
     January: '01',
@@ -178,4 +183,30 @@ const listOfStates =
     "WI": "Wisconsin",
     "WY": "Wyoming"
 }
-export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST, UTCtoPSTString, listOfStates, SERVICES};
+interface funcObj{
+    entireFunction: () => Promise<AxiosResponse<any, any>>
+    type: String
+}
+async function functionGetRetry(jsonObj:funcObj){
+    const maxAttempts = 4;
+    let currentAttempts = 0;
+    let recentError;
+    while(currentAttempts < maxAttempts){
+        const wait = sec => new Promise(r => setTimeout(r, 1000*sec));
+        try{
+            let ret = await jsonObj.entireFunction();
+            if(jsonObj.type == "get" || jsonObj.type == "post"){
+                return ret;
+            }else{
+                return null;
+            }
+        }catch(error){
+            currentAttempts += 1;
+            recentError = error;
+            await wait(Math.pow(2, currentAttempts))
+        }
+    }
+    throw new Error(recentError);
+}
+
+export{monthsNum, monthsWritten, militaryHours, displayHours, UTCtoPST, UTCtoPSTString, listOfStates, SERVICES, functionGetRetry, funcObj};

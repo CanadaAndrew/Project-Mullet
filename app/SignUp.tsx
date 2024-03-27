@@ -18,6 +18,7 @@ import axios from 'axios';
 //firebase imports VVV
 import firebase from './Firebase.js'
 import { getAuth, createUserWithEmailAndPassword  } from "firebase/auth";
+import {funcObj, functionGetRetry} from './Enums/Enums'
 
 //made this available for all pages in the app
 export let hairStyleSelected: string[] = [];
@@ -165,10 +166,11 @@ export default function SignUp({ navigation, route }) { // added route for page 
     ];
 
     const database = axios.create({
+        baseURL: 'http://hair-done-wright530.azurewebsites.net', //Azure server
         //baseURL: 'http://10.0.0.192:3000'
         //baseURL: 'http://10.0.0.199:3000',
         //baseURL: 'http://10.0.0.14:3000', // Cameron's IP address for testing
-        baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        //baseURL: 'http://192.168.1.150:3000', //Chris pc local
     })
 
     //demo data for postNewUser function until Firebase authentication is set up
@@ -186,49 +188,66 @@ export default function SignUp({ navigation, route }) { // added route for page 
     const postNewUser = async () => {
         try {
             //post data for new user
-            const userResponse = await database.post('/newUserPost', {
-                /*email: e_mail, //uses demo data
-                phoneNumber: phone_number,
-                pass: pass_word,
-                adminPrive: admin_priv*/
-                email: email,
-                phoneNumber: phoneNumber,
-                pass: password,
-                adminPrive: 0
-            });
+            let funcObj:funcObj = {
+                entireFunction:() => database.post('/newUserPost', {
+                    /*email: e_mail, //uses demo data
+                    phoneNumber: phone_number,
+                    pass: pass_word,
+                    adminPrive: admin_priv*/
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    pass: password,
+                    adminPriv: 0
+                }),
+                type: 'post'
+            };
+            const userResponse = await functionGetRetry(funcObj);
                 
             //get the userID from response
             const userID = userResponse.data.userID;
             //console.log('userID', userID); //for testing
             //post to Clients -> must post to Clients before NewClients because of foreign key constraint
-            await database.post('/newClientPost', {
-                /*userID: userID, //uses demo data
-                firstName: first_name,
-                middleName: middle_name,
-                lastName: last_name,
-                preferredWayOfContact: preferred_way_of_contact*/
-                userID: userID,
-                firstName: firstName,
-                middleName: middleName, //form info?
-                lastName: lastName,
-                preferredWayOfContact:"filler", //form info?
-            });
             
+            funcObj = {
+                entireFunction: () => database.post('/newClientPost', {
+                    /*userID: userID, //uses demo data
+                    firstName: first_name,
+                    middleName: middle_name,
+                    lastName: last_name,
+                    preferredWayOfContact: preferred_way_of_contact*/
+                    userID: userID,
+                    firstName: firstName,
+                    middleName: middleName, //form info?
+                    lastName: lastName,
+                    preferredWayOfContact:"filler", //form info?
+                }),
+                type: 'post'
+            };
+            await functionGetRetry(funcObj);
+
+            funcObj = {
+                entireFunction: () => database.post('/new_newClientPost', {
+                    /*userID: userID, //uses demo data
+                    approvalStatus: approval_status*/
+                    userID: userID,
+                    approvalStatus: 1 //not sure what 1 represents - Chris
+                }),
+                type: 'post'
+            };
             //post to NewClients
-            await database.post('/new_newClientPost', {
-                /*userID: userID, //uses demo data
-                approvalStatus: approval_status*/
-                userID: userID,
-                approvalStatus: 1 //not sure what 1 represents - Chris
-            });
+            await functionGetRetry(funcObj);
 
             //post to ServicesWanted
             const servicePromises = hairStyleSelected.map(async (service)=> {
                 try {
-                    const serviceResponse = await database.post('/servicesWantedPost', {
-                        userID: userID,
-                        serviceName: service
-                    });
+                    let funcObj:funcObj = {
+                        entireFunction: () => database.post('/servicesWantedPost', {
+                            userID: userID,
+                            serviceName: service
+                        }),
+                        type: 'post'
+                    }
+                    const serviceResponse = await functionGetRetry(funcObj);
                 } catch (error) {
                     console.error('Error posting services wanted:', error.serviceResponse.data);
                 }

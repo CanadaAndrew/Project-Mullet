@@ -3,13 +3,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import axios from 'axios';
 import Constants from 'expo-constants';
-import { UTCtoPST, UTCtoPSTString } from './Enums/Enums';
+import { UTCtoPST, UTCtoPSTString, funcObj, functionGetRetry } from './Enums/Enums';
 export default function appointmentsClientView(){
 
     //server connection
     const database = axios.create({
         baseURL: 'http://hair-done-wright530.azurewebsites.net', //Azure server
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        //baseURL: 'http://10.0.0.192:3000'
     });
 
     const windowDimensions = Dimensions.get('window')
@@ -31,7 +32,8 @@ export default function appointmentsClientView(){
             setFirst(1);
             let date = UTCtoPST(new Date);
             let dateString = UTCtoPSTString(date); //NOTE THAT THE DATE IS CURRENTLY OFF, NEED TO FIX IN ANOTHER SPRINT //UTCtoPSTString should fix this -Tai
-            let name = await getName(1);
+            let name;
+            name = await getName(1);
             updateUpcomingAppointments(dateString.split("T")[0], 1, name); //Note that currently using ID 1 until the use of UserID transfer comes in
             updatePastAppointments(dateString.split("T")[0], 1, name);
         }
@@ -39,28 +41,44 @@ export default function appointmentsClientView(){
     //Updates the upcoming appointments given a date.
     function updateUpcomingAppointments(date, userID, name){
         let data;
-        database.get('/queryUpcomingAppointmentsByUserIDAndDate', {
-            params: {
-                date : UTCtoPST(date),
-                userID: userID //temp value, will be changed
-            }
-        })
+        let funcObj:funcObj ={
+            entireFunction: () => database.get('/queryUpcomingAppointmentsByUserIDAndDate', {
+                params: {
+                    date : date,
+                    userID: userID //temp value, will be changed
+                }
+            }),
+            type:'get'
+        };
+        funcObj.entireFunction()
         .then((ret) => data = ret.data)
         .then(() => {updateUpcomingAppointmentsDisplay(data, name)})
-        .catch(() => {alert("error");});
+        .catch(() => {functionGetRetry(funcObj)
+            .then((ret) => data = ret.data)
+            .then(() => {updateUpcomingAppointmentsDisplay(data, name)})
+            .catch((error) => alert(error))
+        });
     }
 
     function updatePastAppointments(date, userID, name){
         let data;
-        database.get('/queryPastAppointmentsByUserIDAndDate', {
-            params: {
-                date : UTCtoPST(date),
-                userID: userID //temp value, will be changed
-            }
-        })
+        let funcObj:funcObj = {
+            entireFunction: () => database.get('/queryPastAppointmentsByUserIDAndDate', {
+                params: {
+                    date : date,
+                    userID: userID //temp value, will be changed
+                }
+            }),
+            type:'get'
+        };
+        funcObj.entireFunction()
         .then((ret) => data = ret.data)
         .then(() => {updatePastAppointmentsDisplay(data, name)})
-        .catch(() => {alert("error");});
+        .catch(() => {functionGetRetry(funcObj)
+            .then((ret) => data = ret.data)
+            .then(() => {updatePastAppointmentsDisplay(data, name)})
+            .catch((error) => alert(error))
+        });
     }
 
     function updateUpcomingAppointmentsDisplay(data, name){
@@ -77,7 +95,7 @@ export default function appointmentsClientView(){
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
-                realDate: UTCtoPST(newDate)
+                realDate: newDate
             }
             appointmentList[i] = newAppointment;
             i += 1;
@@ -99,31 +117,42 @@ export default function appointmentsClientView(){
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
-                realDate: UTCtoPST(newDate)
-
-               
+                realDate: newDate
             }
             appointmentList[i] = newAppointment;
             i += 1;
-            
         }
         )
         setPastClientAppointments(appointmentList);
         //Test: alert("Past list: " + JSON.stringify(appointmentList));
     }
     async function getName(userID){
-        let name = await database.get('/findCurrentClientFullNameByID', {
-            params: {
-                queryId : userID 
+        let funcObj:funcObj = {
+            entireFunction: () => database.get('/findCurrentClientFullNameByID', {
+                params: {
+                    queryId : userID
+                }
+            }),
+            type: 'get'
+        };
+        let name
+        try{
+            name = await funcObj.entireFunction()
+        }catch{
+            try{
+                name = await functionGetRetry(funcObj)
+            }catch(error){
+                alert(error)
+                return 'NA'
             }
-        })
+        }
         if(name.data[0].MiddleName == null){
             return name.data[0].FirstName + " " + name.data[0].LastName;
         }else{
             return name.data[0].FirstName + " " + name.data[0].MiddleName + " " + name.data[0].LastName
         }
     }
-   
+
     return(
         <ScrollView>
             <View style = {styles.container}>

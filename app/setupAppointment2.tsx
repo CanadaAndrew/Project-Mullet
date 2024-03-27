@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { Link } from 'expo-router';
 import axios from 'axios';
-import { SERVICES, militaryHours, displayHours} from './Enums/Enums';
+import { SERVICES, militaryHours, displayHours, funcObj, functionGetRetry} from './Enums/Enums';
 import Constants from 'expo-constants';
 import { UTCtoPST } from './Enums/Enums';
 
@@ -107,12 +107,16 @@ export default function SetupAppointment2({route}) { // added route for page nav
 
             let appointmentData;
             //Queries the database for appointments with the beginning and end of the day selected and a vacant time
-            let response = await database.get('/queryAppointmentByDaySelectedAndVacancy', {
-                params: {
-                    beginDay: beginDay,
-                    endDay: endDay
-                }
-            });
+            const funcObj:funcObj = {
+                entireFunction: () => database.get('/queryAppointmentByDaySelectedAndVacancy', {
+                    params: {
+                        beginDay: beginDay,
+                        endDay: endDay
+                    }
+                }),
+                type: 'get'
+            };
+            let response = await functionGetRetry(funcObj);
             appointmentData = response.data;
             //appointmentData then gets the data from the responding query
             let apptData;
@@ -167,7 +171,7 @@ export default function SetupAppointment2({route}) { // added route for page nav
                     totalHours += 0;
                 }
             })
-            alert(totalHours);
+            //alert(totalHours);
             setHours(totalHours);
     }
     function formatServices(){
@@ -349,14 +353,18 @@ export default function SetupAppointment2({route}) { // added route for page nav
                                         if(newTime < 10){
                                             newTime = '0' + newTime;
                                         }
-                                        database.put('/confirmAppointment', null, {
-                                            params:{
-                                                date:selectedDate,
-                                                time:(newTime + ':00:00'),
-                                                userID: userData.userID,
-                                                type: services.split('\'').join('')
-                                            }
-                                        }).then(()=>{alert('success')}).catch(() => alert('error'));
+                                        const funcObj:funcObj = {
+                                            entireFunction: () => database.put('/confirmAppointment', null, {
+                                                params:{
+                                                    date:selectedDate,
+                                                    time:(newTime + ':00:00'),
+                                                    userID: userData.userID,
+                                                    type: services.split('\'').join('')
+                                                }
+                                            }),
+                                            type: 'put'
+                                        };
+                                        functionGetRetry(funcObj).then(()=>{alert('success')}).catch(() => alert('error'));
                                     }
                                     }
                                 }

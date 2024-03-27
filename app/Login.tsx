@@ -6,6 +6,7 @@ import React, {useState} from 'react';
 import firebase from './Firebase.js'  // import firebase
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
+import {funcObj, functionGetRetry} from './Enums/Enums'
   
 export default function Login({ route, navigation }) {
 
@@ -22,7 +23,8 @@ export default function Login({ route, navigation }) {
     const [loginError, loginErrorMsg] = useState('');
 
     const database = axios.create({
-        baseURL: 'http://10.0.0.192:3000'
+        baseURL: 'http://hair-done-wright530.azurewebsites.net', //Azure server
+        //baseURL: 'http://10.0.0.192:3000'
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
         //baseURL: 'http://10.0.0.133:3000',
     });
@@ -91,12 +93,15 @@ export default function Login({ route, navigation }) {
     async function checkEmailExists(email) {
         
         try {
-
-            const response = await database.get('/queryCurrentUserFromEmail', {
-                params: {
-                    email: email
-                }
-            });
+            const funcObj:funcObj = {
+                entireFunction: () => database.get('/queryCurrentUserFromEmail',{
+                    params: {
+                        email: 1
+                    }
+                }),
+                type: 'get'
+            };
+            const response = await functionGetRetry(funcObj);
             //userData.userID = response.data.UserID;
             //setUser(response.data);
             console.log('response', response.data); // For debugging

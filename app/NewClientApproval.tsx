@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, {useEffect} from 'react';
 import axios from 'axios';
 import Constants from 'expo-constants';
+import {funcObj, functionGetRetry} from './Enums/Enums'
 
 export default function NewClientApproval() {
 
@@ -59,14 +60,18 @@ export default function NewClientApproval() {
 
     function updateClient() {
         let data;
-        database.get('/customQuery', {
-            params: {
-                query: 'SELECT ServicesWanted.ServiceName, NewClientView.FirstName, NewClientView.MiddleName, NewClientView.LastName, NewClientView.Email, NewClientView.PhoneNumber, NewClientView.ApprovalStatus, NewClientView.UserID FROM ServicesWanted INNER JOIN NewClientView ON ServicesWanted.UserID = NewClientView.UserID WHERE ApprovalStatus = 1;'
-            }
-        })
-            .then((ret) => data = ret.data)
-            .then(() => { updateClientDisplay(data) })
-            .catch(() => { alert("error"); });
+        let funcObj:funcObj = {
+            entireFunction: () => database.get('/customQuery', {
+                params: {
+                    query: 'SELECT ServicesWanted.ServiceName, NewClientView.FirstName, NewClientView.MiddleName, NewClientView.LastName, NewClientView.Email, NewClientView.PhoneNumber, NewClientView.ApprovalStatus, NewClientView.UserID FROM ServicesWanted INNER JOIN NewClientView ON ServicesWanted.UserID = NewClientView.UserID WHERE ApprovalStatus = 1;'
+                }
+            }),
+            type: 'get'
+        };
+        functionGetRetry(funcObj)
+        .then((ret) => data = ret.data)
+        .then(() => { updateClientDisplay(data) })
+        .catch(() => { alert("error"); });
     }
 
     function updateClientDisplay(data) {
@@ -106,11 +111,15 @@ export default function NewClientApproval() {
     }
     
     const handleAcceptClient = async (client) => {
-        database.put('/updateClientApproval', null, {
-            params: {
-                userID: client.ID
-            }
-        });
+        let funcObj:funcObj = {
+            entireFunction: () => database.put('/updateClientApproval', null, {
+                params: {
+                    userID: client.ID
+                }
+            }),
+            type: 'put'
+        };
+        functionGetRetry(funcObj)
         alert(`${client.name} has been accepted`);
         const updatedClients = newClient.filter((person) => person.name !== client.name);
         setNewClient(updatedClients);

@@ -9,7 +9,7 @@ import MyCalendar from './MyCalendar';
 import axios from 'axios';  //Used to get data from the backend nodejs
 import { ScrollView } from 'react-native-gesture-handler';
 import Constants from 'expo-constants';
-import { UTCtoPST, UTCtoPSTString } from './Enums/Enums';
+import { UTCtoPST, UTCtoPSTString, functionGetRetry, funcObj } from './Enums/Enums';
 
 
 export default function ClientAp({ route }){ 
@@ -20,6 +20,7 @@ export default function ClientAp({ route }){
     const database = axios.create({
         baseURL: 'http://hair-done-wright530.azurewebsites.net', //Azure server
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        //baseURL: 'http://10.0.0.192:3000'
     });
 
     interface Appointment {
@@ -109,16 +110,25 @@ export default function ClientAp({ route }){
         }
     }
     //Updates the upcoming appointments given a date.
-    function updateAppointments(date){
+    async function updateAppointments(date){
         let data;
-        database.get('/queryUpcomingAppointments', {
-            params: {
-                queryDate : UTCtoPST(date)
-            }
-        })
+        let FuncObj:funcObj ={
+            entireFunction: async () => await database.get('/queryUpcomingAppointments', {
+                params: {
+                    queryDate : date
+                }
+            }),
+            type: "get"
+        };
+        FuncObj.entireFunction()
         .then((ret) => data = ret.data)
         .then(() => {updateAppointmentsDisplay(data)})
-        .catch(() => {alert("error");});
+        .catch(() => {functionGetRetry(FuncObj)
+            .then((ret) => data = ret.data)
+            .then(() => {updateAppointmentsDisplay(data)})
+            .catch((error) => alert(error))}
+            )
+
     }
 
     async function updateAppointmentsDisplay(data){
@@ -141,7 +151,7 @@ export default function ClientAp({ route }){
                 service: appointment.TypeOfAppointment,
                 date: newDate + ", " + newTime,
                 stylist: 'Melissa Wright',
-                realDate: UTCtoPST(newDate)
+                realDate: newDate
             }
             appointmentList[i] = newAppointment;
             i++;
@@ -152,13 +162,26 @@ export default function ClientAp({ route }){
         handleSelection(selected, appointmentList);
     }
 
-    //Work on another sprint. Query for name instead of having userID as name.
     async function getName(userID){
-        let name = await database.get('/findCurrentClientFullNameByID', {
-            params: {
-                queryId : userID 
+        let funcObj:funcObj = {
+            entireFunction: () => database.get('/findCurrentClientFullNameByID', {
+                params: {
+                    queryId : userID
+                }
+            }),
+            type: 'get'
+        };
+        let name
+        try{
+            name = await funcObj.entireFunction()
+        }catch{
+            try{
+                name = await functionGetRetry(funcObj)
+            }catch(error){
+                alert(error)
+                return 'NA'
             }
-        })
+        }
         if(name.data[0].MiddleName == null){
             return name.data[0].FirstName + " " + name.data[0].LastName;
         }else{

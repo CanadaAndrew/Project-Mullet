@@ -89,6 +89,7 @@ async function connectAndQuery() {
         return ret;
     } catch (err) {
         console.error(err.message);
+        throw err;
     }
 }
 
@@ -103,6 +104,7 @@ async function connect(){
         return poolConnection;
     }catch(err){
         console.error(err.message);
+        throw err;
     }
 }
 
@@ -145,6 +147,7 @@ async function queryUsers(){
     } catch (err) {
         //If any error occurs, it'll throw it over here and print it in console
         console.error(err.message);
+        throw err;
     }
 }
 
@@ -158,6 +161,7 @@ async function queryClients(){
         return sortingResults(resultSet);
     } catch (err) {
         console.error(err.message);
+        throw err;
     }
 }
 
@@ -171,6 +175,7 @@ async function queryAdmins(){
         return sortingResults(resultSet);
     } catch (err) {
         console.error(err.message);
+        throw err;
     }
 }
 
@@ -184,6 +189,7 @@ async function queryCurrentClients(){
         return sortingResults(resultSet);
     } catch (err) {
         console.error(err.message);
+        throw err;
     }
 }
 
@@ -198,6 +204,7 @@ async function queryNewClients(){
         return sortingResults(resultSet);
     } catch (err) {
         console.error(err.message);
+        throw err;
     }
 }
 
@@ -211,6 +218,7 @@ async function queryServicesWanted(){
         return sortingResults(resultSet);
     } catch (err) {
         console.error(err.message);
+        throw err;
     }
 }
 
@@ -224,6 +232,7 @@ async function queryAppointments(){
         return sortingResults(resultSet);
     } catch (err) {
         console.error(err.message);
+        throw err;
     }
 }
 
@@ -236,6 +245,7 @@ async function customQuery(queryString){
         return sortingResults(resultSet);
     } catch (err) {
         console.error(err.message);
+        throw err;
     }
 }
 
@@ -250,6 +260,7 @@ async function updateAppointment(date, time, userID, type){
         poolConnection.close();
     } catch (err) {
         console.error(err.message);
+        throw err;
     }
     
 }
@@ -340,7 +351,7 @@ async function addAvailability(addDateTimeString, vacancyStatus) {
     try {
         const poolConnection = await connect();
         poolConnection.setMaxListeners(24);
-        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${notBooked});`;
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${vacancyStatus});`;
         await poolConnection.request()
             .query(query);
         poolConnection.close();
@@ -416,7 +427,7 @@ async function clientHistoryAppointmentsQuery(startDate, endDate){
         const poolConnection = await connect();
         const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
             FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
-            WHERE AppointmentDate BETWEEN \'' + startDate + '\' AND \'' + endDate + '\'`;
+            WHERE AppointmentDate BETWEEN '${startDate}' AND '${endDate}'`;
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -451,7 +462,7 @@ async function allPastAppointmentsQuery(todaysDate){
         const poolConnection = await connect();
         const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
             FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
-            WHERE AppointmentDate < \'' + todaysDate + '\'`;
+            WHERE AppointmentDate < '${todaysDate}'`;
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -469,7 +480,7 @@ async function allUpcomingAppointmentsQuery(todaysDate){
         const poolConnection = await connect();
         const query = `SELECT FirstName, LastName, AppointmentDate, TypeOfAppointment 
             FROM Appointments JOIN Clients ON Appointments.UserID = Clients.UserID 
-            WHERE AppointmentDate >= \'' + todaysDate + '\'`;
+            WHERE AppointmentDate >= '${todaysDate}'`;
         const resultSet = await poolConnection
             .request()
             .query(query);
@@ -494,30 +505,6 @@ async function customDelete(queryString) {
       throw err;
     }
   }
-  
-async function errorHandle(currentFunction, arguement, res){
-    let i = 0;
-    let ret;
-    console.log("Retrying error, beginning first retry.");
-    while(i < 3){
-        console.log("i = " + i);
-        try{
-            console.log("About to retry");
-            ret = await currentFunction(arguement);
-            console.log("Worked, heading back.");
-            break;
-        }catch{
-            console.log("Another error");
-            i++;
-            if(i >= 3){
-                console.log("Reached max retries, sending error.")
-                res.send("Error");
-            }
-            continue;
-        }
-    }
-    res.send(ret);
-}
 
 async function checkEmailExists(email) {
 
@@ -567,7 +554,7 @@ async function getUserIDByEmail(email) {
     }
 
 }
-        
+
 async function QueryAppointmentByDaySelectedAndVacancy(beginDay, endDay)
 {
     try
@@ -622,7 +609,10 @@ app.get('/customQuery', (req, res) => {
     console.log(query);
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
+    .catch(() => err => {
+        console.error('Error querying user:', err.message);
+        res.status(500).json({ error: 'Internal server error' });
+    })
 })
 
 app.get('/getUserIDByEmail', (req, res) => {
@@ -648,11 +638,11 @@ app.get('/getUserIDByEmail', (req, res) => {
 app.get('/queryUpcomingAppointments', (req, res) => {
     const date = req.query.queryDate;
     console.log(date);
-    let queryString = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + date + " 00:00:00' AND VacancyStatus = 1";
+    let queryString = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + date + "' AND VacancyStatus = 1";
     console.log(queryString);
     customQuery(queryString)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, queryString, res))
+    .catch(() => res.status(500).json({ error: 'Internal server error' }));
 })
 
 
@@ -935,16 +925,21 @@ app.put('/confirmAppointment', (req, res) => {
     */
     updateAppointment(date, time, userID, type)
     .then(res.send("ok"))
-    .catch((err) => console.log(err));
+    .catch(err => {
+        console.error('Error updating appointments:', err.message);
+        res.status(500).send('Internal Server Error');
+    });
 })
 
 app.get('/findEmailByPhoneNumber', (req, res) =>{
     const queryPhoneNumber = req.query.PhoneNumber;
     const query = "SELECT Email FROM Users WHERE PhoneNumber = '" + queryPhoneNumber + "';";
-    console.log(query);
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => res.send("error"));
+    .catch(err => {
+        console.error('Error finding email:', err.message);
+        res.status(500).send('Internal Server Error');
+    });
 })
 
 app.get('/findUserByID', (req, res) =>{
@@ -952,7 +947,10 @@ app.get('/findUserByID', (req, res) =>{
     const query = "SELECT * FROM Users WHERE UserID = " + queryId + ";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
+    .catch(err => {
+        console.error('Error querying user:', err.message);
+        res.status(500).send('Internal Server Error');
+    })
 })
 
 app.get('/findUserId', (req, res) =>{
@@ -960,7 +958,10 @@ app.get('/findUserId', (req, res) =>{
     const query = "SELECT UserID FROM Users WHERE Email = '" + emailOrPhoneNum + "' OR PhoneNumber = '" + emailOrPhoneNum + "';";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
+    .catch(err => {
+        console.error('Error querying user:', err.message);
+        res.status(500).send('Internal Server Error');
+    })
 })
 
 app.get('/findCurrentClientByID', (req, res) =>{
@@ -968,7 +969,10 @@ app.get('/findCurrentClientByID', (req, res) =>{
     const query = "SELECT * FROM CurrentClientView WHERE UserID = " + queryId + ";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
+    .catch(err => {
+        console.error('Error querying current client:', err.message);
+        res.status(500).send('Internal Server Error');
+    })
 })
 
 app.get('/findCurrentClientFullNameByID', (req, res) =>{
@@ -977,7 +981,10 @@ app.get('/findCurrentClientFullNameByID', (req, res) =>{
     console.log(query);
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
+    .catch(err => {
+        console.error('Error querying current client:', err.message);
+        res.status(500).send('Internal Server Error');
+    })
 })
 
 app.get('/findNewClientViewByID', (req, res) =>{
@@ -985,41 +992,45 @@ app.get('/findNewClientViewByID', (req, res) =>{
     const query = "SELECT * FROM NewClientView WHERE UserID = " + queryId + ";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
-})
-
-app.get('/findPasswordByID', (req, res) =>{
-    const queryId = req.query.Id;
-    const query = "SELECT Pass FROM Users WHERE UserID = " + queryId + ";";
-    customQuery(query)
-    .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
+    .catch(err => {
+        console.error('Error querying new client:', err.message);
+        res.status(500).send('Internal Server Error');
+    })
 })
 
 app.get('/findAvailableTimesGivenDate', (req, res) => {
     const date = req.query.date;
-    const query =  "SELECT * FROM Appointments WHERE AppointmentDate >= '" + date + " 00:00:00' AND AppointmentDate <= '" + date + " 23:59:59' AND VacancyStatus = 0;";
+    const query =  "SELECT * FROM Appointments WHERE AppointmentDate >= '" + date + "' AND AppointmentDate <= '" + date + " 23:59:59' AND VacancyStatus = 0;";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
+    .catch(err => {
+        console.error('Error querying available times:', err.message);
+        res.status(500).send('Internal Server Error');
+    })
 })
 
 app.get('/queryUpcomingAppointmentsByUserIDAndDate', (req, res) =>{
     const date = req.query.date;
     const userID = req.query.userID;
-    const query = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + date + " 00:00:00' AND UserID = " + userID +";";
+    const query = "SELECT * FROM Appointments WHERE AppointmentDate >= '" + date + "' AND UserID = " + userID +";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
+    .catch(err => {
+        console.error('Error querying appointments by user:', err.message);
+        res.status(500).send('Internal Server Error');
+    })
 })
 
 app.get('/queryPastAppointmentsByUserIDAndDate', (req, res) =>{
     const date = req.query.date;
     const userID = req.query.userID;
-    const query = "SELECT * FROM Appointments WHERE AppointmentDate <= '" + date + " 00:00:00' AND UserID = " + userID +";";
+    const query = "SELECT * FROM Appointments WHERE AppointmentDate <= '" + date + "' AND UserID = " + userID +";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
+    .catch(err => {
+        console.error('Error querying past appointments by user:', err.message);
+        res.status(500).send('Internal Server Error');
+    })
 })
 
 app.get('/queryAllAppointmentsByUserID', (req, res) =>{
@@ -1027,7 +1038,10 @@ app.get('/queryAllAppointmentsByUserID', (req, res) =>{
     const query = "SELECT * FROM Appointments WHERE UserID = " + userID +";";
     customQuery(query)
     .then((ret) => res.send(ret))
-    .catch(() => errorHandle(customQuery, query, res))
+    .catch(err => {
+        console.error('Error querying all appointments:', err.message);
+        res.status(500).send('Internal Server Error');
+    })
 })
 
 

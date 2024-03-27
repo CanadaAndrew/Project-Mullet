@@ -8,7 +8,7 @@ import moment from 'moment-timezone';
 import { TextInput } from 'react-native-gesture-handler';
 import { text } from 'express';
 import Constants from 'expo-constants';
-import { UTCtoPST, UTCtoPSTString } from './Enums/Enums';
+import { UTCtoPST, UTCtoPSTString, funcObj, functionGetRetry } from './Enums/Enums';
 
 export default function ClientHistory() {
 
@@ -16,6 +16,7 @@ export default function ClientHistory() {
     const database = axios.create({
         baseURL: 'http://hair-done-wright530.azurewebsites.net', //Azure server
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
+        //baseURL: 'http://10.0.0.192:3000'
     });
 
 
@@ -78,7 +79,6 @@ export default function ClientHistory() {
     const pstDateString =  UTCtoPSTString(today);
     const todaysDate = pstDateString.slice(0, 10) + "T00:00:00.000Z";
     //console.log('todaysDate: ', todaysDate); //for debugging
-
     //for the drop down list below
     const [selected, setSelected] = React.useState("");
 
@@ -91,52 +91,80 @@ export default function ClientHistory() {
 
     //handleSelection is called whenever a change is made in the drop down menu. 
     //It passes it back to the flatlist down below
-    async function handleSelection(selected) {       
-        if (selected == 'All') { //all appointments   
-
+    async function handleSelection(selected) {
+        if (selected == 'All') { //all appointments
+            let funcObj:funcObj;
             //past appointments
             try {
-                const response = await database.get('/allPastAppointmentsQuery', {
-                    params: {
-                        todaysDate: todaysDate
-                    }             
-                });
+                    funcObj = {
+                    entireFunction: () => database.get('/allPastAppointmentsQuery', {
+                        params: {
+                            todaysDate: todaysDate
+                        }
+                    }),
+                    type: 'get'
+                };
+                const response = await funcObj.entireFunction()
                 setPastClientAppointments(response.data);
                 //console.log('response', response.data); //for debugging
             } catch (error) {
-                console.error('Error getting all past appointments: ', error);
+                try{
+                    const response = await functionGetRetry(funcObj)
+                    setPastClientAppointments(response.data)
+                }catch(err){
+                    console.error('Error getting all past appointments: ', err);
+                }
             }
 
             //upcoming appointments
             try {
-                const response = await database.get('/allUpcomingAppointmentsQuery', {
-                    params: {
-                        todaysDate: todaysDate
-                    }
-                });
+                funcObj = {
+                    entireFunction: () => database.get('/allUpcomingAppointmentsQuery', {
+                        params: {
+                            todaysDate: todaysDate
+                        }
+                    }),
+                    type: 'get'
+                };
+                const response = await funcObj.entireFunction()
                 setUpcomingClientAppointments(response.data);
             } catch (error) {
-                console.error('Error getting all upcoming appointments: ', error);
+                try{
+                    const response = await functionGetRetry(funcObj);
+                    setUpcomingClientAppointments(response.data)
+                }catch(err){
+                    console.error('Error getting all upcoming appointments: ', err);
+                }
             }
         } else if (selected == 'Today') { //today's appointments  
 
             const endOfDay = todaysDate.slice(0, 10) + "T23:59:59.999Z";   //sql DateTime2 format
             //console.log('startOfDay: ', todaysDate); //for debugging
             //console.log('endOfDay: ', endOfDay); //for debugging
-
+            let funcObj:funcObj;
             //past and appointments
             try {
-                const response = await database.get('/clientHistoryAppointmentsQuery', {
-                    params: {
-                        startDate: todaysDate,
-                        endDate: endOfDay
-                    }
-                });
-                //console.log(response.data); //for debugging   
-                setPastClientAppointments(response.data); 
-                setUpcomingClientAppointments(response.data);           
+                funcObj = {
+                    entireFunction: () => database.get('/clientHistoryAppointmentsQuery', {
+                        params: {
+                            startDate: todaysDate,
+                            endDate: endOfDay
+                        }
+                    }),
+                    type: 'get'
+                };
+                const response = await funcObj.entireFunction()
+                //console.log(response.data); //for debugging
+                setPastClientAppointments(response.data);
+                setUpcomingClientAppointments(response.data);
             } catch (error) {
-                console.error("Error getting today's appointment", error);
+                try{
+                    const response = await functionGetRetry(funcObj);
+                    setPastClientAppointments(response.data);
+                    setUpcomingClientAppointments(response.data);
+                }catch(err){
+                    console.error("Error getting today's appointment", error);
+                }
             }
         } else if (selected == 'This Week') { //this week's appointments
 
@@ -150,31 +178,49 @@ export default function ClientHistory() {
             //console.log('upcomingDay: ', upcomingDay); //for debugging
             const firstDayOfWeek = todaysDate.slice(0, 8) + pastDay + "T00:00:00.000Z"; //sql DateTime2 format
             const lastDayOfWeek = todaysDate.slice(0, 8) + upcomingDay + "T23:59:59.999Z"; //sql DateTime2 format
-            
+            let funcObj:funcObj;
             //past appointments
             try {
-             const response = await database.get('/clientHistoryAppointmentsQuery', {
-                params: {
-                        startDate: firstDayOfWeek,
-                        endDate: todaysDate
-                    }
-                });
+                funcObj = {
+                    entireFunction: () => database.get('/clientHistoryAppointmentsQuery', {
+                        params: {
+                                startDate: firstDayOfWeek,
+                                endDate: todaysDate
+                            }
+                        }),
+                        type: 'get'
+                };
+                const response = await funcObj.entireFunction();
                 setPastClientAppointments(response.data);
             } catch (error) {
-                console.error("Error getting this week's past appointments", error);
+                try{
+                    const response = await functionGetRetry(funcObj);
+                    setPastClientAppointments(response.data);
+                }catch(err){
+                    console.error("Error getting this week's past appointments", err);
+                }
             }
 
             //upcoming appointments
             try {
-                const response = await database.get('/clientHistoryAppointmentsQuery', {
-                    params: {
-                        startDate: todaysDate,
-                        endDate: lastDayOfWeek
-                    }
-                });
+                funcObj ={
+                    entireFunction: () =>database.get('/clientHistoryAppointmentsQuery', {
+                        params: {
+                            startDate: todaysDate,
+                            endDate: lastDayOfWeek
+                        }
+                    }),
+                    type: 'get'
+                };
+                const response = await funcObj.entireFunction();
                 setUpcomingClientAppointments(response.data);
             } catch (error) {
-                console.error("Error getting this week's upcoming appointments", error);
+                try{
+                    const response = await functionGetRetry(funcObj);
+                    setUpcomingClientAppointments(response.data);
+                }catch(err){
+                    console.error("Error getting this week's upcoming appointments", error);
+                }
             }
         } else if (selected == "This Month") { //this month's appointments
             
@@ -193,26 +239,40 @@ export default function ClientHistory() {
             //console.log('lastDayOfMonth: ', lastDayOfMonth); //for debugging
 
             //past appointments
+            let funcObj:funcObj;
             try {
-                const response = await database.get('/clientHistoryAppointmentsQuery', {
-                    params: {
-                        startDate: firstDayOfMonth,
-                        endDate: todaysDate
-                    }
-                });
+                funcObj = {
+                    entireFunction : () => database.get('/clientHistoryAppointmentsQuery', {
+                        params: {
+                            startDate: firstDayOfMonth,
+                            endDate: todaysDate
+                        }
+                    }),
+                    type: 'get'
+                };
+                const response = await funcObj.entireFunction();
                 setPastClientAppointments(response.data);
             } catch (error) {
-                console.error("Error getting this month's past appointments", error);
+                try{
+                    const response = await functionGetRetry(funcObj);
+                    setPastClientAppointments(response.data);
+                }catch(err){
+                    console.error("Error getting this month's past appointments", error);
+                }
             }
 
             //upcoming appointments
             try {
-                const response = await database.get('/clientHistoryAppointmentsQuery', {
-                    params: {
-                        startDate: todaysDate,
-                        endDate: lastDayOfMonth
-                    }
-                });
+                funcObj = {
+                    entireFunction: () => database.get('/clientHistoryAppointmentsQuery', {
+                        params: {
+                            startDate: todaysDate,
+                            endDate: lastDayOfMonth
+                        }
+                    }),
+                    type: 'get'
+                };
+                const response = await functionGetRetry(funcObj);
                 setUpcomingClientAppointments(response.data);
             } catch (error) {
                 console.error("Error getting this month's upcoming appointments", error);
