@@ -100,6 +100,7 @@ async function connectAndQuery() {
 async function connect(){
     try {
         var poolConnection = await sql.connect(config);
+        console.log("Connected to the database.");
         return poolConnection;
     }catch(err){
         console.error(err.message);
@@ -254,13 +255,12 @@ async function updateAppointment(date, time, userID, type){
     
 }
 
-//updates CurrentClientView with email, phone number, street, city, state, and zip
-async function currentClientViewContactInfoUpdate(userID, email, phoneNumber, street, city, state, zip) {
+//updates CurrentClients table with street, city, state, and zip
+async function currentClientsAddressUpdate(userID, street, city, stateAbbreviation, zip) {
     try {
         const poolConnection = await connect();
-        const query = `UPDATE CurrentClientView
-            SET Email = '${email}', PhoneNumber = '${phoneNumber}', Street = '${street}', 
-                City = '${city}', StateAbbreviation = '${state}', Zip = '${zip}'
+        const query = `UPDATE CurrentClients
+            SET Street = '${street}', City = '${city}', StateAbbreviation = '${stateAbbreviation}', Zip = '${zip}'
             WHERE UserID = ${userID};`;
         await poolConnection.request().query(query);
         poolConnection.close();
@@ -269,11 +269,39 @@ async function currentClientViewContactInfoUpdate(userID, email, phoneNumber, st
     }
 };
 
-//updates CurrentClientView with client notes
-async function currentClientViewNotesUpdate(userID, clientNotes) {
+//updates Users table with email and phone number
+async function usersEmailUpdate(userID, email) {
     try {
         const poolConnection = await connect();
-        const query = `UPDATE CurrentClientView
+        const query = `UPDATE Users
+            SET Email = '${email}'
+            WHERE UserID = ${userID};`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+    }
+};
+
+//updates Users table with phone number
+async function usersPhoneUpdate(userID, phoneNumber) {
+    try {
+        const poolConnection = await connect();
+        const query = `UPDATE Users
+            SET PhoneNumber = '${phoneNumber}'
+            WHERE UserID = ${userID};`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+    }
+};
+
+//updates CurrentClients table with client notes
+async function currentClientsNotesUpdate(userID, clientNotes) {
+    try {
+        const poolConnection = await connect();
+        const query = `UPDATE CurrentClients
             SET ClientNotes = '${clientNotes}'
             WHERE UserID = ${userID};`;
         await poolConnection.request().query(query);
@@ -283,13 +311,13 @@ async function currentClientViewNotesUpdate(userID, clientNotes) {
     }
 };
 
-//updates ServicesWanted with service name
-async function servicesWantedUpdate(userID, serviceName) {
+//updates ServicesWanted table with service name
+async function servicesWantedDelete(userID, serviceName) {
     try {
         const poolConnection = await connect();
-        const query = `UPDATE ServicesWanted
-            SET ServiceName = '${serviceName}'
-            WHERE UserID = ${userID};`;
+        const query = `DELETE FROM ServicesWanted 
+            WHERE UserID = ${userID} AND ServiceName = '${serviceName}';`;
+            console.log(query);
         await poolConnection.request().query(query);
         poolConnection.close();
     } catch (err) {
@@ -362,6 +390,7 @@ async function servicesWantedPost(userID, serviceName) {
         throw err; // rethrow error so it can be caught in calling code
     }
 }
+
 async function appointmentQuery(startDate, endDate, vacancyStatus){
     try {
         const poolConnection = await connect();
@@ -379,11 +408,12 @@ async function appointmentQuery(startDate, endDate, vacancyStatus){
 }
 
 //adds an admin availability date/time to the database
-async function addAvailability(addDateTimeString, notBooked) {
+async function addAvailability(addDateTimeString, vacancyStatus) {
     try {
         const poolConnection = await connect();
         poolConnection.setMaxListeners(24);
-        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) VALUES ('${addDateTimeString}', ${notBooked});`;
+        const query = `INSERT INTO Appointments (AppointmentDate, VacancyStatus) 
+            VALUES ('${addDateTimeString}', ${vacancyStatus});`;
         await poolConnection.request()
             .query(query);
         poolConnection.close();
@@ -859,13 +889,14 @@ app.post('/addAvailability', async (req, res) => {
     }
 });
 
-app.patch('/updateCurrentClientViewContactInfo', async (req, res) => {
+//app.patch('/updateCurrentClientViewContactInfo', async (req, res) => {
+app.patch('/updateCurrentClientsAddress', async (req, res) => {
     try {
-        const { userID, email, phoneNumber, street, city, state, zip } = req.body;
+        const { userID, street, city, stateAbbreviation, zip } = req.body;
         if (!userID) {
             throw new Error('Invalid request body. Missing "userID"');
         }
-        await currentClientViewContactInfoUpdate(userID, email, phoneNumber, street, city, state, zip);
+        await currentClientsAddressUpdate(userID, street, city, stateAbbreviation, zip);
         res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
@@ -873,13 +904,43 @@ app.patch('/updateCurrentClientViewContactInfo', async (req, res) => {
     }
 });
 
-app.patch('/updateCurrentClientViewNotes', async (req, res) => {
+app.patch('/updateUsersEmail', async (req, res) => {
+    try {
+        const { userID, email } = req.body;
+        if (!userID) {
+            throw new Error('Invalid request body. Missing "userID"');
+        }
+        await usersEmailUpdate(userID, email);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    };
+});
+
+app.patch('/updateUsersPhone', async (req, res) => {
+    try {
+        const { userID, phoneNumber } = req.body;
+        if (!userID) {
+            throw new Error('Invalid request body. Missing "userID"');
+        }
+        await usersPhoneUpdate(userID, phoneNumber);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    };
+})
+
+;
+
+app.patch('/updateCurrentClientsNotes', async (req, res) => {
     try {
         const { userID, clientNotes } = req.body;
         if (!userID) {
             throw new Error('Invalid request body. Missing "userID"');
         }
-        await currentClientViewNotesUpdate(userID, clientNotes);
+        await currentClientsNotesUpdate(userID, clientNotes);
         res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
@@ -887,13 +948,14 @@ app.patch('/updateCurrentClientViewNotes', async (req, res) => {
     }
 });
 
-app.patch('/updateServicesWanted', async (req, res) => {
+app.delete('/deleteServicesWanted', async (req, res) => {
     try {
         const { userID, serviceName } = req.body;
+        console.log('userID: ' + userID + ', serviceName: ' + serviceName);
         if (!userID) {
             throw new Error('Invalid request body. Missing "userID"');
         }
-        await servicesWantedUpdate(userID, serviceName);
+        await servicesWantedDelete(userID, serviceName);
         res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
