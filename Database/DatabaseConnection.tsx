@@ -262,7 +262,6 @@ async function currentClientsAddressUpdate(userID, street, city, stateAbbreviati
         const query = `UPDATE CurrentClients
             SET Street = '${street}', City = '${city}', StateAbbreviation = '${stateAbbreviation}', Zip = '${zip}'
             WHERE UserID = ${userID};`;
-        console.log('query', query);
         await poolConnection.request().query(query);
         poolConnection.close();
     } catch (err) {
@@ -271,11 +270,25 @@ async function currentClientsAddressUpdate(userID, street, city, stateAbbreviati
 };
 
 //updates Users table with email and phone number
-async function usersEmailPhoneUpdate(userID, email, phoneNumber) {
+async function usersEmailUpdate(userID, email) {
     try {
         const poolConnection = await connect();
         const query = `UPDATE Users
-            SET Email = '${email}', PhoneNumber = '${phoneNumber}'
+            SET Email = '${email}'
+            WHERE UserID = ${userID};`;
+        await poolConnection.request().query(query);
+        poolConnection.close();
+    } catch (err) {
+        console.error(err.message);
+    }
+};
+
+//updates Users table with phone number
+async function usersPhoneUpdate(userID, phoneNumber) {
+    try {
+        const poolConnection = await connect();
+        const query = `UPDATE Users
+            SET PhoneNumber = '${phoneNumber}'
             WHERE UserID = ${userID};`;
         await poolConnection.request().query(query);
         poolConnection.close();
@@ -299,12 +312,12 @@ async function currentClientsNotesUpdate(userID, clientNotes) {
 };
 
 //updates ServicesWanted table with service name
-async function servicesWantedUpdate(userID, serviceName) {
+async function servicesWantedDelete(userID, serviceName) {
     try {
         const poolConnection = await connect();
-        const query = `UPDATE ServicesWanted
-            SET ServiceName = '${serviceName}'
-            WHERE UserID = ${userID};`;
+        const query = `DELETE FROM ServicesWanted 
+            WHERE UserID = ${userID} AND ServiceName = '${serviceName}';`;
+            console.log(query);
         await poolConnection.request().query(query);
         poolConnection.close();
     } catch (err) {
@@ -377,6 +390,7 @@ async function servicesWantedPost(userID, serviceName) {
         throw err; // rethrow error so it can be caught in calling code
     }
 }
+
 async function appointmentQuery(startDate, endDate, vacancyStatus){
     try {
         const poolConnection = await connect();
@@ -890,19 +904,35 @@ app.patch('/updateCurrentClientsAddress', async (req, res) => {
     }
 });
 
-app.patch('/updateUsersEmailPhone', async (req, res) => {
+app.patch('/updateUsersEmail', async (req, res) => {
     try {
-        const { userID, email, phoneNumber } = req.body;
+        const { userID, email } = req.body;
         if (!userID) {
             throw new Error('Invalid request body. Missing "userID"');
         }
-        await usersEmailPhoneUpdate(userID, email, phoneNumber);
+        await usersEmailUpdate(userID, email);
         res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
-    }
+    };
 });
+
+app.patch('/updateUsersPhone', async (req, res) => {
+    try {
+        const { userID, phoneNumber } = req.body;
+        if (!userID) {
+            throw new Error('Invalid request body. Missing "userID"');
+        }
+        await usersPhoneUpdate(userID, phoneNumber);
+        res.status(204).send(); // 204 means success with no content
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    };
+})
+
+;
 
 app.patch('/updateCurrentClientsNotes', async (req, res) => {
     try {
@@ -918,13 +948,14 @@ app.patch('/updateCurrentClientsNotes', async (req, res) => {
     }
 });
 
-app.patch('/updateServicesWanted', async (req, res) => {
+app.delete('/deleteServicesWanted', async (req, res) => {
     try {
         const { userID, serviceName } = req.body;
+        console.log('userID: ' + userID + ', serviceName: ' + serviceName);
         if (!userID) {
             throw new Error('Invalid request body. Missing "userID"');
         }
-        await servicesWantedUpdate(userID, serviceName);
+        await servicesWantedDelete(userID, serviceName);
         res.status(204).send(); // 204 means success with no content
     } catch (error) {
         console.error(error);
