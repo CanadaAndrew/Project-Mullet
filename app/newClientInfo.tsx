@@ -19,7 +19,7 @@ import axios from 'axios';
 import { listOfStates, funcObj, functionGetRetry } from './Enums/Enums';
 import Constants from 'expo-constants';
 
-export default function newClientInfo() {
+export default function newClientInfo(route) {
 
     //server connection
     const database = axios.create({
@@ -27,8 +27,38 @@ export default function newClientInfo() {
         //baseURL: 'http://192.168.1.150:3000', //Chris pc local
     });
 
+   const { userData } = route.params;
+
+    async function getName(userID){
+        let funcObj:funcObj = {
+            entireFunction: () => database.get('/findCurrentClientFullNameByID', {
+                params: {
+                    queryId : userID
+                }
+            }),
+            type: 'get'
+        };
+        let name
+        try{
+            name = await funcObj.entireFunction()
+        }catch{
+            try{
+                name = await functionGetRetry(funcObj)
+            }catch(error){
+                alert(error)
+                return 'NA'
+            }
+        }
+    
+            return name.data[0].FirstName;
+      
+        
+    }
+
+    
+
     //temp name, need to import the client's name from somewhere else
-    const [firstName, newFirstName] = useState('Sam'); 
+    const [firstName, newFirstName] = useState(''); 
     const welcomeMessage = 'Congratulations ' + firstName + '! You\'ve been approved as a new client. Fill in some additional info to complete your sign up process.';
 
     const [StreetAddress, newStreetAddress] = useState(''); 
@@ -123,10 +153,19 @@ export default function newClientInfo() {
         //zip codes are 5 digits
         setZipValid(ZipCode.length == 5 ? true : false);
     }
+    async function setFirstName()
+    {
+        const updateName =  await getName(userData.userID)
+        if(firstName == '')
+        newFirstName(updateName);
+    }
+    
 
     return (
 
     <>
+    
+        {setFirstName()}
         <LinearGradient locations={[0.7, 1]} colors={['#DDA0DD', 'white']} style={styles.container}>  
             <Text >{'\n'}</Text>
             <View style = {[styles.appointBox, styles.boxShadowIOS, styles.boxShadowAndroid]}>

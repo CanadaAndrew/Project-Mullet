@@ -176,9 +176,18 @@ function filterButtons(){
       >
       <Text style = {styles.homeButtonText}>FAQ</Text>
     </TouchableOpacity>
+
+    var newClientInfoButton = <TouchableOpacity
+    style = {styles.homeButton}
+    onPress = {() => navigation.navigate("newClientInfo", {userData})}
+    >
+    <Text style = {styles.homeButtonText}>newClientInfo</Text>
+    </TouchableOpacity>
+
     buttons.push(servicesOfferedButton3);
     buttons.push(aboutMeButton3);
     buttons.push(FAQButton3);
+    buttons.push(newClientInfoButton);
     setButtonDisplay(buttons);
   }
 }
