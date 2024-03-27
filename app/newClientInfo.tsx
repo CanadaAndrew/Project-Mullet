@@ -18,6 +18,7 @@ import axios from 'axios';
 //import {initializeApp} from 'firebase/app';
 import { listOfStates, funcObj, functionGetRetry } from './Enums/Enums';
 import Constants from 'expo-constants';
+import { loginuserData } from './Login';
 
 export default function newClientInfo() {
 
@@ -44,7 +45,7 @@ export default function newClientInfo() {
     const formComplete = StreetAddressValid && CityValid && StateValid && ZipValid;
 
     //dummy data for testing purposes
-    const user_ID = 7; //will need to be replaced with actual userID once ok'd from admin (ApprovalStatus in NewClients) -> do we need to check approval status?
+    const user_ID = 7; //loginuserData.userID; //will need to be replaced with actual userID once ok'd from admin (ApprovalStatus in NewClients) -> do we need to check approval status?
     const strt = "1234 Main St";
     const cty = "Anytown";
     const stat = "TX";

@@ -7,7 +7,9 @@ import firebase from './Firebase.js'  // import firebase
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
 import {funcObj, functionGetRetry} from './Enums/Enums'
+import { response } from 'express';
   
+var loginuserData;
 export default function Login({ route, navigation }) {
 
     //test@fakemail.com
@@ -32,7 +34,8 @@ export default function Login({ route, navigation }) {
     const userData = {
         userID: undefined, // You can omit this line, it will default to undefined
         adminPriv: undefined, // You can omit this line, it will default to undefined
-        newClient: undefined // You can omit this line, it will default to undefined
+        newClient: undefined, // You can omit this line, it will default to undefined
+        firstName: undefined // to be sent to newClientInfo
     };
 
       
@@ -109,12 +112,16 @@ export default function Login({ route, navigation }) {
             userData.adminPriv = false;
             userData.newClient = false;
 
+            //userData.firstName = response.data[1].firstName; //I think firstName is in index 1
+
         } catch (error) {
             //console.error('Error finding User from email: ', error);
             userData.adminPriv = false;
             userData.newClient = true;
             console.log(userData);
         }
+
+        loginuserData = userData;
 
     }
 
@@ -136,7 +143,7 @@ export default function Login({ route, navigation }) {
                 {/*Login error loginError in brackets*/}
                 <Text style = {styles.errorTitle}>{loginError}</Text>
                 <Text style = {styles.objectTitle}>Login</Text>
-
+               
                 {/*user input for email or phone# partly functional*/}
                 <TextInput 
                   placeholder = ' Email or Phone ' 
@@ -192,7 +199,7 @@ export default function Login({ route, navigation }) {
 
     );
 }
-
+export{loginuserData}
 const styles = StyleSheet.create({
     container: {
         borderRadius: 90
