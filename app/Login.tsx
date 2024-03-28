@@ -77,18 +77,20 @@ export default function Login({ route, navigation }) {
     }
 
     //put user input into phone number format
-    const [rawNum, setNum] = useState('');
+    //const [rawNum, setNum] = useState('');
     const formattingPhoneNumber = (input) => {
         if (/^\d*$/.test(input)) {
             if (input.length <=10){
                 return input.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
             }
+        }else{
+            return input
         }
         //return input.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
     }
     const setPhoneNumFormat = (input) => { 
         const formatPhoNum = formattingPhoneNumber(input); 
-        setNum(formatPhoNum);
+        setEmail(formatPhoNum);
     }
 
     async function checkEmailExists(email) {
@@ -139,14 +141,14 @@ export default function Login({ route, navigation }) {
                 <Text style = {styles.errorTitle}>{loginError}</Text>
                 <Text style = {styles.objectTitle}>Login</Text>
 
-                {/*user input for email or phone# partly functional*/}
+                {/*user input for email or phone# partly functional //setEmail*/}
                 <TextInput 
                   placeholder = ' Email or Phone ' 
                   placeholderTextColor = {'gray'} 
                   keyboardType = 'default'
                   style = {styles.inputBox}
                   value = {email}
-                  onChangeText = {setEmail}
+                  onChangeText = {setPhoneNumFormat}
                 />
 
                 <View>

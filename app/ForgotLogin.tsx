@@ -69,7 +69,7 @@ export default function ForgotLogin({ navigation }){
     const formattingPhoneNumber = (input) => {
         if (/^\d*$/.test(input)){
             if (input.length <=10){
-                return input.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+                return input.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
             }
         }else{
             return input
